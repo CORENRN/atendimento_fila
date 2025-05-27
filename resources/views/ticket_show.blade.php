@@ -10,7 +10,11 @@
     <div class="bg-white p-8 rounded shadow-lg text-center">
         <h1 class="text-2xl font-bold mb-4">Sua Senha</h1>
         <p class="text-4xl font-bold mb-6">#{{ $ticket->id }}</p>
-        <p class="mb-4">Nome: <strong>{{ $ticket->name }}</strong></p>
+        <p class="mb-2">Tipo: 
+            <strong class="{{ $ticket->type === 'preferencial' ? 'text-red-600' : 'text-blue-600' }}">
+                {{ ucfirst($ticket->type) }}
+            </strong>
+        </p>
         <p class="mb-8">Aguarde ser chamado na triagem.</p>
 
         <a href="{{ route('home') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">

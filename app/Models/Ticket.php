@@ -11,8 +11,8 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'document',
+        'service',
+        'type',
         'stage',
         'status',
         'called_at',

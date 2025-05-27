@@ -13,19 +13,47 @@ class FrontendController extends Controller
         return view('home');
     }
 
-    public function queue($stage)
+public function queue($stage)
     {
         $status = $stage === 'triagem' ? 'triagem' : 'atendimento';
 
+        $attendantId = auth()->id() ?? 1; // ID do atendente logado (ou fallback)
+
+        // Busca os tickets na fila para o estágio atual (aguardando ou em andamento)
         $tickets = Ticket::where('stage', $stage)
             ->whereIn('status', ['aguardando', $status])
-            ->orderBy('called_at')
+            // Ordena colocando chamados sem chamado primeiro e depois pela data chamada
+            ->orderByRaw('called_at IS NULL, called_at ASC')
             ->orderBy('created_at')
             ->get();
 
-        return view('queue', compact('tickets', 'stage'));
-    }
+        // Enum services (de acordo com sua migration)
+        $services = [
+            'financeiro' => 'Financeiro',
+            'documentacao' => 'Documentação',
+            'informacoes' => 'Informações',
+            'cadastro' => 'Cadastro',
+            'suporte' => 'Suporte',
+        ];
 
+        // Busca se este atendente já chamou algum ticket que está ativo no stage
+        $calledTicket = Ticket::where('stage', $stage)
+            ->where('attendant_id', $attendantId)
+            ->whereIn('status', [$status])
+            ->whereNotNull('called_at')
+            ->whereNull('finished_at')
+            ->first();
+
+        $called_id = $calledTicket ? $calledTicket->id : null;
+
+        $statusCounts = Ticket::where('stage', $stage)
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts'));
+    }
 
     public function callNext($stage)
     {
@@ -98,16 +126,22 @@ class FrontendController extends Controller
         return redirect()->back();
     }
 
-    public function advance($id)
+    public function advance(Request $request, $id)
     {
+
         $ticket = Ticket::findOrFail($id);
+
+        $request->validate([
+            'service' => 'required|in:financeiro,documentacao,informacoes,cadastro,suporte',
+        ]);
 
         if ($ticket->stage === 'triagem') {
             $ticket->update([
                 'stage' => 'atendimento',
-                'status' => 'aguardando', // Muda para aguardando no atendimento
+                'status' => 'aguardando',
                 'finished_at' => null,
                 'attendant_id' => null,
+                'service' => $request->service,
             ]);
 
             event(new TicketUpdated($ticket));
@@ -117,16 +151,15 @@ class FrontendController extends Controller
     }
 
 
+
     public function takeTicket(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'document' => 'nullable|string',
+            'type' => 'required|in:regular,preferencial',
         ]);
 
         $ticket = Ticket::create([
-            'name' => $request->name,
-            'document' => $request->document,
+            'type' => $request->type,
             'stage' => 'triagem',
             'status' => 'aguardando',
         ]);

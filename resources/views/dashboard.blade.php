@@ -44,7 +44,6 @@
             <thead>
                 <tr class="bg-gray-200">
                     <th class="p-2 border">ID</th>
-                    <th class="p-2 border">Nome</th>
                     <th class="p-2 border">Início</th>
                     <th class="p-2 border">Fim</th>
                     <th class="p-2 border">Duração</th>
@@ -54,7 +53,6 @@
                 @forelse($tickets as $ticket)
                     <tr class="hover:bg-gray-100">
                         <td class="p-2 border text-center">{{ $ticket->id }}</td>
-                        <td class="p-2 border">{{ $ticket->name }}</td>
                         <td class="p-2 border text-center">
                             {{ $ticket->called_at ? \Carbon\Carbon::parse($ticket->called_at)->format('H:i:s') : '-' }}
                         </td>

@@ -13,8 +13,18 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('document')->nullable();
+
+            // Tipo de atendimento: regular ou preferencial
+            $table->enum('type', ['regular', 'preferencial'])->default('regular');
+
+            // Serviço solicitado
+            $table->enum('service', [
+                'financeiro',      // Questões financeiras, pagamentos, boletos
+                'documentacao',    // Entrega ou retirada de documentos
+                'informacoes',     // Suporte de informações gerais
+                'cadastro',        // Atualização ou criação de cadastros
+                'suporte'          // Suporte técnico ou específico
+            ])->nullable();
             $table->enum('stage', ['triagem', 'atendimento'])->default('triagem');
             $table->enum('status', ['aguardando', 'triagem', 'atendimento', 'finalizado', 'cancelado'])->default('aguardando');
             $table->timestamp('called_at')->nullable();

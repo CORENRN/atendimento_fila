@@ -10,22 +10,27 @@
     <div class="bg-white p-8 rounded shadow-lg">
         <h1 class="text-2xl font-bold mb-6 text-center">Retirar Senha</h1>
 
-        <form action="{{ route('ticket.take.post') }}" method="POST" class="space-y-4">
-            @csrf
-            <div>
-                <label class="block mb-1">Nome:</label>
-                <input type="text" name="name" class="w-full border rounded px-3 py-2" required>
-            </div>
+       <form action="{{ route('ticket.take.post') }}" method="POST" class="space-y-4">
+        @csrf
 
-            <div>
-                <label class="block mb-1">Documento (opcional):</label>
-                <input type="text" name="document" class="w-full border rounded px-3 py-2">
+        <div>
+            <label class="block mb-2">Selecione o tipo de senha:</label>
+            <div class="flex gap-4">
+                <input 
+                    type="submit" 
+                    name="type" 
+                    value="regular" 
+                    class="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer" 
+                />
+                <input 
+                    type="submit" 
+                    name="type" 
+                    value="preferencial" 
+                    class="flex-1 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer" 
+                />
             </div>
-
-            <button class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
-                Gerar Senha
-            </button>
-        </form>
+        </div>
+    </form>
     </div>
 
 </body>
