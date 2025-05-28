@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $attendantId = 1; // Ajuste conforme sua lógica
+        $attendantId = auth()->id();  //pega o id do usuário logado do breeze pra filtrar
         $today = Carbon::today();
 
         $tickets = Ticket::where('attendant_id', $attendantId)
@@ -21,14 +21,11 @@ class DashboardController extends Controller
 
         $totalAtendimentos = $tickets->count();
 
-        // Calcular tempo médio ignorando tickets inválidos
         $duracoes = $tickets->map(function ($ticket) {
             if ($ticket->called_at && $ticket->finished_at) {
                 $inicio = Carbon::parse($ticket->called_at);
                 $fim = Carbon::parse($ticket->finished_at);
-
-                // Diferença absoluta em segundos para evitar valores negativos
-                return abs($fim->diffInSeconds($inicio));
+                return $fim->diffInSeconds($inicio);
             }
             return null;
         })->filter();

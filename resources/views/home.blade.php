@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Sistema de Fila</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+@extends('layouts.app')
+@section('content')
 
     <div class="relative flex flex-col text-6xl font-black w-[50%] h-full items-center justify-center">
         <img src="{{ asset('images/atendimento.jpg') }}" 
@@ -31,7 +25,5 @@
                 <a href="{{ route('dashboard') }}" class="block bg-purple-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-purple-600">Dashboard</a>
             </div>
     </div>
+@endsection
 
-
-</body>
-</html>

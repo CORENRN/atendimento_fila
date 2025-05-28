@@ -45,4 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function guiches()
+    {
+        return $this->belongsToMany(Guiche::class, 'user_guiche', 'user_id', 'guiche_id')->withTimestamps();
+    }
 }

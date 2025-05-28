@@ -13,21 +13,18 @@ class FrontendController extends Controller
         return view('home');
     }
 
-public function queue($stage)
+    public function queue($stage)
     {
         $status = $stage === 'triagem' ? 'triagem' : 'atendimento';
 
-        $attendantId = auth()->id() ?? 1; // ID do atendente logado (ou fallback)
+        $attendantId = auth()->id();
 
-        // Busca os tickets na fila para o estágio atual (aguardando ou em andamento)
         $tickets = Ticket::where('stage', $stage)
             ->whereIn('status', ['aguardando', $status])
-            // Ordena colocando chamados sem chamado primeiro e depois pela data chamada
             ->orderByRaw('called_at IS NULL, called_at ASC')
             ->orderBy('created_at')
             ->get();
 
-        // Enum services (de acordo com sua migration)
         $services = [
             'financeiro' => 'Financeiro',
             'documentacao' => 'Documentação',
@@ -36,7 +33,7 @@ public function queue($stage)
             'suporte' => 'Suporte',
         ];
 
-        // Busca se este atendente já chamou algum ticket que está ativo no stage
+        // Ticket que o atendente logado está atendendo (se existir)
         $calledTicket = Ticket::where('stage', $stage)
             ->where('attendant_id', $attendantId)
             ->whereIn('status', [$status])
@@ -44,7 +41,7 @@ public function queue($stage)
             ->whereNull('finished_at')
             ->first();
 
-        $called_id = $calledTicket ? $calledTicket->id : null;
+        $called_id = $calledTicket?->id;
 
         $statusCounts = Ticket::where('stage', $stage)
             ->selectRaw('status, COUNT(*) as count')
@@ -57,9 +54,8 @@ public function queue($stage)
 
     public function callNext($stage)
     {
-        $attendantId = auth()->id() ?? 1; // Usa o atendente logado ou 1 como fallback
+        $attendantId = auth()->id();
 
-        // Verifica se o atendente já está com algum ticket chamado e não finalizado nesse stage
         $existingCall = Ticket::where('stage', $stage)
             ->where('attendant_id', $attendantId)
             ->whereIn('status', ['triagem', 'atendimento'])
@@ -68,10 +64,9 @@ public function queue($stage)
             ->first();
 
         if ($existingCall) {
-            return redirect()->back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
         }
 
-        // Pega o próximo ticket aguardando no stage
         $ticket = Ticket::where('stage', $stage)
             ->where('status', 'aguardando')
             ->orderBy('created_at')
@@ -81,26 +76,27 @@ public function queue($stage)
             $data = [
                 'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
                 'attendant_id' => $attendantId,
+                'called_at' => $ticket->called_at ?? now(),
             ];
-
-            // Só seta o called_at se ainda não tiver sido chamado antes
-            if (is_null($ticket->called_at)) {
-                $data['called_at'] = now();
-            }
 
             $ticket->update($data);
 
-            return redirect()->back()->with('success', 'Ticket chamado com sucesso.');
+            event(new TicketUpdated($ticket));
+
+            return back()->with('success', 'Ticket chamado com sucesso.');
         }
 
-        return redirect()->back()->with('info', 'Não há tickets aguardando na fila.');
+        return back()->with('info', 'Não há tickets aguardando na fila.');
     }
-
-
 
     public function finish(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
+
+        // ✅ Verifica se é o atendente correto
+        if ($ticket->attendant_id !== auth()->id()) {
+            return back()->with('error', 'Você não pode finalizar um ticket que não está atendendo.');
+        }
 
         $ticket->update([
             'status' => 'finalizado',
@@ -109,12 +105,16 @@ public function queue($stage)
 
         event(new TicketUpdated($ticket));
 
-        return redirect()->back();
+        return back()->with('success', 'Ticket finalizado.');
     }
 
-    public function cancel (Request $request, $id)
+    public function cancel(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
+
+        if ($ticket->attendant_id !== auth()->id()) {
+            return back()->with('error', 'Você não pode cancelar um ticket que não está atendendo.');
+        }
 
         $ticket->update([
             'status' => 'cancelado',
@@ -123,13 +123,17 @@ public function queue($stage)
 
         event(new TicketUpdated($ticket));
 
-        return redirect()->back();
+        return back()->with('success', 'Ticket cancelado.');
     }
 
     public function advance(Request $request, $id)
     {
-
         $ticket = Ticket::findOrFail($id);
+
+        // ✅ Verifica se o atendente é quem está atendendo
+        if ($ticket->attendant_id !== auth()->id()) {
+            return back()->with('error', 'Você não pode avançar um ticket que não está atendendo.');
+        }
 
         $request->validate([
             'service' => 'required|in:financeiro,documentacao,informacoes,cadastro,suporte',
@@ -145,12 +149,12 @@ public function queue($stage)
             ]);
 
             event(new TicketUpdated($ticket));
+
+            return back()->with('success', 'Ticket avançado para atendimento.');
         }
 
-        return redirect()->back();
+        return back()->with('error', 'Este ticket não está na triagem.');
     }
-
-
 
     public function takeTicket(Request $request)
     {

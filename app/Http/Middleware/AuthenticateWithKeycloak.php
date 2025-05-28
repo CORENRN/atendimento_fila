@@ -31,7 +31,7 @@ class AuthenticateWithKeycloak
 
                 $json = file_get_contents($jwksUrl, false, stream_context_create([
                     'ssl' => [
-                        'verify_peer' => false,           // ⚠️ Desabilitar apenas em ambiente dev/local
+                        'verify_peer' => false,         
                         'verify_peer_name' => false,
                     ],
                 ]));
