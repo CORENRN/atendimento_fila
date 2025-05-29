@@ -16,28 +16,32 @@ class PanelController extends Controller
     public function data()
     {
         $triagem = Ticket::where('stage', 'triagem')
-            ->whereIn('status', ['triagem'])
+            ->where('status', 'triagem')
             ->whereNotNull('called_at')
+            ->whereNull('finished_at')
             ->latest('called_at')
-            ->first();
+            ->get()
+            ->map(fn($t) => [
+                'id' => sprintf('%04d', $t->id),
+                'called_at' => $t->called_at->format('H:i:s'),
+                'guiche' => $this->getGuicheName($t->attendant_id),
+            ]);
 
         $atendimento = Ticket::where('stage', 'atendimento')
-            ->whereIn('status', ['atendimento'])
+            ->where('status', 'atendimento')
             ->whereNotNull('called_at')
+            ->whereNull('finished_at')
             ->latest('called_at')
-            ->first();
+            ->get()
+            ->map(fn($t) => [
+                'id' => sprintf('%04d', $t->id),
+                'called_at' => $t->called_at->format('H:i:s'),
+                'guiche' => $this->getGuicheName($t->attendant_id),
+            ]);
 
         return response()->json([
-            'triagem' => $triagem ? [
-                'id' => sprintf('%04d', $triagem->id),
-                'called_at' => $triagem->called_at->format('H:i:s'),
-                'guiche' => $this->getGuicheName($triagem->attendant_id),
-            ] : null,
-            'atendimento' => $atendimento ? [
-                'id' => sprintf('%04d', $atendimento->id),
-                'called_at' => $atendimento->called_at->format('H:i:s'),
-                'guiche' => $this->getGuicheName($atendimento->attendant_id),
-            ] : null,
+            'triagem' => $triagem,
+            'atendimento' => $atendimento,
         ]);
     }
 

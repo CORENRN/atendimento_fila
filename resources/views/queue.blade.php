@@ -77,6 +77,19 @@
                         Chamar Próximo
                     </button>
                 </form>
+
+                <form action="{{ route('queue.recall', $calledTicket?->id ?? 0) }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit"
+                        @if(!$calledTicket) disabled class="bg-gray-400 text-white px-5 py-2 rounded cursor-not-allowed" 
+                        @else class="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600" 
+                        @endif
+                    >
+                        Chamar Novamente
+                    </button>
+                </form>
+
             </div>
 
             <!-- Tabela de tickets -->

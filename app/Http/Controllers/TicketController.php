@@ -6,7 +6,7 @@ use App\Events\TicketUpdated;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
-class FrontendController extends Controller
+class TicketController extends Controller
 {
     public function home()
     {
@@ -49,7 +49,7 @@ class FrontendController extends Controller
             ->pluck('count', 'status')
             ->toArray();
 
-        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts'));
+        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts', 'calledTicket'));
     }
 
     public function callNext($stage)
@@ -88,6 +88,29 @@ class FrontendController extends Controller
 
         return back()->with('info', 'Não há tickets aguardando na fila.');
     }
+
+   public function recall(Request $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if ($ticket->attendant_id !== auth()->id()) {
+            return back()->with('error', 'Você não pode chamar novamente um ticket que não está atendendo.');
+        }
+
+        if ($ticket->finished_at !== null) {
+            return back()->with('error', 'Este ticket já foi finalizado.');
+        }
+
+        $ticket->update([
+            'called_at' => now(),
+        ]);
+
+        event(new TicketUpdated($ticket));
+
+        return back()->with('success', 'Ticket chamado novamente.');
+    }
+
+
 
     public function finish(Request $request, $id)
     {

@@ -1,5 +1,7 @@
 @extends('layouts.app')
+
 @section('content')
+
 
     <div class="relative flex flex-col text-6xl font-black w-[50%] h-full items-center justify-center">
         <img src="{{ asset('images/atendimento.jpg') }}" 

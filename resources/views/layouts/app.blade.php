@@ -27,10 +27,35 @@
                 </header>
             @endisset
 
+            @if (session('success'))
+
+                <div id="flash-message" class="w-full flex justify-center">
+                    <div class="fixed mt-5 w-[60%] mx-auto
+                                bg-green-100 border border-green-400 text-green-700 
+                                px-6 py-3 rounded shadow-lg z-50">
+                        <strong class="font-bold">Sucesso! </strong>
+                        <span class="block sm:inline">{{ session('success') }}</span>
+                    </div>
+                </div>
+
+            @endif
+
+
+
             <!-- Page Content -->
             <main class="bg-gray-100 flex items-center justify-center h-screen">
+                
                  @yield('content')
             </main>
         </div>
+
+        <script>
+            setTimeout(() => {
+                const flash = document.getElementById('flash-message');
+                if (flash) {
+                    flash.style.display = 'none';
+                }
+            }, 3000);
+        </script>
     </body>
 </html>
