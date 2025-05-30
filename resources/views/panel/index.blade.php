@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Painel de Chamadas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
 
         @keyframes pulse-glow-blue {
@@ -32,41 +35,48 @@
         animation: pulse-glow-green 2s infinite;
         }
 
+        h1, h3
+        {
+            font-family: 'Libre Baskerville', serif;
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="flex flex-col w-[50%] h-screen p-20">
+        <h1 class="text-6xl font-bold mb-10">Painel de Chamadas:</h1>
+        <div class="h-[50vh] w-[100%] bg-gray-600 rounded-lg flex justify-center items-center">
+            <p class="text-6xl font-bold text-white">video</p>
+        </div>
 
-    <h1 class="text-4xl font-bold mb-10">Painel de Chamadas</h1>
-
-    <button id="enable-sound-btn" class="mb-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-        Ativar Som de Notificação
-    </button>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-    <!-- Card Triagem -->
-    <div id="card-triagem" class="bg-white rounded-2xl shadow-xl p-8 w-96">
-        <h2 class="text-3xl font-bold text-blue-600 mb-4">Triagem</h2>
-        <div id="triagem-list" class="space-y-2">
-            <p class="text-gray-500">Nenhum chamado</p>
+        <div class="h-[20vh] w-[100%] shadow-2xl rounded-lg mt-5 p-8">
+            <h3 class="text-2xl font-bold">Ultimos atendimentos:</h3>
         </div>
     </div>
 
-    <!-- Card Atendimento -->
-    <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-8 w-96">
-        <h2 class="text-3xl font-bold text-green-600 mb-4">Atendimento</h2>
-        <div id="atendimento-list" class="space-y-2">
-            <p class="text-gray-500">Nenhum chamado</p>
+    <div class="flex flex-col w-[50%] gap-10 h-screen p-20 items-center">
+        <h1 class="text-6xl font-bold">Senhas:</h1>
+         <!-- Card Triagem -->
+        <div id="card-triagem" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Triagem</h2>
+            <div id="triagem-list" class="space-y-2">
+                <p class="text-gray-500">Nenhum chamado</p>
+            </div>
         </div>
+
+        <!-- Card Atendimento -->
+        <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
+            <h2 class="text-3xl font-bold text-green-600 mb-4">Atendimento</h2>
+            <div id="atendimento-list" class="space-y-2">
+                <p class="text-gray-500">Nenhum chamado</p>
+            </div>
+        </div>
+
+        <button id="enable-sound-btn" class="px-5 py-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 w-[80%]">
+            Ativar Som de Notificação
+        </button>
     </div>
-
-
-
-    </div>
-
-    <div class="mt-10">
-        <p class="text-gray-500 text-sm">Atualizando automaticamente...</p>
-    </div>
+    
 
     <audio id="notification-sound" src="/sounds/notification.mp3" preload="auto"></audio>
 
