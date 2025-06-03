@@ -24,7 +24,9 @@
                 <a href="{{ route('queue', 'triagem') }}" class="block bg-blue-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-blue-600">Fila de Triagem</a>
                 <a href="{{ route('queue', 'atendimento') }}" class="block bg-green-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-green-600">Fila de Atendimento</a>
                 <a href="{{ route('ticket.take') }}" class="block bg-yellow-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-yellow-600">Retirar Senha</a>
-                <a href="{{ route('dashboard') }}" class="block bg-purple-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-purple-600">Dashboard</a>
+                @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
+                    <a href="{{ route('dashboard') }}" class="block bg-purple-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-purple-600">Dashboard</a>
+                @endif
             </div>
     </div>
 @endsection

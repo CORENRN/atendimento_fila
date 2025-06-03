@@ -93,8 +93,8 @@
             </div>
 
             <!-- Tabela de tickets -->
-            <table class="w-full table-auto border">
-                <thead>
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr class="bg-gray-200">
                         <th class="p-2 border">ID</th>
                         <th class="p-2 border">Tipo</th>
@@ -118,7 +118,7 @@
                                     : ($isActive && $ticket->called_at !== null);
                             @endphp
 
-                            <tr id="ticket-{{ $ticket->id }}">
+                            <tr id="ticket-{{ $ticket->id }}" >
                                 <td class="p-2 border text-center">{{ $ticket->id }}</td>
                                 <td class="p-2 border">{{ $ticket->type }}</td>
 

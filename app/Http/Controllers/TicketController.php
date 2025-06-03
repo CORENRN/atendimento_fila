@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\TicketUpdated;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use App\Http\Controllers\PrintController;
 
 class TicketController extends Controller
 {
@@ -153,7 +154,6 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id);
 
-        // ✅ Verifica se o atendente é quem está atendendo
         if ($ticket->attendant_id !== auth()->id()) {
             return back()->with('error', 'Você não pode avançar um ticket que não está atendendo.');
         }
@@ -191,10 +191,15 @@ class TicketController extends Controller
             'status' => 'aguardando',
         ]);
 
-        event(new TicketUpdated($ticket));
+        try {
+            app(PrintController::class)->printTicket($ticket->id);
+        } catch (\Exception $e) {
+            \Log::error('Erro na impressão: ' . $e->getMessage());
+        }
 
         return redirect()->route('ticket.show', ['id' => $ticket->id]);
     }
+
 
     public function showTicket($id)
     {

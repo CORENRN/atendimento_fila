@@ -28,7 +28,7 @@
        <form action="{{ route('ticket.take.post') }}" method="POST">
         @csrf
 
-            <label class="block mb-2 text-3xl text-white/80 text-center tracking-wider uppercase font-bold">Selecione o tipo de senha:</label>
+            <label class="block mb-2 text-3xl text-white/80 text-center tracking-wider uppercase font-bold">Toque na tela para escolher o tipo de senha:</label>
             <div class="flex justify-center gap-4">
                 <!-- Botão Regular -->
                 <button 

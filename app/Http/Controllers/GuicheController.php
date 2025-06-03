@@ -19,11 +19,10 @@ class GuicheController extends Controller
         return view('choose_guiche', compact('guiches'));
     }
 
-
     public function selectGuiche(Request $request)
     {
         $request->validate([
-            'guiche_id' => 'required|exists:guiche,id',
+            'guiche_id' => 'required|exists:guiches,id',
         ]);
 
         $userId = auth()->id();
@@ -48,6 +47,4 @@ class GuicheController extends Controller
 
         return redirect()->route('home')->with('success', 'Guichê selecionado com sucesso.');
     }
-
-
 }

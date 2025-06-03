@@ -9,7 +9,7 @@ class Guiche extends Model
 {
     use HasFactory;
 
-    protected $table = 'guiche';
+    protected $table = 'guiches';
 
     protected $fillable = ['name'];
 

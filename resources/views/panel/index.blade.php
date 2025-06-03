@@ -46,8 +46,26 @@
     <div class="flex flex-col w-[50%] h-screen p-20">
         <h1 class="text-6xl font-bold mb-10">Painel de Chamadas:</h1>
         <div class="h-[50vh] w-[100%] bg-gray-600 rounded-lg flex justify-center items-center">
-            <p class="text-6xl font-bold text-white">video</p>
+            <iframe class="w-[100%] h-[100%]" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+            
         </div>
+
+        @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
+            <div class="mt-10 bg-white p-6 rounded-lg shadow-lg w-full">
+                <h2 class="text-2xl font-bold mb-4">Atualizar Vídeo do Painel</h2>
+                @if(session('success'))
+                    <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                <form action="{{ route('panel.updateVideo') }}" method="POST">
+                    @csrf
+                    <input type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." class="w-full p-3 border border-gray-300 rounded mb-4" value="{{ $videoUrl }}" required>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar Vídeo</button>
+                </form>
+            </div>
+        @endif
 
         <div class="h-[20vh] w-[100%] shadow-2xl rounded-lg mt-5 p-8">
             <h3 class="text-2xl font-bold">Ultimos atendimentos:</h3>
@@ -79,7 +97,6 @@
     
 
     <audio id="notification-sound" src="/sounds/notification.mp3" preload="auto"></audio>
-
 <script>
     const sound = document.getElementById('notification-sound');
     const enableSoundBtn = document.getElementById('enable-sound-btn');
@@ -95,7 +112,7 @@
             sound.currentTime = 0;
             soundEnabled = true;
             enableSoundBtn.style.display = 'none';
-        }).catch(e => {
+        }).catch(() => {
             alert('Não foi possível ativar o som. Por favor, permita a reprodução.');
         });
     });
@@ -107,10 +124,11 @@
     async function fetchData() {
         try {
             const response = await fetch('{{ route('panel.data') }}');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
 
-            const triagemKeys = getIdWithTimestamp(data.triagem);
-            const atendimentoKeys = getIdWithTimestamp(data.atendimento);
+            const triagemKeys = getIdWithTimestamp(data.triagem || []);
+            const atendimentoKeys = getIdWithTimestamp(data.atendimento || []);
 
             // Verifica atualizações na triagem
             const novosTriagem = triagemKeys.filter(k => !lastTriagemKeys.includes(k));
@@ -124,12 +142,11 @@
                 playNotification('card-atendimento', 'green');
             }
 
-            // Atualiza os estados
             lastTriagemKeys = triagemKeys;
             lastAtendimentoKeys = atendimentoKeys;
 
-            renderTickets('triagem', data.triagem, 'blue');
-            renderTickets('atendimento', data.atendimento, 'green');
+            renderTickets('triagem', data.triagem || [], 'blue');
+            renderTickets('atendimento', data.atendimento || [], 'green');
 
         } catch (error) {
             console.error('Erro ao buscar dados:', error);
@@ -139,7 +156,9 @@
     function renderTickets(type, tickets, color) {
         const listElement = document.getElementById(`${type}-list`);
         const cardElement = document.getElementById(`card-${type}`);
-        
+
+        if (!listElement || !cardElement) return;
+
         listElement.innerHTML = '';
 
         if (tickets.length === 0) {
@@ -150,7 +169,6 @@
             return;
         }
 
-        // Adiciona efeito visual
         cardElement.classList.remove(
             'custom-pulse-blue', 'custom-pulse-green', 'ring-blue-400', 'ring-green-400', 'ring-4'
         );
@@ -177,6 +195,9 @@
     function playNotification(cardId, color) {
         if (!soundEnabled) return;
 
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
         let playCount = 0;
         const maxPlays = 1;
 
@@ -186,11 +207,11 @@
             sound.play().then(() => {
                 playCount++;
                 sound.onended = playSoundRepeatedly;
+            }).catch(() => {
+                // Falha ao reproduzir som (ex: bloqueio do navegador)
             });
         }
         playSoundRepeatedly();
-
-        const card = document.getElementById(cardId);
 
         card.classList.remove('custom-pulse-blue', 'custom-pulse-green', 'ring-blue-400', 'ring-green-400', 'ring-4');
 
@@ -204,6 +225,7 @@
     setInterval(fetchData, 3000);
     fetchData();
 </script>
+
 
 
 

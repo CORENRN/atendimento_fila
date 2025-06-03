@@ -6,13 +6,24 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\GuicheController;
+use App\Http\Controllers\PrintController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 
 
+    // Retirada de senha
+    Route::get('/ticket/take', function () {
+        return view('ticket_take');
+    })->name('ticket.take');
+
+    Route::post('/ticket/take', [TicketController::class, 'takeTicket'])->name('ticket.take.post');
+    Route::get('/ticket/{id}', [TicketController::class, 'showTicket'])->name('ticket.show');
+
 Route::get('/painel', [PanelController::class, 'index'])->name('panel.index');
 Route::get('/painel/data', [PanelController::class, 'data'])->name('panel.data');
+Route::get('/ticket/{id}/print', [PrintController::class, 'printTicket'])->name('ticket.print');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -34,17 +45,15 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    // Retirada de senha
-    Route::get('/ticket/take', function () {
-        return view('ticket_take');
-    })->name('ticket.take');
 
-    Route::post('/ticket/take', [TicketController::class, 'takeTicket'])->name('ticket.take.post');
-    Route::get('/ticket/{id}', [TicketController::class, 'showTicket'])->name('ticket.show');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('adminOrSuper')->name('dashboard');
 
+    Route::post('/panel/update-video', [PanelController::class, 'updateVideo'])
+    ->middleware('superAdmin')
+    ->name('panel.updateVideo');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('/users/assign-category', [UserController::class, 'showAssignCategory'])->name('users.assignCategory');
+    Route::put('/users/{id}/update-category', [UserController::class, 'updateCategory'])->name('users.updateCategory');
 
 });
 

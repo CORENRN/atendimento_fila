@@ -37,5 +37,20 @@
         </a>
     </div>
 
+    <script>
+    async function printTicket(id) {
+    try {
+        const res = await fetch(`/ticket/${id}/print`);
+        const data = await res.json();
+        if (data.success) {
+        alert('Ticket impresso com sucesso no servidor!');
+        } else {
+        alert('Erro na impressão: ' + data.message);
+        }
+    } catch (error) {
+        alert('Erro na requisição: ' + error.message);
+    }
+    }
+    </script>
 </body>
 </html>
