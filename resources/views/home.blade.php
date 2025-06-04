@@ -1,13 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-
-
-    <div class="relative flex flex-col text-6xl font-black w-[50%] h-full items-center justify-center">
-        <img src="{{ asset('images/atendimento.jpg') }}" 
+<div class="flex h-screen">
+    <div class="relative flex flex-col text-6xl font-black w-[50%] h-full bg-white items-center justify-center">
+        <!-- <img src="{{ asset('images/atendimento.jpg') }}" 
             alt="tickets" 
             class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-blue-800 opacity-50"></div>
+        <div class="absolute inset-0 bg-blue-800 opacity-50"></div> -->
+
+        <img src="{{ asset('images/homeimage.png') }}" 
+            alt="tickets" 
+            class="w-[90%] mb-20">
     </div>
 
     <div class="bg-white w-[50%] h-full flex flex-col items-center justify-center">
@@ -20,14 +23,18 @@
                 <p class="text-lg">Por favor, selecione uma das opções abaixo:</p>
             </div>
 
-            <div class="space-y-4 mt-4 w-[70%]">
-                <a href="{{ route('queue', 'triagem') }}" class="block bg-blue-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-blue-600">Fila de Triagem</a>
-                <a href="{{ route('queue', 'atendimento') }}" class="block bg-green-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-green-600">Fila de Atendimento</a>
-                <a href="{{ route('ticket.take') }}" class="block bg-yellow-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-yellow-600">Retirar Senha</a>
+            <div class="space-y-4 mt-0 w-[70%]">
+                <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#527cd1] transition duration-300 text-white px-6 py-7 rounded hover:bg-[#8aabec] hover:text-[#213555]/80"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Fila de Triagem</a>
+                <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#213555]/80 transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
+                <a href="{{ route('ticket.take') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#213555]/80 text-white px-6 py-7 rounded"><img src="{{ asset('images/ticketico.png') }}" alt="atendente" class="w-14">Retirar Senha</a>
                 @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
-                    <a href="{{ route('dashboard') }}" class="block bg-purple-500 transition duration-300 text-white px-6 py-10 rounded hover:bg-purple-600">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#213555]/80 text-white px-6 py-7 rounded"><img src="{{ asset('images/graficoico.png') }}" alt="atendente" class="w-14">Dashboard</a>
                 @endif
             </div>
     </div>
+</div>
+
+
+
 @endsection
 
