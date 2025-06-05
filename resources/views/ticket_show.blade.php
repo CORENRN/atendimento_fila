@@ -10,9 +10,9 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-image: url('/images/bgticket.jpg');
+            background-image: url('/images/bgticket.png');
             background-size: cover;
-            background-position: center;
+            background-position: bottom;
             background-repeat: no-repeat;
         }
         h1, p{
@@ -22,20 +22,21 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
-    <div class="flex flex-col gap-3 p-8 rounded text-center">
-        <h1 class="text-7xl text-white font-bold mb-4">Sua Senha</h1>
-        <p class="text-7xl text-white font-bold mb-6">#00{{ $ticket->id }}</p>
-        <p class="mb-2 text-white text-4xl">Tipo: 
-            <strong class="{{ $ticket->type === 'preferencial' ? 'text-red-600' : 'text-blue-300' }} bg-gray-800 py-3 px-4 rounded-lg">
-                {{ ucfirst($ticket->type) }}
-            </strong>
-        </p>
-        <p class="mb-8 text-4xl text-white/80 tracking-widest">Aguarde ser chamado na triagem.</p>
+    <div class="flex flex-col gap-3 p-8 rounded text-center items-center">
+        <h1 class="text-4xl text-[#213555] font-bold mb-2">Sua senha foi cadastrada com sucesso!</h1>
+        <p class="mb-8 text-lg font-bold text-[#213555]/80 w-[60%] ">Aguarde seu numero ser chamado no painel de atendimento.</p>
+        
+        <div class="w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-md duration-300 hover:scale-105 hover:shadow-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mt-8 h-16 w-16 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <h1 class="mt-2 text-center text-2xl font-bold text-[#213555]">#00{{ $ticket->id }}</h1>
+          <h1 class="mb-2 text-center text-lg font-bold text-[#213555]">{{ ucfirst($ticket->type) }}</h1>
+          <p class="mb-4 text-center text-sm text-[#213555]/70">Sua senha foi gerada com sucesso!</p>
 
-        <a href="{{ route('ticket.take') }}" class="bg-sky-500 text-3xl text-white px-4 py-8 rounded hover:bg-blue-600 transition duration-300">
-            Voltar para o início
-        </a>
+        </div>
     </div>
+
 
     <script>
     async function printTicket(id) {
@@ -51,6 +52,10 @@
         alert('Erro na requisição: ' + error.message);
     }
     }
+
+    setTimeout(() => {
+        window.location.href = "{{ route('ticket.take') }}";
+    }, 5000);
     </script>
 </body>
 </html>

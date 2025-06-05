@@ -1,17 +1,10 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Fila de {{ $stage === 'triagem' ? 'Triagem' : 'Atendimento' }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@extends('layouts.app')
 
-</head>
-<body class="bg-gray-100 p-8">
+@section('content')
+<section class="h-screen w-screen relative">
 
-    <!-- Sidebar -->
-    <aside class="fixed top-7 left-0 w-64 h-full p-4">
-        <h1 class="text-3xl font-bold mb-6">COREN TICKET</h1>
+  <!-- Sidebar -->
+    <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
         <nav class="flex flex-col h-fit p-5 rounded-md bg-white shadow-2xl gap-5">
             <h2 class="font-semibold text-lg tracking-widest text-gray-500/50">MENU</h2>
             @foreach([
@@ -46,18 +39,7 @@
 
 
     <!-- Título -->
-     <div class="ml-64 flex items-center mb-4">
-        <a href="{{ route('home') }}" 
-        class="transition duration-300 text-black px-3 py-3 hover:bg-gray-500 flex items-center justify-center rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke-width="1.5" 
-                stroke="currentColor" 
-                class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-        </a>
+     <div class="flex items-center mb-4 z-10 justify-center mt-5">
         <h1 class="text-4xl font-bold px-4 py-2">
             Fila de {{ $stage === 'triagem' ? 'Triagem' : 'Atendimento' }}
         </h1>
@@ -65,35 +47,35 @@
 
 
     <!-- Conteúdo Principal-->
-    <section class="flex ml-64 h-full">
+    <section class="flex ml-64 h-full z-10">
 
         <!-- Painel da fila -->
-        <div class="min-w-[50%] h-[85vh] bg-white p-8 rounded shadow">
+        <div class="min-w-[50%] h-[75vh] bg-white p-8 rounded shadow">
 
-            <div class="mb-4 flex space-x-4">
-                <form action="{{ route('queue.call', $stage) }}" method="POST" class="w-full">
-                    @csrf
-                    <button class="bg-black transition duration-300 text-white px-4 py-5 w-full rounded hover:bg-gray-600">
-                        Chamar Próximo
-                    </button>
-                </form>
+        <h1 class="w-full text-center text-3xl font-bold mb-5">Chamada de Tickets</h1>
+        <div class="mb-4 flex space-x-4">
+            <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
+                @csrf
+                <button class="bg-black transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-600">
+                    Chamar Próximo
+                </button>
+            </form>
 
-                <form action="{{ route('queue.recall', $calledTicket?->id ?? 0) }}" method="POST" class="inline">
-                    @csrf
-                    <button 
-                        type="submit"
-                        @if(!$calledTicket) disabled class="bg-gray-400 text-white px-5 py-2 rounded cursor-not-allowed" 
-                        @else class="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600" 
-                        @endif
-                    >
-                        Chamar Novamente
-                    </button>
-                </form>
-
-            </div>
+            <form action="{{ route('queue.recall', $calledTicket?->id ?? 0) }}" method="POST" class="flex-1">
+                @csrf
+                <button 
+                    type="submit"
+                    @if(!$calledTicket) disabled class="bg-gray-400 text-white w-full uppercase tracking-wider font-black px-4 py-5 rounded cursor-not-allowed" 
+                    @else class="bg-blue-500 transition duration-300 text-white w-full py-5 rounded uppercase tracking-wider font-black hover:bg-blue-600" 
+                    @endif
+                >
+                    Chamar Novamente
+                </button>
+            </form>
+        </div>
 
             <!-- Tabela de tickets -->
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-900">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr class="bg-gray-200">
                         <th class="p-2 border">ID</th>
@@ -193,7 +175,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="flex">
+        <div class="flex w-full">
 
 
         <!-- Painel do ticket chamado -->
@@ -210,7 +192,7 @@
             @endphp
 
             @if($calledTicket)
-                <div class="ml-6 p-6 h-fit bg-white border border-white/30 rounded shadow-md">
+                <div class="ml-6 p-6 h-fit bg-white border border-white/30 rounded shadow-md w-[95%]">
                     <div class="flex gap-3 items-center bg mb-3">
                         <h2 class="font-bold text-xl">Ficha em Atendimento:</h2>
                         <div class="w-10 h-10 flex items-center justify-center font-semibold bg-black rounded-full text-white">
@@ -293,13 +275,6 @@
             @endif
         @endif
 
-        @if($stage === 'atendimento')
-        <div class="min-w-[25%] h-[45vh] ml-8 bg-white p-10 rounded shadow mb-5">
-            <h2 class="text-xl font-bold text-center">Status dos Tickets</h2>
-            <canvas id="statusChart" class="w-full"></canvas>
-        </div>
-        @endif
-
         </div>  
     </section>
 
@@ -350,6 +325,8 @@
     });
 </script>
 
+</section>
 
-</body>
-</html>
+  
+
+@endsection
