@@ -27,8 +27,9 @@ class Ticket extends Model
 
     public function attendant()
     {
-        return $this->belongsTo(Attendant::class);
+        return $this->belongsTo(User::class);
     }
+
 
 public function getDurationFormattedAttribute()
 {

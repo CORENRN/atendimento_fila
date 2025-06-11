@@ -24,11 +24,16 @@
             </div>
 
             <div class="space-y-4 mt-0 w-[70%]">
-                <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#527cd1] transition duration-300 text-white px-6 py-7 rounded hover:bg-[#8aabec] hover:text-[#eef4ff]"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Fila de Triagem</a>
-                <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
-                <a href="{{ route('ticket.take') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/ticketico.png') }}" alt="atendente" class="w-14">Retirar Senha</a>
+                @if(auth()->user() && auth()->user()->categoria === 'user')
+                    <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#527cd1] transition duration-300 text-white px-6 py-7 rounded hover:bg-[#8aabec] hover:text-[#eef4ff]"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Fila de Triagem</a>
+                    <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
+                    
+                @endif
                 @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
+                    <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#527cd1] transition duration-300 text-white px-6 py-7 rounded hover:bg-[#8aabec] hover:text-[#eef4ff]"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Fila de Triagem</a>
+                    <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/graficoico.png') }}" alt="atendente" class="w-14">Dashboard</a>
+                    <a href="{{ route('panel.index') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel</a>
                 @endif
             </div>
     </div>

@@ -185,7 +185,7 @@
             div.innerHTML = `
                 <p class="text-4xl font-bold ${color === 'blue' ? 'text-blue-800' : 'text-green-800'}">${ticket.id}</p>
                 <p class="text-sm text-gray-500">Chamado às ${ticket.called_at}</p>
-                ${ticket.guiche ? `<p class="text-sm text-gray-800 font-semibold">Guichê: ${ticket.guiche}</p>` : ''}
+                ${ticket.guiche ? `<p class="text-2xl text-gray-800 font-bold">Guichê: ${ticket.guiche}</p>` : ''}
             `;
 
             listElement.appendChild(div);

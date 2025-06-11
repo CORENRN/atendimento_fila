@@ -39,15 +39,15 @@
 
 
     <!-- Título -->
-     <div class="flex items-center mb-4 z-10 justify-center mt-5">
-        <h1 class="text-4xl font-bold px-4 py-2">
+     <div class="flex items-center mb-4 z-10 justify-center bg-[#edf3ff] h-48 w-full">
+        <h1 class="text-4xl text-[#142136] font-bold px-4 py-2 -mt-24">
             Fila de {{ $stage === 'triagem' ? 'Triagem' : 'Atendimento' }}
         </h1>
      </div>
 
 
     <!-- Conteúdo Principal-->
-    <section class="flex ml-64 h-full z-10">
+    <section class="flex ml-64 h-full z-10 -mt-28">
 
         <!-- Painel da fila -->
         <div class="min-w-[50%] h-[75vh] bg-white p-8 rounded shadow">
@@ -58,6 +58,13 @@
                 @csrf
                 <button class="bg-black transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-600">
                     Chamar Próximo
+                </button>
+            </form>
+
+            <form action="{{ route('queue.priority', $stage) }}" method="POST" class="flex-1">
+                @csrf
+                <button class="bg-red-600 transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red-700">
+                    Chamar Prioritário
                 </button>
             </form>
 
@@ -127,37 +134,40 @@
                                         </form>
 
                                         @if($stage === 'triagem')
-                                            <form 
-                                                action="{{ route('queue.advance', $ticket->id) }}" 
-                                                method="POST" 
-                                                class="inline"
-                                            >
-                                                @csrf
-                                                <select 
-                                                    name="service" 
-                                                    required
-                                                    onchange="document.getElementById('advance-btn-{{ $ticket->id }}').disabled = (this.value === '')"
-                                                    class="border rounded px-2 py-1 mr-2"
+                                            <div class="flex bg-red-500">
+                                                <form 
+                                                    action="{{ route('queue.advance', $ticket->id) }}" 
+                                                    method="POST" 
+                                                    class="inline"
                                                 >
-                                                    <option value="">Selecione o serviço</option>
-                                                    @foreach($services as $key => $label)
-                                                        <option 
-                                                            value="{{ $key }}" 
-                                                            {{ $ticket->service === $key ? 'selected' : '' }}
-                                                        >
-                                                            {{ $label }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <button 
-                                                    id="advance-btn-{{ $ticket->id }}" 
-                                                    class="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600" 
-                                                    disabled 
-                                                    type="submit"
-                                                >
-                                                    Avançar
-                                                </button>
-                                            </form>
+                                                    @csrf
+                                                    <select 
+                                                        name="service" 
+                                                        required
+                                                        onchange="document.getElementById('advance-btn-{{ $ticket->id }}').disabled = (this.value === '')"
+                                                        class="border rounded px-2 py-1 mr-2"
+                                                    >
+                                                        <option value="">Selecione o serviço</option>
+                                                        @foreach($services as $key => $label)
+                                                            <option 
+                                                                value="{{ $key }}" 
+                                                                {{ $ticket->service === $key ? 'selected' : '' }}
+                                                            >
+                                                                {{ $label }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button 
+                                                        id="advance-btn-{{ $ticket->id }}" 
+                                                        class="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600" 
+                                                        disabled 
+                                                        type="submit"
+                                                    >
+                                                        Avançar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                           
                                         @endif
                                     @else
                                         <span class="text-gray-500">-</span>
@@ -231,17 +241,18 @@
                                 @if($stage === 'triagem')
                                     <div>
                                         <h3 class="font-bold mb-1">Avançar:</h3>
+
                                         <form 
                                             action="{{ route('queue.advance', $calledTicket->id) }}" 
                                             method="POST"
-                                            class="flex flex-col gap-3"
+                                            class="flex  gap-3"
                                         >
                                             @csrf
                                             <select 
                                                 name="service" 
                                                 required
                                                 onchange="document.getElementById('advance-btn-{{ $calledTicket->id }}').disabled = (this.value === '')"
-                                                class="border rounded px-3 py-3 mr-2"
+                                                class="border rounded px-24 py-3 mr-2"
                                             >
                                                 <option value="">Selecione o serviço</option>
                                                 @foreach($services as $key => $label)
@@ -255,13 +266,15 @@
                                             </select>
                                             <button 
                                                 id="advance-btn-{{ $calledTicket->id }}" 
-                                                class="bg-purple-500 transition duration-300 text-white px-3 py-3 rounded hover:bg-purple-600" 
+                                                class="bg-purple-500 transition duration-300 text-white px-5 py-3 w-full rounded hover:bg-purple-600" 
                                                 disabled 
                                                 type="submit"
                                             >
                                                 Avançar
                                             </button>
                                         </form>
+                                        </div>
+                                        
                                     </div>
                                 @endif
                             @else

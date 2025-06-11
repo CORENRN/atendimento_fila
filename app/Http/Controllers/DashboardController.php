@@ -1,43 +1,72 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $attendantId = auth()->id();  //pega o id do usuário logado do breeze pra filtrar
-        $today = Carbon::today();
+{
+    $query = Ticket::with('attendant')->where('status', 'finalizado');
 
-        $tickets = Ticket::where('attendant_id', $attendantId)
-            ->whereDate('finished_at', $today)
-            ->where('status', 'finalizado')
-            ->orderBy('finished_at')
-            ->get();
+    $date = request('date');
+    $month = request('month');
 
-        $totalAtendimentos = $tickets->count();
+    if ($date) {
+        $query->whereDate('finished_at', Carbon::parse($date));
+    } elseif ($month) {
+        $query->whereMonth('finished_at', Carbon::parse($month)->month)
+              ->whereYear('finished_at', Carbon::parse($month)->year);
+    } else {
+        // Por padrão, mostra os de hoje
+        $query->whereDate('finished_at', Carbon::today());
+    }
 
-        $duracoes = $tickets->map(function ($ticket) {
+    $tickets = $query->get();
+
+    $atendimentosPorUsuario = $tickets->groupBy('attendant_id')->map(function ($group) {
+        return [
+            'nome' => optional($group->first()->attendant)->name ?? 'Desconhecido',
+            'quantidade' => $group->count(),
+        ];
+    })->values();
+
+    $tempoMedioPorUsuario = $tickets->groupBy('attendant_id')->map(function ($group) {
+        $duracoes = $group->map(function ($ticket) {
             if ($ticket->called_at && $ticket->finished_at) {
-                $inicio = Carbon::parse($ticket->called_at);
-                $fim = Carbon::parse($ticket->finished_at);
-                return $fim->diffInSeconds($inicio);
+                return Carbon::parse($ticket->finished_at)->diffInSeconds(Carbon::parse($ticket->called_at));
             }
-            return null;
+            return 0;
         })->filter();
 
-        $tempoMedioAtendimento = $duracoes->isNotEmpty()
-            ? round($duracoes->avg())
-            : 0;
+        return [
+            'nome' => optional($group->first()->attendant)->name ?? 'Desconhecido',
+            'media' => $duracoes->isNotEmpty() ? round($duracoes->avg() / 60, 2) : 0, // em minutos
+        ];
+    })->values();
 
-        return view('dashboard', [
-            'tickets' => $tickets,
-            'totalAtendimentos' => $totalAtendimentos,
-            'tempoMedioAtendimento' => $tempoMedioAtendimento,
-        ]);
-    }
+    $atendimentosPorServico = $tickets->groupBy('service')->map(function ($group, $service) {
+        return [
+            'servico' => $service ?? 'Não informado',
+            'quantidade' => $group->count(),
+        ];
+    })->values();
+
+    $atendimentosPorServicoMap = $atendimentosPorServico->mapWithKeys(function ($item) {
+        return [strtolower($item['servico']) => $item['quantidade']];
+    });
+
+
+    return view('dashboard', [
+        'atendimentosPorUsuario' => $atendimentosPorUsuario,
+        'tempoMedioPorUsuario' => $tempoMedioPorUsuario,
+        'atendimentosPorServico' => $atendimentosPorServico,
+        'atendimentosPorServicoMap' => $atendimentosPorServicoMap,
+    ]);
+
+}
+
 }

@@ -1,84 +1,192 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard de Atendimentos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
+@extends('layouts.app')
 
-    <div class="max-w-5xl mx-auto bg-white p-8 rounded shadow">
-        <h1 class="text-3xl font-bold mb-6">Dashboard de Atendimentos</h1>
+@section('content')
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Total de Atendimentos -->
-            <div class="bg-blue-500 text-white p-6 rounded shadow">
-                <h2 class="text-xl">Atendimentos Realizados</h2>
-                <p class="text-4xl font-bold">{{ $totalAtendimentos }}</p>
+<div class="p-10 w-full -mt-4">
+
+    <div class="flex items-center gap-10 mb-5">
+        <h1 class="text-3xl text-[#213555] font-bold">Dashboard de Atendimentos:</h1>
+        <form method="GET" action="{{ route('dashboard') }}" class=" flex gap-4 items-end">
+            <div>
+                <label for="date" class="block font-medium text-[#213555]">Data:</label>
+                <input type="date" id="date" name="date" value="{{ request('date') }}" class="border rounded px-3 py-2">
             </div>
-
-            <!-- Tempo Médio -->
-            <div class="bg-green-500 text-white p-6 rounded shadow">
-                <h2 class="text-xl">Tempo Médio</h2>
-                <p class="text-4xl font-bold">
-                    @php
-                        $tempo = max(0, intval($tempoMedioAtendimento));
-                        $hours = floor($tempo / 3600);
-                        $minutes = floor(($tempo % 3600) / 60);
-                        $seconds = $tempo % 60;
-                    @endphp
-                    {{ sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds) }}
-                </p>
+            <div>
+                <label for="month" class="block font-medium text-[#213555]">Mês:</label>
+                <input type="month" id="month" name="month" value="{{ request('month') }}" class="border rounded px-3 py-2">
             </div>
-
-            <!-- Data Atual -->
-            <div class="bg-purple-500 text-white p-6 rounded shadow">
-                <h2 class="text-xl">Data</h2>
-                <p class="text-4xl font-bold">{{ now()->format('d/m/Y') }}</p>
-            </div>
-        </div>
-
-        <h2 class="text-2xl font-bold mb-4">Detalhes dos Atendimentos</h2>
-
-        <table class="w-full table-auto border">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-2 border">ID</th>
-                    <th class="p-2 border">Início</th>
-                    <th class="p-2 border">Fim</th>
-                    <th class="p-2 border">Duração</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($tickets as $ticket)
-                    <tr class="hover:bg-gray-100">
-                        <td class="p-2 border text-center">{{ $ticket->id }}</td>
-                        <td class="p-2 border text-center">
-                            {{ $ticket->called_at ? \Carbon\Carbon::parse($ticket->called_at)->format('H:i:s') : '-' }}
-                        </td>
-                        <td class="p-2 border text-center">
-                            {{ $ticket->finished_at ? \Carbon\Carbon::parse($ticket->finished_at)->format('H:i:s') : '-' }}
-                        </td>
-                        <td class="p-2 border text-center">
-                            {{ $ticket->duration_formatted }}
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="p-4 text-center text-gray-500">
-                            Nenhum atendimento realizado hoje.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="mt-6">
-            <a href="{{ route('home') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                Voltar
-            </a>
-        </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filtrar</button>
+        </form>
     </div>
 
-</body>
-</html>
+    
+    <div class="w-full flex flex-col h-[79vh] gap-5 rounded">
+
+
+
+            <div class="w-[100%] h-72  bg-white shadow-lg rounded-md p-10">
+                <p class="text-xl font-semibold text-[#213555]/70 mb-4">Atendimentos por Usuário</p>
+                <canvas id="chartAtendimentosUsuario" class="w-full h-full"></canvas>
+            </div>
+
+            <div class="flex justify-between">
+                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de financias</p>
+                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                        {{ $atendimentosPorServicoMap['financeiro'] ?? 0 }}
+                    </p>
+                </div>
+                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de documentos</p>
+                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                        {{ $atendimentosPorServicoMap['documentacao'] ?? 0 }}
+                    </p>
+                </div>
+                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de informacoes</p>
+                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                        {{ $atendimentosPorServicoMap['informacoes'] ?? 0 }}
+                    </p>
+                </div>
+                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de cadastro</p>
+                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                        {{ $atendimentosPorServicoMap['cadastro'] ?? 0 }}
+                    </p>
+                </div>
+                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de suporte</p>
+                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                        {{ $atendimentosPorServicoMap['suporte'] ?? 0 }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-full flex gap-10 h-56">
+                <div class="bg-white h-full w-[50%] shadow-lg rounded-md p-10">
+                    <h2 class="text-xl font-semibold mb-4">Tempo Médio de Atendimento (hh:mm:ss)</h2>
+                    <canvas id="chartTempoMedioUsuario" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="bg-white h-full shadow-lg w-[50%] rounded-md p-10">
+                    <h2 class="text-xl font-semibold mb-4">Atendimentos por Categoria</h2>
+                    <canvas id="chartAtendimentosCategoria" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Dados do backend
+        const atendimentosPorUsuario = @json($atendimentosPorUsuario);
+        const tempoMedioPorUsuario = @json($tempoMedioPorUsuario);
+        const atendimentosPorServico = @json($atendimentosPorServico);
+
+        // Labels e dados para gráficos de usuário
+        const labelsUsuarios = atendimentosPorUsuario.map(item => item.nome);
+        const atendimentosUsuarios = atendimentosPorUsuario.map(item => item.quantidade);
+        // Tempo médio em minutos (já arredondado no backend), converter para segundos para o gráfico?
+        // Como o gráfico está em segundos, vamos converter para segundos * 60
+        const tempoMedioUsuariosSeg = tempoMedioPorUsuario.map(item => item.media * 60);
+
+        // Função para formatar segundos em hh:mm:ss
+        function formatarTempo(segundos) {
+            const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
+            const m = Math.floor((segundos % 3600) / 60).toString().padStart(2, '0');
+            const s = (segundos % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        // Gráfico 1: Atendimentos por usuário (barra)
+        new Chart(document.getElementById('chartAtendimentosUsuario'), {
+            type: 'bar',
+            data: {
+                labels: labelsUsuarios,
+                datasets: [{
+                    label: 'Atendimentos',
+                    data: atendimentosUsuarios,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)', // azul
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, precision: 0 } }
+            }
+        });
+
+        // Gráfico 2: Tempo médio de atendimento por usuário (barra com label customizado)
+        new Chart(document.getElementById('chartTempoMedioUsuario'), {
+            type: 'bar',
+            data: {
+                labels: tempoMedioPorUsuario.map(item => item.nome),
+                datasets: [{
+                    label: 'Tempo Médio (segundos)',
+                    data: tempoMedioUsuariosSeg,
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)', // verde
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            // Mostrar em hh:mm:ss no eixo Y
+                            callback: function(value) {
+                                return formatarTempo(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `Tempo Médio: ${formatarTempo(ctx.parsed.y)}`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico 3: Atendimentos por categoria (pizza)
+        new Chart(document.getElementById('chartAtendimentosCategoria'), {
+            type: 'doughnut',
+            data: {
+                labels: atendimentosPorServico.map(item => {
+                    // Capitalizar a primeira letra da categoria
+                    return item.servico.charAt(0).toUpperCase() + item.servico.slice(1);
+                }),
+                datasets: [{
+                    label: 'Atendimentos',
+                    data: atendimentosPorServico.map(item => item.quantidade),
+                    backgroundColor: [
+                        '#3B82F6', // azul
+                        '#F59E0B', // amarelo
+                        '#10B981', // verde
+                        '#EF4444', // vermelho
+                        '#8B5CF6'  // roxo
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+
+</div>
+
+@endsection

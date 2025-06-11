@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
         Route::post('{id}/finish', [TicketController::class, 'finish'])->name('queue.finish');
         Route::post('{id}/cancel', [TicketController::class, 'cancel'])->name('queue.cancel');
         Route::post('{id}/advance', [TicketController::class, 'advance'])->name('queue.advance');
+        Route::post('{stage}/call-priority', [TicketController::class, 'callNextPriority'])->name('queue.priority');
+
         Route::post('recall/{id}', [TicketController::class, 'recall'])->name('queue.recall');
 
     });

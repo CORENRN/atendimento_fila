@@ -29,7 +29,7 @@ return new class extends Migration
             $table->enum('status', ['aguardando', 'triagem', 'atendimento', 'finalizado', 'cancelado'])->default('aguardando');
             $table->timestamp('called_at')->nullable();
             $table->timestamp('finished_at')->nullable();
-            $table->foreignId('attendant_id')->nullable()->constrained('attendants');
+            $table->foreignId('attendant_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

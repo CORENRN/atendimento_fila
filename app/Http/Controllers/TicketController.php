@@ -90,6 +90,44 @@ class TicketController extends Controller
         return back()->with('info', 'Não há tickets aguardando na fila.');
     }
 
+    public function callNextPriority($stage)
+    {
+        $attendantId = auth()->id();
+
+        $existingCall = Ticket::where('stage', $stage)
+            ->where('attendant_id', $attendantId)
+            ->whereIn('status', ['triagem', 'atendimento'])
+            ->whereNotNull('called_at')
+            ->whereNull('finished_at')
+            ->first();
+
+        if ($existingCall) {
+            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+        }
+
+        $ticket = Ticket::where('stage', $stage)
+            ->where('status', 'aguardando')
+            ->where('type', 'preferencial')
+            ->orderBy('created_at')
+            ->first();
+
+        if ($ticket) {
+            $data = [
+                'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
+                'attendant_id' => $attendantId,
+                'called_at' => $ticket->called_at ?? now(),
+            ];
+
+            $ticket->update($data);
+
+            event(new \App\Events\TicketUpdated($ticket));
+
+            return back()->with('success', 'Ticket prioritário chamado com sucesso.');
+        }
+
+        return back()->with('info', 'Não há tickets prioritários aguardando na fila.');
+    }
+
    public function recall(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
