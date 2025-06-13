@@ -291,53 +291,6 @@
         </div>  
     </section>
 
-    <script>
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    const statusChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                'Aguardando',
-                'Triagem',
-                'Atendimento',
-                'Finalizado',
-                'Cancelado'
-            ],
-            datasets: [{
-                label: 'Tickets',
-                data: [
-                    {{ $statusCounts['aguardando'] ?? 0 }},
-                    {{ $statusCounts['triagem'] ?? 0 }},
-                    {{ $statusCounts['atendimento'] ?? 0 }},
-                    {{ $statusCounts['finalizado'] ?? 0 }},
-                    {{ $statusCounts['cancelado'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#fbbf24', // amarelo
-                    '#3b82f6', // azul
-                    '#6366f1', // roxo
-                    '#22c55e', // verde
-                    '#ef4444'  // vermelho
-                ],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                title: {
-                    display: true,
-                    text: 'Distribuição dos Tickets por Status'
-                }
-            }
-        }
-    });
-</script>
-
 </section>
 
   

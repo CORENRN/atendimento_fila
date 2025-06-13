@@ -11,17 +11,22 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service',
-        'type',
-        'stage',
         'status',
+        'attendant_id',
+        'triagem_id',         // ✅ novo campo adicionado
         'called_at',
+        'last_called_at',
+        'called_tri_at',
         'finished_at',
-        'attendant_id'
+        'stage',
+        'type',
+        'service',
     ];
 
     protected $casts = [
         'called_at' => 'datetime',
+        'last_called_at' => 'datetime',
+        'called_tri_at' => 'datetime',
         'finished_at' => 'datetime',
     ];
 
@@ -30,25 +35,26 @@ class Ticket extends Model
         return $this->belongsTo(User::class);
     }
 
-
-public function getDurationFormattedAttribute()
-{
-    if ($this->called_at && $this->finished_at) {
-        $inicio = Carbon::parse($this->called_at);
-        $fim = Carbon::parse($this->finished_at);
-
-        // Calcular diferença absoluta em segundos
-        $diff = abs($fim->diffInSeconds($inicio));
-
-        $h = floor($diff / 3600);
-        $m = floor(($diff % 3600) / 60);
-        $s = $diff % 60;
-
-        return sprintf('%02d:%02d:%02d', $h, $m, $s);
+    public function triagem()
+    {
+        return $this->belongsTo(User::class, 'triagem_id');
     }
-    return '00:00:00';
+
+    public function getDurationFormattedAttribute()
+    {
+        if ($this->called_at && $this->finished_at) {
+            $inicio = Carbon::parse($this->called_at);
+            $fim = Carbon::parse($this->finished_at);
+
+            $diff = abs($fim->diffInSeconds($inicio));
+
+            $h = floor($diff / 3600);
+            $m = floor(($diff % 3600) / 60);
+            $s = $diff % 60;
+
+            return sprintf('%02d:%02d:%02d', $h, $m, $s);
+        }
+
+        return '00:00:00';
+    }
 }
-
-
-}
-

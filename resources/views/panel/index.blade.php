@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>Painel de Chamadas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
 
         @keyframes pulse-glow-blue {
@@ -35,65 +37,85 @@
         animation: pulse-glow-green 2s infinite;
         }
 
-        h1, h3
+        /* h1, h3
         {
             font-family: 'Libre Baskerville', serif;
+        } */
+
+        h2, h1{
+            font-family: "Lora", serif;
+        }
+
+
+        p{
+            font-family: "Roboto Slab", serif;
         }
 
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="flex flex-col w-[50%] h-screen p-20">
-        <h1 class="text-6xl font-bold mb-10">Painel de Chamadas:</h1>
-        <div class="h-[50vh] w-[100%] bg-gray-600 rounded-lg flex justify-center items-center">
-            <iframe class="w-[100%] h-[100%]" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<body class="bg-gray-100 overflow-hidden">
+    <h1 class="text-5xl uppercase tracking-wide font-bold text-[#213555] text-center pt-7">Painel de Chamadas:</h1>
+    <section class="flex items-center justify-center min-h-screen -mt-10">
+        
+        <div class="flex flex-col w-[50%] h-screen p-20">
 
-            
-        </div>
+            <div class="h-[50vh] w-[120%] bg-gray-600 rounded-lg flex justify-center items-center">
+                <iframe class="w-[100%] h-[100%] rounded-lg" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-        @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
-            <div class="mt-10 bg-white p-6 rounded-lg shadow-lg w-full">
-                <h2 class="text-2xl font-bold mb-4">Atualizar Vídeo do Painel</h2>
-                @if(session('success'))
-                    <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                <form action="{{ route('panel.updateVideo') }}" method="POST">
-                    @csrf
-                    <input type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." class="w-full p-3 border border-gray-300 rounded mb-4" value="{{ $videoUrl }}" required>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar Vídeo</button>
-                </form>
+
             </div>
-        @endif
 
-        <div class="h-[20vh] w-[100%] shadow-2xl rounded-lg mt-5 p-8">
-            <h3 class="text-2xl font-bold">Ultimos atendimentos:</h3>
-        </div>
-    </div>
-
-    <div class="flex flex-col w-[50%] gap-10 h-screen p-20 items-center">
-        <h1 class="text-6xl font-bold">Senhas:</h1>
-         <!-- Card Triagem -->
-        <div id="card-triagem" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
-            <h2 class="text-3xl font-bold text-blue-600 mb-4">Triagem</h2>
-            <div id="triagem-list" class="space-y-2">
-                <p class="text-gray-500">Nenhum chamado</p>
+            <div class="h-[20vh] w-[120%] shadow-2xl rounded-lg mt-5 p-8">
+                <h3 class="text-2xl font-bold">Ultimos atendimentos:</h3>
             </div>
+
+            @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
+                <div class="mt-10 bg-white p-6 rounded-lg shadow-lg w-full">
+                    <h2 class="text-2xl font-bold mb-4">Atualizar Vídeo do Painel</h2>
+                    @if(session('success'))
+                        <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    <form action="{{ route('panel.updateVideo') }}" method="POST">
+                        @csrf
+                        <input type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." class="w-full p-3 border border-gray-300 rounded mb-4" value="{{ $videoUrl }}" required>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar Vídeo</button>
+                    </form>
+                </div>
+            @endif
         </div>
 
-        <!-- Card Atendimento -->
-        <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
-            <h2 class="text-3xl font-bold text-green-600 mb-4">Atendimento</h2>
-            <div id="atendimento-list" class="space-y-2">
-                <p class="text-gray-500">Nenhum chamado</p>
+        <div class="flex flex-col w-[50%] gap-10 h-screen p-20 items-center">
+            <div id="card-triagem" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
+                <h2 class="text-3xl font-bold text-blue-600 mb-4">Triagem</h2>
+                <div id="triagem-list" class="space-y-2">
+                    <p class="text-gray-500">Nenhum chamado</p>
+                </div>
             </div>
+
+            <!-- Card Atendimento -->
+            <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] min-h-[25vh]">
+                <h2 class="text-3xl font-bold text-green-600 mb-4">Atendimento</h2>
+                <div id="atendimento-list" class="space-y-2">
+                    <p class="text-gray-500">Nenhum chamado</p>
+                </div>
+            </div>
+
+            <button id="enable-sound-btn" class="px-5 py-5 bg-[#527cd1] text-white rounded-md hover:bg-[#223458] transition duration-300 w-[80%]">
+                Ativar Som de Notificação
+            </button>
         </div>
 
-        <button id="enable-sound-btn" class="px-5 py-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 w-[80%]">
-            Ativar Som de Notificação
-        </button>
-    </div>
+    </section>
+    <!-- <div class="relative mt-10">
+        <div class="w-[120%] h-12 bg-[#527cd1] shadow-xl -ml-12 -mt-36 rotate-2">
+            a
+        </div>
+        <div class=" absolute top-[132px] w-[120%] h-12 bg-[#90b5ff] -ml-28 -mt-36 -rotate-3">
+            a
+        </div>
+    </div> -->
     
 
     <audio id="notification-sound" src="/sounds/notification.mp3" preload="auto"></audio>

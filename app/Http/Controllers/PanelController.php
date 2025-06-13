@@ -80,7 +80,7 @@ class PanelController extends Controller
         if (!$userId) return null;
 
         $guiche = DB::table('user_guiche')
-            ->join('guiches', 'user_guiche.guiche_id', '=', 'guiches.id')  // corrigido aqui
+            ->join('guiches', 'user_guiche.guiche_id', '=', 'guiches.id') 
             ->where('user_guiche.user_id', $userId)
             ->where('user_guiche.created_at', '>=', now()->subHours(12))
             ->select('guiches.name')

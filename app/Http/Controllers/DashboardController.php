@@ -2,71 +2,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
-{
-    $query = Ticket::with('attendant')->where('status', 'finalizado');
+    public function index(Request $request)
+    {
+        $query = Ticket::with(['attendant', 'triagem'])->where('status', 'finalizado');
 
-    $date = request('date');
-    $month = request('month');
+        $tickets = $query->get();
 
-    if ($date) {
-        $query->whereDate('finished_at', Carbon::parse($date));
-    } elseif ($month) {
-        $query->whereMonth('finished_at', Carbon::parse($month)->month)
-              ->whereYear('finished_at', Carbon::parse($month)->year);
-    } else {
-        // Por padrão, mostra os de hoje
-        $query->whereDate('finished_at', Carbon::today());
+        // Atendimentos por usuário da triagem
+        $atendimentosPorUsuario = $tickets->groupBy('triagem_id')->map(function ($group) {
+            return [
+                'nome' => optional($group->first()->triagem)->name ?? 'Desconhecido',
+                'quantidade' => $group->count(),
+            ];
+        })->values();
+
+        // Tempo médio por usuário da triagem
+        $tempoMedioPorUsuario = $tickets->groupBy('triagem_id')->map(function ($group) {
+            $duracoes = $group->map(function ($ticket) {
+                $start = $ticket->called_tri_at; // chamado da triagem
+                if ($start && $ticket->finished_at) {
+                    return Carbon::parse($ticket->finished_at)->diffInSeconds(Carbon::parse($start));
+                }
+                return 0;
+            })->filter();
+
+            return [
+                'nome' => optional($group->first()->triagem)->name ?? 'Desconhecido',
+                'media' => $duracoes->isNotEmpty() ? round($duracoes->avg() / 60, 2) : 0,
+            ];
+        })->values();
+
+        // Tempo médio por usuário (considerando o campo chamado correto)
+        $tempoMedioPorUsuario = $tickets->groupBy('attendant_id')->map(function ($group) {
+            $duracoes = $group->map(function ($ticket) {
+                $start = $ticket->stage === 'triagem' 
+                    ? $ticket->called_tri_at 
+                    : $ticket->called_at;
+
+                if ($start && $ticket->finished_at) {
+                    return Carbon::parse($ticket->finished_at)->diffInSeconds(Carbon::parse($start));
+                }
+                return 0;
+            })->filter();
+
+            return [
+                'nome' => optional($group->first()->attendant)->name ?? 'Desconhecido',
+                'media' => $duracoes->isNotEmpty() ? round($duracoes->avg() / 60, 2) : 0, // média em minutos
+            ];
+        })->values();
+
+        // Atendimentos por serviço
+        $atendimentosPorServico = $tickets->groupBy('service')->map(function ($group, $service) {
+            return [
+                'servico' => $service ?? 'Não informado',
+                'quantidade' => $group->count(),
+            ];
+        })->values();
+
+        // Mapa para uso direto na view (ex: $atendimentosPorServicoMap['financeiro'])
+        $atendimentosPorServicoMap = $atendimentosPorServico->mapWithKeys(function ($item) {
+            return [strtolower($item['servico']) => $item['quantidade']];
+        });
+
+        return view('dashboard', [
+            'atendimentosPorUsuario' => $atendimentosPorUsuario,
+            'tempoMedioPorUsuario' => $tempoMedioPorUsuario,
+            'atendimentosPorServico' => $atendimentosPorServico,
+            'atendimentosPorServicoMap' => $atendimentosPorServicoMap,
+        ]);
     }
-
-    $tickets = $query->get();
-
-    $atendimentosPorUsuario = $tickets->groupBy('attendant_id')->map(function ($group) {
-        return [
-            'nome' => optional($group->first()->attendant)->name ?? 'Desconhecido',
-            'quantidade' => $group->count(),
-        ];
-    })->values();
-
-    $tempoMedioPorUsuario = $tickets->groupBy('attendant_id')->map(function ($group) {
-        $duracoes = $group->map(function ($ticket) {
-            if ($ticket->called_at && $ticket->finished_at) {
-                return Carbon::parse($ticket->finished_at)->diffInSeconds(Carbon::parse($ticket->called_at));
-            }
-            return 0;
-        })->filter();
-
-        return [
-            'nome' => optional($group->first()->attendant)->name ?? 'Desconhecido',
-            'media' => $duracoes->isNotEmpty() ? round($duracoes->avg() / 60, 2) : 0, // em minutos
-        ];
-    })->values();
-
-    $atendimentosPorServico = $tickets->groupBy('service')->map(function ($group, $service) {
-        return [
-            'servico' => $service ?? 'Não informado',
-            'quantidade' => $group->count(),
-        ];
-    })->values();
-
-    $atendimentosPorServicoMap = $atendimentosPorServico->mapWithKeys(function ($item) {
-        return [strtolower($item['servico']) => $item['quantidade']];
-    });
-
-
-    return view('dashboard', [
-        'atendimentosPorUsuario' => $atendimentosPorUsuario,
-        'tempoMedioPorUsuario' => $tempoMedioPorUsuario,
-        'atendimentosPorServico' => $atendimentosPorServico,
-        'atendimentosPorServicoMap' => $atendimentosPorServicoMap,
-    ]);
-
-}
-
 }

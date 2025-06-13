@@ -6,37 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
 
-            // Tipo de atendimento: regular ou preferencial
             $table->enum('type', ['regular', 'preferencial'])->default('regular');
-
-            // Serviço solicitado
             $table->enum('service', [
-                'financeiro',      // Questões financeiras, pagamentos, boletos
-                'documentacao',    // Entrega ou retirada de documentos
-                'informacoes',     // Suporte de informações gerais
-                'cadastro',        // Atualização ou criação de cadastros
-                'suporte'          // Suporte técnico ou específico
+                'financeiro',
+                'documentacao',
+                'informacoes',
+                'cadastro',
+                'suporte'
             ])->nullable();
             $table->enum('stage', ['triagem', 'atendimento'])->default('triagem');
             $table->enum('status', ['aguardando', 'triagem', 'atendimento', 'finalizado', 'cancelado'])->default('aguardando');
+
             $table->timestamp('called_at')->nullable();
+            $table->timestamp('called_tri_at')->nullable();       // ⬅️ adicionado
+            $table->timestamp('last_called_at')->nullable();      // ⬅️ adicionado
             $table->timestamp('finished_at')->nullable();
+
             $table->foreignId('attendant_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('tickets');

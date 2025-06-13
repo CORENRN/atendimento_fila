@@ -14,121 +14,154 @@ class TicketController extends Controller
         return view('home');
     }
 
-    public function queue($stage)
-    {
-        $status = $stage === 'triagem' ? 'triagem' : 'atendimento';
+public function queue($stage)
+{
+    $status = $stage === 'triagem' ? 'triagem' : 'atendimento';
 
-        $attendantId = auth()->id();
+    $attendantId = auth()->id();
 
-        $tickets = Ticket::where('stage', $stage)
-            ->whereIn('status', ['aguardando', $status])
-            ->orderByRaw('called_at IS NULL, called_at ASC')
-            ->orderBy('created_at')
-            ->get();
+    $tickets = Ticket::where('stage', $stage)
+        ->whereIn('status', ['aguardando', $status])
+        ->orderByRaw('called_at IS NULL, called_at ASC')
+        ->orderBy('created_at')
+        ->get();
 
-        $services = [
-            'financeiro' => 'Financeiro',
-            'documentacao' => 'Documentação',
-            'informacoes' => 'Informações',
-            'cadastro' => 'Cadastro',
-            'suporte' => 'Suporte',
+    $services = [
+        'financeiro' => 'Financeiro',
+        'documentacao' => 'Documentação',
+        'informacoes' => 'Informações',
+        'cadastro' => 'Cadastro',
+        'suporte' => 'Suporte',
+    ];
+
+    // Ticket que o atendente logado está atendendo (se existir)
+    $calledTicket = Ticket::where('stage', $stage)
+        ->where('attendant_id', $attendantId)
+        ->where('status', $status)
+        ->when($stage === 'triagem', function ($query) {
+            return $query->whereNotNull('called_tri_at');
+        }, function ($query) {
+            return $query->whereNotNull('called_at');
+        })
+        ->whereNull('finished_at')
+        ->first();
+
+    $called_id = $calledTicket?->id;
+
+    $statusCounts = Ticket::where('stage', $stage)
+        ->selectRaw('status, COUNT(*) as count')
+        ->groupBy('status')
+        ->pluck('count', 'status')
+        ->toArray();
+
+    return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts', 'calledTicket'));
+}
+
+
+  public function callNext($stage)
+{
+    $attendantId = auth()->id();
+
+    $existingCall = Ticket::where('stage', $stage)
+        ->where('attendant_id', $attendantId)
+        ->whereIn('status', ['triagem', 'atendimento'])
+        ->whereNotNull('called_at')
+        ->whereNull('finished_at')
+        ->first();
+
+    if ($existingCall) {
+        return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+    }
+
+    $ticket = Ticket::where('stage', $stage)
+        ->where('status', 'aguardando')
+        ->orderBy('created_at')
+        ->first();
+
+    if ($ticket) {
+        $data = [
+            'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
+            'attendant_id' => $attendantId,
+            'last_called_at' => now(),
         ];
 
-        // Ticket que o atendente logado está atendendo (se existir)
-        $calledTicket = Ticket::where('stage', $stage)
-            ->where('attendant_id', $attendantId)
-            ->whereIn('status', [$status])
-            ->whereNotNull('called_at')
-            ->whereNull('finished_at')
-            ->first();
+        if ($stage === 'triagem') {
+            if (!$ticket->called_tri_at) {
+                $data['called_tri_at'] = now();
+            }
+            $data['triagem_id'] = $attendantId;
+        } else {
+            if (!$ticket->called_at) {
+                $data['called_at'] = now();
+            }
+        }
 
-        $called_id = $calledTicket?->id;
+        $ticket->update($data);
 
-        $statusCounts = Ticket::where('stage', $stage)
-            ->selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+        event(new TicketUpdated($ticket));
 
-        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts', 'calledTicket'));
+        return back()->with('success', 'Ticket chamado com sucesso.');
     }
 
-    public function callNext($stage)
-    {
-        $attendantId = auth()->id();
+    return back()->with('info', 'Não há tickets aguardando na fila.');
+}
 
-        $existingCall = Ticket::where('stage', $stage)
-            ->where('attendant_id', $attendantId)
-            ->whereIn('status', ['triagem', 'atendimento'])
-            ->whereNotNull('called_at')
-            ->whereNull('finished_at')
-            ->first();
 
-        if ($existingCall) {
-            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
-        }
 
-        $ticket = Ticket::where('stage', $stage)
-            ->where('status', 'aguardando')
-            ->orderBy('created_at')
-            ->first();
 
-        if ($ticket) {
-            $data = [
-                'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
-                'attendant_id' => $attendantId,
-                'called_at' => $ticket->called_at ?? now(),
-            ];
+ public function callNextPriority($stage)
+{
+    $attendantId = auth()->id();
 
-            $ticket->update($data);
+    $existingCall = Ticket::where('stage', $stage)
+        ->where('attendant_id', $attendantId)
+        ->whereIn('status', ['triagem', 'atendimento'])
+        ->whereNotNull('called_at')
+        ->whereNull('finished_at')
+        ->first();
 
-            event(new TicketUpdated($ticket));
-
-            return back()->with('success', 'Ticket chamado com sucesso.');
-        }
-
-        return back()->with('info', 'Não há tickets aguardando na fila.');
+    if ($existingCall) {
+        return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
     }
 
-    public function callNextPriority($stage)
-    {
-        $attendantId = auth()->id();
+    $ticket = Ticket::where('stage', $stage)
+        ->where('status', 'aguardando')
+        ->where('type', 'preferencial')
+        ->orderBy('created_at')
+        ->first();
 
-        $existingCall = Ticket::where('stage', $stage)
-            ->where('attendant_id', $attendantId)
-            ->whereIn('status', ['triagem', 'atendimento'])
-            ->whereNotNull('called_at')
-            ->whereNull('finished_at')
-            ->first();
+    if ($ticket) {
+        $data = [
+            'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
+            'attendant_id' => $attendantId,
+            'last_called_at' => now(),
+        ];
 
-        if ($existingCall) {
-            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+        if ($stage === 'triagem') {
+            if (!$ticket->called_tri_at) {
+                $data['called_tri_at'] = now();
+            }
+            $data['triagem_id'] = $attendantId;
+        } else {
+            if (!$ticket->called_at) {
+                $data['called_at'] = now();
+            }
         }
 
-        $ticket = Ticket::where('stage', $stage)
-            ->where('status', 'aguardando')
-            ->where('type', 'preferencial')
-            ->orderBy('created_at')
-            ->first();
+        $ticket->update($data);
 
-        if ($ticket) {
-            $data = [
-                'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
-                'attendant_id' => $attendantId,
-                'called_at' => $ticket->called_at ?? now(),
-            ];
+        event(new TicketUpdated($ticket));
 
-            $ticket->update($data);
-
-            event(new \App\Events\TicketUpdated($ticket));
-
-            return back()->with('success', 'Ticket prioritário chamado com sucesso.');
-        }
-
-        return back()->with('info', 'Não há tickets prioritários aguardando na fila.');
+        return back()->with('success', 'Ticket prioritário chamado com sucesso.');
     }
 
-   public function recall(Request $request, $id)
+    return back()->with('info', 'Não há tickets prioritários aguardando na fila.');
+}
+
+
+
+
+    public function recall(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
 
@@ -141,7 +174,7 @@ class TicketController extends Controller
         }
 
         $ticket->update([
-            'called_at' => now(),
+            'last_called_at' => now(),
         ]);
 
         event(new TicketUpdated($ticket));
