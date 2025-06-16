@@ -106,6 +106,21 @@ public function queue($stage)
     return back()->with('info', 'Não há tickets aguardando na fila.');
 }
 
+public function getTicketsJson($stage)
+{
+    $statusValue = $stage === 'triagem' ? 'triagem' : 'atendimento';
+
+    $tickets = Ticket::where('stage', $stage)
+        ->whereIn('status', ['aguardando', $statusValue])
+        ->orderByRaw('called_at IS NULL, called_at ASC')
+        ->orderBy('created_at')
+        ->get();
+
+    return response()->json([
+        'tickets' => $tickets,
+    ]);
+}
+
 
 
 

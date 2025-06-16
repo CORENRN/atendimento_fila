@@ -23,7 +23,21 @@ class PanelController extends Controller
     public function index()
     {
         $videoUrl = \App\Models\Setting::get('video_url', 'https://www.youtube.com/embed/42s7LKG5GQE');
-        return view('panel.index', compact('videoUrl'));
+
+        // Buscar os últimos atendimentos finalizados (exemplo: últimos 10)
+        $lastAtendimentos = Ticket::where('status', 'finalizado')
+            ->latest('finished_at')
+            ->limit(3)
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id' => sprintf('%04d', $t->id),
+                    'finished_at' => $t->finished_at ? $t->finished_at->format('d/m/Y H:i:s') : '-',
+                    'guiche' => $this->getGuicheName($t->attendant_id),
+                ];
+            });
+
+        return view('panel.index', compact('videoUrl', 'lastAtendimentos'));
     }
 
     public function updateVideo(Request $request)
@@ -43,37 +57,38 @@ class PanelController extends Controller
         return redirect()->back()->with('success', 'Vídeo atualizado com sucesso.');
     }
 
-    public function data()
-    {
-        $triagem = Ticket::where('stage', 'triagem')
-            ->where('status', 'triagem')
-            ->whereNotNull('called_at')
-            ->whereNull('finished_at')
-            ->latest('called_at')
-            ->get()
-            ->map(fn($t) => [
-                'id' => sprintf('%04d', $t->id),
-                'called_at' => $t->called_at->format('H:i:s'),
-                'guiche' => $this->getGuicheName($t->attendant_id),
-            ]);
-
-        $atendimento = Ticket::where('stage', 'atendimento')
-            ->where('status', 'atendimento')
-            ->whereNotNull('called_at')
-            ->whereNull('finished_at')
-            ->latest('called_at')
-            ->get()
-            ->map(fn($t) => [
-                'id' => sprintf('%04d', $t->id),
-                'called_at' => $t->called_at->format('H:i:s'),
-                'guiche' => $this->getGuicheName($t->attendant_id),
-            ]);
-
-        return response()->json([
-            'triagem' => $triagem,
-            'atendimento' => $atendimento,
+   public function data()
+{
+    $triagem = Ticket::where('stage', 'triagem')
+        ->where('status', 'triagem')
+        ->whereNotNull('called_tri_at')
+        ->whereNull('finished_at')
+        ->latest('called_tri_at')  // corrigido aqui
+        ->get()
+        ->map(fn($t) => [
+            'id' => sprintf('%04d', $t->id),
+            'called_at' => $t->called_tri_at->format('H:i:s'),  // aqui também usar chamado_tri_at
+            'guiche' => $this->getGuicheName($t->attendant_id),
         ]);
-    }
+
+    $atendimento = Ticket::where('stage', 'atendimento')
+        ->where('status', 'atendimento')
+        ->whereNotNull('called_at')
+        ->whereNull('finished_at')
+        ->latest('called_at')
+        ->get()
+        ->map(fn($t) => [
+            'id' => sprintf('%04d', $t->id),
+            'called_at' => $t->called_at->format('H:i:s'),
+            'guiche' => $this->getGuicheName($t->attendant_id),
+        ]);
+
+    return response()->json([
+        'triagem' => $triagem,
+        'atendimento' => $atendimento,
+    ]);
+}
+
 
     private function getGuicheName($userId)
     {

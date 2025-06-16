@@ -65,9 +65,25 @@
 
             </div>
 
-            <div class="h-[20vh] w-[120%] shadow-2xl rounded-lg mt-5 p-8">
-                <h3 class="text-2xl font-bold">Ultimos atendimentos:</h3>
-            </div>
+        <div class="h-[30vh] w-[120%] shadow-2xl bg-white rounded-lg mt-5 p-8">
+            <h3 class="text-2xl font-bold mb-4">Últimos atendimentos:</h3>
+
+            @if($lastAtendimentos->isEmpty())
+                <p class="text-gray-500">Nenhum atendimento registrado</p>
+            @else
+                <div class="flex gap-4 ">
+                    @foreach($lastAtendimentos as $atendimento)
+                        <div class="flex-shrink-0 w-[32%] bg-white p-3 rounded-lg shadow-md border border-gray-300">
+                            <p class="font-bold text-3xl text-[#213555] mb-2">#{{ $atendimento['id'] }}</p>
+                            <p class="text-gray-600 mb-2">{{ $atendimento['finished_at'] }}</p>
+                            @if($atendimento['guiche'])
+                                <p class="text-green-600 font-semibold">Guichê: {{ $atendimento['guiche'] }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
 
             @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
                 <div class="mt-10 bg-white p-6 rounded-lg shadow-lg w-full">

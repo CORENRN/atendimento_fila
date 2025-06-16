@@ -17,7 +17,20 @@
             </div>
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filtrar</button>
         </form>
+            @if(request('date') || request('month'))
+            <div class="text-sm text-gray-600 italic mt-6">
+                Filtro aplicado: 
+                @if(request('date'))
+                    Dia: {{ \Carbon\Carbon::parse(request('date'))->format('d/m/Y') }}
+                @endif
+                @if(request('month'))
+                    Mês: {{ \Carbon\Carbon::parse(request('month'))->translatedFormat('F Y') }}
+                @endif
+            </div>
+        @endif
+
     </div>
+
 
     
     <div class="w-full flex flex-col h-[79vh] gap-5 rounded">
@@ -74,7 +87,6 @@
                 </div>
             </div>
 
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -90,8 +102,10 @@
         const atendimentosUsuarios = atendimentosPorUsuario.map(item => item.quantidade);
         // Tempo médio em minutos (já arredondado no backend), converter para segundos para o gráfico?
         // Como o gráfico está em segundos, vamos converter para segundos * 60
-        const tempoMedioUsuariosSeg = tempoMedioPorUsuario.map(item => item.media * 60);
+        const tempoMedioUsuariosSeg = tempoMedioPorUsuario.map(item => Math.abs(item.media));
 
+
+        
         // Função para formatar segundos em hh:mm:ss
         function formatarTempo(segundos) {
             const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
@@ -140,11 +154,10 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            // Mostrar em hh:mm:ss no eixo Y
                             callback: function(value) {
                                 return formatarTempo(value);
                             }
-                        }
+                        },
                     }
                 },
                 plugins: {
@@ -185,6 +198,9 @@
                 }
             }
         });
+
+        console.log(labelsUsuarios); // mesmo tamanho que tempoMedioUsuariosSeg?
+        console.log(tempoMedioUsuariosSeg);
     </script>
 
 </div>

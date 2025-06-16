@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('queue')->group(function () {
         Route::get('{stage}', [TicketController::class, 'queue'])->name('queue');
+        Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])->name('queue.tickets.json');
         Route::post('{stage}/call', [TicketController::class, 'callNext'])->name('queue.call');
         Route::post('{id}/finish', [TicketController::class, 'finish'])->name('queue.finish');
         Route::post('{id}/cancel', [TicketController::class, 'cancel'])->name('queue.cancel');

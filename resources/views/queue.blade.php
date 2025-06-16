@@ -4,38 +4,49 @@
 <section class="h-screen w-screen relative">
 
   <!-- Sidebar -->
-    <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
-        <nav class="flex flex-col h-fit p-5 rounded-md bg-white shadow-2xl gap-5">
-            <h2 class="font-semibold text-lg tracking-widest text-gray-500/50">MENU</h2>
-            @foreach([
+   <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
+    <nav class="flex flex-col h-fit p-5 rounded-md bg-white shadow-2xl gap-5">
+        <h2 class="font-semibold text-lg tracking-widest text-gray-500/50">MENU</h2>
+
+        @php
+            // Função para verificar se usuário é admin ou superAdmin
+            $isAdmin = auth()->check() && in_array(auth()->user()->categoria ?? '', ['admin', 'superAdmin']);
+
+            // Monta o array de rotas conforme permissão
+            $menuItems = [
                 ['home', 'Home'],
-                ['dashboard', 'Dashboard'],
+                // Só adiciona dashboard se for admin ou superAdmin
+                ...($isAdmin ? [['dashboard', 'Dashboard']] : []),
                 ['ticket.take', 'Retirar Senha'],
                 ['queue', 'Fila de Triagem', 'triagem'],
                 ['queue', 'Fila de Atendimento', 'atendimento'],
-            ] as $item)
-                @php
-                    $isActive = false;
+            ];
+        @endphp
 
-                    if ($item[0] === 'queue') {
-                        $isActive = Route::currentRouteName() === 'queue' && (request()->route('stage') === ($item[2] ?? ''));
-                    } else {
-                        $isActive = Route::currentRouteName() === $item[0];
-                    }
+        @foreach($menuItems as $item)
+            @php
+                $isActive = false;
 
-                    $baseClasses = 'h-10 transition duration-300 text-black px-4 py-2 rounded';
-                    $activeClasses = $isActive ? 'bg-black text-white' : 'bg-white hover:bg-gray-200';
-                @endphp
+                if ($item[0] === 'queue') {
+                    $isActive = Route::currentRouteName() === 'queue' && (request()->route('stage') === ($item[2] ?? ''));
+                } else {
+                    $isActive = Route::currentRouteName() === $item[0];
+                }
 
-                <a 
-                    href="{{ isset($item[2]) ? route($item[0], $item[2]) : route($item[0]) }}" 
-                    class="{{ $baseClasses }} {{ $activeClasses }}"
-                >
-                    {{ $item[1] }}
-                </a>
-            @endforeach
-        </nav>
-    </aside>
+                $baseClasses = 'h-10 transition duration-300 text-black px-4 py-2 rounded';
+                $activeClasses = $isActive ? 'bg-black text-white' : 'bg-white hover:bg-gray-200';
+            @endphp
+
+            <a 
+                href="{{ isset($item[2]) ? route($item[0], $item[2]) : route($item[0]) }}" 
+                class="{{ $baseClasses }} {{ $activeClasses }}"
+            >
+                {{ $item[1] }}
+            </a>
+        @endforeach
+    </nav>
+</aside>
+
 
 
     <!-- Título -->
@@ -293,6 +304,67 @@
 
 </section>
 
-  
+  <script>
+    async function fetchTickets() {
+        try {
+            // Ajuste a URL para seu endpoint, usando o estágio atual da fila
+            const stage = "{{ $stage }}";
+            const url = `/queue/tickets/${stage}`;
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Erro ao buscar tickets');
+
+            const data = await response.json();
+
+            // Função para atualizar o tbody da tabela
+            updateTable(data.tickets);
+        } catch (error) {
+            console.error('Erro ao atualizar fila:', error);
+        }
+    }
+
+    function updateTable(tickets) {
+        const tbody = document.getElementById('tickets-body');
+        tbody.innerHTML = ''; // limpa tabela
+
+        if (tickets.length === 0) {
+            tbody.innerHTML = `
+                <tr id="empty-row">
+                    <td colspan="{{ $stage === 'atendimento' ? 6 : 5 }}" class="p-4 text-center text-gray-500">
+                        Nenhum ticket na fila.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        tickets.forEach(ticket => {
+            // Ajuste as colunas conforme seu layout
+            const tr = document.createElement('tr');
+            tr.id = `ticket-${ticket.id}`;
+
+            let innerHTML = `
+                <td class="p-2 border text-center">${ticket.id}</td>
+                <td class="p-2 border">${ticket.type}</td>`;
+
+            if ("{{ $stage }}" === 'atendimento') {
+                innerHTML += `<td class="p-2 border">${ticket.service ?? '-'}</td>`;
+            }
+
+            innerHTML += `
+                <td class="p-2 border text-center">${ticket.status.toUpperCase()}</td>
+                <td class="p-2 border text-center">-</td>`;
+
+            tr.innerHTML = innerHTML;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Atualiza a tabela a cada 5 segundos (5000ms)
+    setInterval(fetchTickets, 5000);
+
+    // Busca inicial
+    fetchTickets();
+</script>
+
 
 @endsection
