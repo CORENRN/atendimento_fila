@@ -67,7 +67,7 @@
         <div class="mb-4 flex space-x-4">
             <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
                 @csrf
-                <button class="bg-black transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-600">
+                <button class="bg-black transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-400 hover:text-black">
                     Chamar Próximo
                 </button>
             </form>
@@ -235,18 +235,21 @@
                             @if($canFinish)
                                 <div>
                                     <h3 class="font-bold mb-1">Encerrar:</h3>
-                                    <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button class="bg-green-500 w-full transition duration-300 text-white px-3 py-3 rounded hover:bg-green-600 mb-3">
-                                            Finalizar
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button class="bg-red-500 transition duration-300 w-full text-white px-3 py-3 rounded hover:bg-red-600">
-                                            Cancelar
-                                        </button>
-                                    </form>
+                                    <div class="flex flex-row w-full gap-6">
+                                        <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
+                                            @csrf
+                                            <button class="bg-green-500 w-full transition duration-300 text-white px-3 py-3 rounded hover:bg-green-600 mb-3">
+                                                Finalizar
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
+                                            @csrf
+                                            <button class="bg-red-500 transition duration-300 w-full text-white px-3 py-3 rounded hover:bg-red-600">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
+
                                 </div>
 
                                 @if($stage === 'triagem')

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\User;
+use App\Models\PrinterM; // Importa o model de impressoras
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PanelController extends Controller
 {
-
     private function formatYoutubeUrl($url)
     {
-        // Extrai o ID do vídeo, suportando links comuns e links encurtados
         preg_match(
             '%(?:youtube\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i',
             $url,
@@ -24,7 +24,6 @@ class PanelController extends Controller
     {
         $videoUrl = \App\Models\Setting::get('video_url', 'https://www.youtube.com/embed/42s7LKG5GQE');
 
-        // Buscar os últimos atendimentos finalizados (exemplo: últimos 10)
         $lastAtendimentos = Ticket::where('status', 'finalizado')
             ->latest('finished_at')
             ->limit(3)
@@ -38,6 +37,20 @@ class PanelController extends Controller
             });
 
         return view('panel.index', compact('videoUrl', 'lastAtendimentos'));
+    }
+
+    public function adminPanel()
+    {
+        $videoUrl = \App\Models\Setting::get('video_url', 'https://www.youtube.com/embed/42s7LKG5GQE');
+
+        // Buscando todas as impressoras para a view
+        $printers = PrinterM::all();
+
+        //Buiscando todos os usuários
+        $users = User::all();
+
+        // Passando impressoras e vídeo para a view
+        return view('panel.admin', compact('videoUrl', 'printers', 'users'));
     }
 
     public function updateVideo(Request $request)
@@ -57,45 +70,44 @@ class PanelController extends Controller
         return redirect()->back()->with('success', 'Vídeo atualizado com sucesso.');
     }
 
-   public function data()
-{
-    $triagem = Ticket::where('stage', 'triagem')
-        ->where('status', 'triagem')
-        ->whereNotNull('called_tri_at')
-        ->whereNull('finished_at')
-        ->latest('called_tri_at')  // corrigido aqui
-        ->get()
-        ->map(fn($t) => [
-            'id' => sprintf('%04d', $t->id),
-            'called_at' => $t->called_tri_at->format('H:i:s'),  // aqui também usar chamado_tri_at
-            'guiche' => $this->getGuicheName($t->attendant_id),
+    public function data()
+    {
+        $triagem = Ticket::where('stage', 'triagem')
+            ->where('status', 'triagem')
+            ->whereNotNull('called_tri_at')
+            ->whereNull('finished_at')
+            ->latest('called_tri_at')
+            ->get()
+            ->map(fn($t) => [
+                'id' => sprintf('%04d', $t->id),
+                'called_at' => $t->called_tri_at->format('H:i:s'),
+                'guiche' => $this->getGuicheName($t->attendant_id),
+            ]);
+
+        $atendimento = Ticket::where('stage', 'atendimento')
+            ->where('status', 'atendimento')
+            ->whereNotNull('called_at')
+            ->whereNull('finished_at')
+            ->latest('called_at')
+            ->get()
+            ->map(fn($t) => [
+                'id' => sprintf('%04d', $t->id),
+                'called_at' => $t->called_at->format('H:i:s'),
+                'guiche' => $this->getGuicheName($t->attendant_id),
+            ]);
+
+        return response()->json([
+            'triagem' => $triagem,
+            'atendimento' => $atendimento,
         ]);
-
-    $atendimento = Ticket::where('stage', 'atendimento')
-        ->where('status', 'atendimento')
-        ->whereNotNull('called_at')
-        ->whereNull('finished_at')
-        ->latest('called_at')
-        ->get()
-        ->map(fn($t) => [
-            'id' => sprintf('%04d', $t->id),
-            'called_at' => $t->called_at->format('H:i:s'),
-            'guiche' => $this->getGuicheName($t->attendant_id),
-        ]);
-
-    return response()->json([
-        'triagem' => $triagem,
-        'atendimento' => $atendimento,
-    ]);
-}
-
+    }
 
     private function getGuicheName($userId)
     {
         if (!$userId) return null;
 
         $guiche = DB::table('user_guiche')
-            ->join('guiches', 'user_guiche.guiche_id', '=', 'guiches.id') 
+            ->join('guiches', 'user_guiche.guiche_id', '=', 'guiches.id')
             ->where('user_guiche.user_id', $userId)
             ->where('user_guiche.created_at', '>=', now()->subHours(12))
             ->select('guiches.name')

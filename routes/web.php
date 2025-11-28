@@ -48,6 +48,9 @@ Route::middleware('auth')->group(function () {
 
     });
 
+    Route::get('/adminPanel', [PanelController::class, 'adminPanel'])->middleware('adminOrSuper')->name('adminPanel');
+    Route::get('/impressoras', [PrintController::class, 'index'])->name('printers.index');
+    Route::post('/impressoras', [PrintController::class, 'store'])->name('printers.store');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('adminOrSuper')->name('dashboard');
 

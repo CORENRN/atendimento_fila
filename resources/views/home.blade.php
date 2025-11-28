@@ -3,14 +3,10 @@
 @section('content')
 <div class="flex h-screen">
     <div class="relative flex flex-col text-6xl font-black w-[50%] h-full bg-white items-center justify-center">
-        <!-- <img src="{{ asset('images/atendimento.jpg') }}" 
-            alt="tickets" 
+        <img src="{{ asset('images/atendimento.jpg') }}" 
+            alt="tickets"
             class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-blue-800 opacity-50"></div> -->
-
-        <img src="{{ asset('images/homeimage.png') }}" 
-            alt="tickets" 
-            class="w-[90%] mb-20">
+        <div class="absolute inset-0 bg-blue-800 opacity-50"></div>
     </div>
 
     <div class="bg-white w-[50%] h-full flex flex-col items-center justify-center">
@@ -33,7 +29,7 @@
                     <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#527cd1] transition duration-300 text-white px-6 py-7 rounded hover:bg-[#8aabec] hover:text-[#eef4ff]"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Fila de Triagem</a>
                     <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/graficoico.png') }}" alt="atendente" class="w-14">Dashboard</a>
-                    <a href="{{ route('panel.index') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel</a>
+                    <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 transition duration-300 bg-[#527cd1] hover:bg-[#8aabec] hover:text-[#eef4ff] text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel do Administrador</a>
                 @endif
             </div>
     </div>

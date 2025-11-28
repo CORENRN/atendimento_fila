@@ -277,11 +277,11 @@ public function getTicketsJson($stage)
             'status' => 'aguardando',
         ]);
 
-        try {
-            app(PrintController::class)->printTicket($ticket->id);
-        } catch (\Exception $e) {
-            \Log::error('Erro na impressão: ' . $e->getMessage());
-        }
+        // try {
+        //     app(PrintController::class)->printTicket($ticket->id);
+        // } catch (\Exception $e) {
+        //     \Log::error('Erro na impressão: ' . $e->getMessage());
+        // }
 
         return redirect()->route('ticket.show', ['id' => $ticket->id]);
     }

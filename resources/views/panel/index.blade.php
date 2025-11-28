@@ -84,22 +84,6 @@
                 </div>
             @endif
         </div>
-
-            @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
-                <div class="mt-10 bg-white p-6 rounded-lg shadow-lg w-full">
-                    <h2 class="text-2xl font-bold mb-4">Atualizar Vídeo do Painel</h2>
-                    @if(session('success'))
-                        <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    <form action="{{ route('panel.updateVideo') }}" method="POST">
-                        @csrf
-                        <input type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." class="w-full p-3 border border-gray-300 rounded mb-4" value="{{ $videoUrl }}" required>
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar Vídeo</button>
-                    </form>
-                </div>
-            @endif
         </div>
 
         <div class="flex flex-col w-[50%] gap-10 h-screen p-20 items-center">

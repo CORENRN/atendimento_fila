@@ -36,6 +36,12 @@
             font-weight: normal;
         }
     </style>
+
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+    </script>
 </head>
 <body>
 
