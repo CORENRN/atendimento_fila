@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="h-screen w-screen relative">
+<section class="h-screen w-screen relative bg-[#141e22]">
 
   <!-- Sidebar -->
    <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
-    <nav class="flex flex-col h-fit p-5 rounded-md bg-white shadow-2xl gap-5">
+    <nav class="flex flex-col h-fit p-5 rounded-md bg-[#202e36] shadow-2xl gap-5">
         <h2 class="font-semibold text-lg tracking-widest text-gray-500/50">MENU</h2>
 
         @php
@@ -50,8 +50,8 @@
 
 
     <!-- Título -->
-     <div class="flex items-center mb-4 z-10 justify-center bg-[#edf3ff] h-48 w-full">
-        <h1 class="text-4xl text-[#142136] font-bold px-4 py-2 -mt-24">
+     <div class="flex items-center mb-4 z-10 bg-[#141e22] justify-center  h-48 w-full">
+        <h1 class="text-4xl text-[#56cbec] font-bold px-4 py-2 -mt-24">
             Fila de {{ $stage === 'triagem' ? 'Triagem' : 'Atendimento' }}
         </h1>
      </div>
@@ -61,48 +61,50 @@
     <section class="flex ml-64 h-full z-10 -mt-28">
 
         <!-- Painel da fila -->
-        <div class="min-w-[50%] h-[75vh] bg-white p-8 rounded shadow">
+        <div class="min-w-[50%] h-[75vh] bg-[#1a262b] p-8 rounded shadow">
 
-        <h1 class="w-full text-center text-3xl font-bold mb-5">Chamada de Tickets</h1>
+        <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
         <div class="mb-4 flex space-x-4">
-            <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
-                @csrf
-                <button class="bg-black transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-400 hover:text-black">
-                    Chamar Próximo
-                </button>
-            </form>
+            <div class= "mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">
+                <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
+                    @csrf
+                    <button class="bg-[#202e36] border-2 border-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-400 hover:text-black">
+                        Próximo
+                    </button>
+                </form>
 
-            <form action="{{ route('queue.priority', $stage) }}" method="POST" class="flex-1">
-                @csrf
-                <button class="bg-red-600 transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red-700">
-                    Chamar Prioritário
-                </button>
-            </form>
+                <form action="{{ route('queue.priority', $stage) }}" method="POST" class="flex-1">
+                    @csrf
+                    <button class=" transition bg-[#202e36] border-2 border-red-600 duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red-700">
+                        Prioritário
+                    </button>
+                </form>
 
-            <form action="{{ route('queue.recall', $calledTicket?->id ?? 0) }}" method="POST" class="flex-1">
-                @csrf
-                <button 
-                    type="submit"
-                    @if(!$calledTicket) disabled class="bg-gray-400 text-white w-full uppercase tracking-wider font-black px-4 py-5 rounded cursor-not-allowed" 
-                    @else class="bg-blue-500 transition duration-300 text-white w-full py-5 rounded uppercase tracking-wider font-black hover:bg-blue-600" 
-                    @endif
-                >
-                    Chamar Novamente
-                </button>
-            </form>
+                <form action="{{ route('queue.recall', $calledTicket?->id ?? 0) }}" method="POST" class="flex-1">
+                    @csrf
+                    <button 
+                        type="submit"
+                        @if(!$calledTicket) disabled class=" border-2 border-[#ffeb39] text-white w-full bg-[#202e36] uppercase tracking-wider font-black px-4 py-5 rounded cursor-not-allowed" 
+                        @else class="bg-blue-500  transition duration-300 text-white w-full py-5 rounded uppercase tracking-wider font-black hover:bg-blue-600" 
+                        @endif
+                    >
+                        Novamente
+                    </button>
+                </form>
+            </div>
         </div>
 
             <!-- Tabela de tickets -->
             <table class="w-full text-sm text-left rtl:text-right text-gray-900">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr class="bg-gray-200">
-                        <th class="p-2 border">ID</th>
-                        <th class="p-2 border">Tipo</th>
+                    <tr class="bg-[#202e36]">
+                        <th class="p-2 text-[#eceef0]">ID</th>
+                        <th class="p-2 text-[#eceef0]">Tipo</th>
                         @if($stage === 'atendimento')
-                            <th class="p-2 border">Serviço</th>
+                            <th class="p-2 text-[#eceef0]">Serviço</th>
                         @endif
-                        <th class="p-2 border">Status</th>
-                        <th class="p-2 border">Ações</th>
+                        <th class="p-2 text-[#eceef0]">Status</th>
+                        <th class="p-2 text-[#eceef0]">Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tickets-body">

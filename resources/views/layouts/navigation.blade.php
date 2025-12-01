@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-gray-100 dark:border-gray-700 py-3 shadow-lg">
+<nav x-data="{ open: false }" class=" bg-[#141e22] border-gray-100 dark:border-gray-700 py-3 shadow-lg">
     <!-- Primary Navigation Menu -->
     <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between px-11 h-16">
@@ -6,14 +6,14 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}">
-                <h1 class="flex items-center text-xl font-black text-[#213555] ">ATENDIMENT<div>
+                <h1 class="flex items-center text-xl font-black text-[#56cbec] ">ATENDIMENT<div>
                 <svg width="20px" class="mt-0" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <path fill="none" d="M0 0h24v24H0z"/>
-                        <path fill="#213555" d="M21 8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1.062A8.001 8.001 0 0 1 12 23v-2a6 6 0 0 0 6-6V9A6 6 0 1 0 6 9v7H3a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1.062a8.001 8.001 0 0 1 15.876 0H21zM7.76 15.785l1.06-1.696A5.972 5.972 0 0 0 12 15a5.972 5.972 0 0 0 3.18-.911l1.06 1.696A7.963 7.963 0 0 1 12 17a7.963 7.963 0 0 1-4.24-1.215z"/>
+                        <path fill="#56cbec" d="M21 8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1.062A8.001 8.001 0 0 1 12 23v-2a6 6 0 0 0 6-6V9A6 6 0 1 0 6 9v7H3a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1.062a8.001 8.001 0 0 1 15.876 0H21zM7.76 15.785l1.06-1.696A5.972 5.972 0 0 0 12 15a5.972 5.972 0 0 0 3.18-.911l1.06 1.696A7.963 7.963 0 0 1 12 17a7.963 7.963 0 0 1-4.24-1.215z"/>
                     </g>
                 </svg>
-                </div><span class="text-[#527cd1] ml-3">COREN</span></h1>
+                </div><span class="text-[#eceef0] ml-3">COREN</span></h1>
                         
                     </a>
                 </div>

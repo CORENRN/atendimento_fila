@@ -33,7 +33,7 @@
             <div class="w-[50%] bg-[#bddafc] h-screen flex flex-col items-center justify-center">
                 <img src="{{ asset('images/login.png') }}" alt="atendente" class="w-[70%] -mt-20">
                 <h2 class="text-5xl font-black text-[#213555] text-center">Bem Vindo(a) de volta!</h2>
-                <p class="text-lg text-center  mt-5 text-[#213555]/80 max-w-[50%]">o "Atendimento Coren" é um sistema que veio para facilitar os processos profissionais de atendimento!</p>
+                <p class="text-lg text-center  mt-5 text-[#213555]/80 max-w-[50%]">o "" é um sistema que veio para facilitar os processos profissionais de atendimento!</p>
             </div>
             <div class="w-[50%] bg-[#F8FAFC] h-screen flex flex-col items-center justify-center">
                 <h1 class="flex items-center text-4xl font-black text-[#213555] ">ATENDIMENT<div>
