@@ -6,7 +6,7 @@
   <!-- Sidebar -->
    <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
     <nav class="flex flex-col h-fit p-5 rounded-md bg-[#202e36] shadow-2xl gap-5">
-        <h2 class="font-semibold text-lg tracking-widest text-gray-500/50">MENU</h2>
+        <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>
 
         @php
             // Função para verificar se usuário é admin ou superAdmin
@@ -68,14 +68,14 @@
             <div class= "mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">
                 <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
                     @csrf
-                    <button class="bg-[#202e36] border-2 border-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-gray-400 hover:text-black">
+                    <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
                         Próximo
                     </button>
                 </form>
 
                 <form action="{{ route('queue.priority', $stage) }}" method="POST" class="flex-1">
                     @csrf
-                    <button class=" transition bg-[#202e36] border-2 border-red-600 duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red-700">
+                    <button class=" transition bg-[#202e36] border-2 border-red duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red">
                         Prioritário
                     </button>
                 </form>
@@ -84,7 +84,7 @@
                     @csrf
                     <button 
                         type="submit"
-                        @if(!$calledTicket) disabled class=" border-2 border-[#ffeb39] text-white w-full bg-[#202e36] uppercase tracking-wider font-black px-4 py-5 rounded cursor-not-allowed" 
+                        @if(!$calledTicket) disabled class=" border-2 border-[#ffeb39] hover:bg-[#ffeb39] text-white w-full bg-[#202e36] uppercase tracking-wider font-black px-4 py-5 rounded cursor-not-allowed" 
                         @else class="bg-blue-500  transition duration-300 text-white w-full py-5 rounded uppercase tracking-wider font-black hover:bg-blue-600" 
                         @endif
                     >

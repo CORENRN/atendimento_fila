@@ -27,8 +27,8 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
 
-    <div class="p-8 rounded">
-        <h1 class="text-5xl mb-2 text-center text-[#213555] font-black uppercase">Retirar Senha</h1>
+    <div class="p-8 rounde">
+        <h1 class="text-5xl mb-2 text-center font-black uppercase">Retirar Senha</h1>
 
        <form action="{{ route('ticket.take.post') }}" method="POST">
         @csrf

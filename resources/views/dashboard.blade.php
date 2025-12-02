@@ -2,20 +2,22 @@
 
 @section('content')
 
-<div class="p-10 w-full -mt-4">
+<div class="p-10 w-full bg-blackPrimary -mt-4">
 
-    <div class="flex items-center gap-10 mb-5">
-        <h1 class="text-3xl text-[#213555] font-bold">Dashboard de Atendimentos:</h1>
+    <div class="flex items-center black gap-10 mb-5">
+        <h1 class="text-3xl text-lightW font-bold">Dashboard de Atendimentos:</h1>
         <form method="GET" action="{{ route('dashboard') }}" class=" flex gap-4 items-end">
             <div>
-                <label for="date" class="block font-medium text-[#213555]">Data:</label>
+                <label for="date" class="block font-medium text-lightW">Data:</label>
                 <input type="date" id="date" name="date" value="{{ request('date') }}" class="border rounded px-3 py-2">
             </div>
             <div>
-                <label for="month" class="block font-medium text-[#213555]">Mês:</label>
+                <label for="month" class="block font-medium text-lightW">Mês:</label>
                 <input type="month" id="month" name="month" value="{{ request('month') }}" class="border rounded px-3 py-2">
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filtrar</button>
+            <div class="bg-blackSecondary hover:p-1 duration-300 rounded">
+                <button type="submit" class="bg-blackThirdy text-white px-4 py-2 rounded">Filtrar</button>
+            </div>
         </form>
             @if(request('date') || request('month'))
             <div class="text-sm text-gray-600 italic mt-6">
@@ -37,52 +39,52 @@
 
 
 
-            <div class="w-[100%] h-72  bg-white shadow-lg rounded-md p-10">
-                <p class="text-xl font-semibold text-[#213555]/70 mb-4">Atendimentos por Usuário</p>
+            <div class="w-[100%] h-72  bg-blackSecondary shadow-lg rounded-md p-10">
+                <p class="text-xl font-semibold text-lightW mb-4">Atendimentos por Usuário</p>
                 <canvas id="chartAtendimentosUsuario" class="w-full h-full"></canvas>
             </div>
 
             <div class="flex justify-between">
-                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de financias</p>
-                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de financias</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
                         {{ $atendimentosPorServicoMap['financeiro'] ?? 0 }}
                     </p>
                 </div>
-                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de documentos</p>
-                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de documentos</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
                         {{ $atendimentosPorServicoMap['documentacao'] ?? 0 }}
                     </p>
                 </div>
-                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de informacoes</p>
-                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de informacoes</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
                         {{ $atendimentosPorServicoMap['informacoes'] ?? 0 }}
                     </p>
                 </div>
-                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de cadastro</p>
-                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de cadastro</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
                         {{ $atendimentosPorServicoMap['cadastro'] ?? 0 }}
                     </p>
                 </div>
-                <div class="bg-white shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-[#213555]/70 text-center font-semibold">Atendimentos de suporte</p>
-                    <p class="text-center text-3xl font-bold text-[#213555] mt-4">
+                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
+                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de suporte</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
                         {{ $atendimentosPorServicoMap['suporte'] ?? 0 }}
                     </p>
                 </div>
             </div>
 
             <div class="w-full flex gap-10 h-56">
-                <div class="bg-white h-full w-[50%] shadow-lg rounded-md p-10">
-                    <h2 class="text-xl font-semibold mb-4">Tempo Médio de Atendimento (hh:mm:ss)</h2>
+                <div class="bg-blackSecondary h-full w-[50%] shadow-lg rounded-md p-10">
+                    <h2 class="text-xl text-lightW font-semibold mb-4">Tempo Médio de Atendimento (hh:mm:ss)</h2>
                     <canvas id="chartTempoMedioUsuario" class="w-full h-full"></canvas>
                 </div>
 
-                <div class="bg-white h-full shadow-lg w-[50%] rounded-md p-10">
-                    <h2 class="text-xl font-semibold mb-4">Atendimentos por Categoria</h2>
+                <div class="bg-blackSecondary h-full shadow-lg w-[50%] rounded-md p-10">
+                    <h2 class="text-xl text-lightW font-semibold mb-4">Atendimentos por Categoria</h2>
                     <canvas id="chartAtendimentosCategoria" class="w-full h-full"></canvas>
                 </div>
             </div>

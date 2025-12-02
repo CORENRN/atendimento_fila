@@ -28,10 +28,10 @@
         <div class="flex justify-between mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" class="rounded border-[#3368d1] dark:border-gray-700 text-[#3368d1] shadow-sm" name="remember">
-                <span class="ms-2 text-md text-[#213555]">{{ __('Lembrar senha') }}</span>
+                <span class="ms-2 text-md text-lightW">{{ __('Lembar senha') }}</span>
             </label>
             @if (Route::has('password.request'))
-                <a class="underline text-md text-[#213555]/80 hover:text-[#3368d1] rounded-md transition durateion-300" href="{{ route('password.request') }}">
+                <a class="underline text-md text-lightW/80 hover:text-primary rounded-md transition durateion-300" href="{{ route('password.request') }}">
                     {{ __('Esqueceu sua senha?') }}
                 </a>
             @endif

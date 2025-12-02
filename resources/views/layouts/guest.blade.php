@@ -28,22 +28,22 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
+    <body class="font-sans bg-blackPrimary text-gray-900 antialiased">
         <div class="min-h-screen flex items-center  sm:pt-0">
-            <div class="w-[50%] bg-[#bddafc] h-screen flex flex-col items-center justify-center">
+            <div class="w-[50%] bg- h-screen flex flex-col items-center justify-center">
                 <img src="{{ asset('images/login.png') }}" alt="atendente" class="w-[70%] -mt-20">
-                <h2 class="text-5xl font-black text-[#213555] text-center">Bem Vindo(a) de volta!</h2>
-                <p class="text-lg text-center  mt-5 text-[#213555]/80 max-w-[50%]">o "" é um sistema que veio para facilitar os processos profissionais de atendimento!</p>
+                <h2 class="text-5xl font-black text-lightW text-center">Bem Vindo(a) de volta!</h2>
+                <p class="text-lg text-center  mt-5 text-lightW/80 max-w-[50%]">o "Atendimento COREN" é um sistema que veio para facilitar os processos profissionais de atendimento!</p>
             </div>
-            <div class="w-[50%] bg-[#F8FAFC] h-screen flex flex-col items-center justify-center">
-                <h1 class="flex items-center text-4xl font-black text-[#213555] ">ATENDIMENT<div>
+            <div class="w-[50%] h-screen flex flex-col items-center justify-center">
+                <h1 class="flex items-center text-4xl font-black text-primary">ATENDIMENT<div>
                 <svg width="35px" class="mt-0" height="35px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <path fill="none" d="M0 0h24v24H0z"/>
-                        <path fill="#213555" d="M21 8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1.062A8.001 8.001 0 0 1 12 23v-2a6 6 0 0 0 6-6V9A6 6 0 1 0 6 9v7H3a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1.062a8.001 8.001 0 0 1 15.876 0H21zM7.76 15.785l1.06-1.696A5.972 5.972 0 0 0 12 15a5.972 5.972 0 0 0 3.18-.911l1.06 1.696A7.963 7.963 0 0 1 12 17a7.963 7.963 0 0 1-4.24-1.215z"/>
+                        <path fill="#56cbec" d="M21 8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1.062A8.001 8.001 0 0 1 12 23v-2a6 6 0 0 0 6-6V9A6 6 0 1 0 6 9v7H3a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1.062a8.001 8.001 0 0 1 15.876 0H21zM7.76 15.785l1.06-1.696A5.972 5.972 0 0 0 12 15a5.972 5.972 0 0 0 3.18-.911l1.06 1.696A7.963 7.963 0 0 1 12 17a7.963 7.963 0 0 1-4.24-1.215z"/>
                     </g>
                 </svg>
-                </div><span class="text-[#527cd1] ml-3">COREN</span></h1>
+                </div><span class="text-lightW ml-3">COREN</span></h1>
                 <div class="px-6 py-4 overflow-hidden sm:rounded-lg w-[60%]">
                     {{ $slot }}
                 </div>
