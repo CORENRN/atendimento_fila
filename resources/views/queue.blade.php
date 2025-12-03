@@ -60,7 +60,7 @@
     <!-- Conteúdo Principal-->
     <section class="flex ml-64 h-full z-10 -mt-28">
 
-        <!-- Painel da fila -->
+        <!-- da fila -->
         <div class="min-w-[50%] h-[75vh] bg-[#1a262b] p-8 rounded shadow">
 
         <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
@@ -201,7 +201,7 @@
         <div class="flex w-full">
 
 
-        <!-- Painel do ticket chamado -->
+        <!-- do ticket chamado -->
         @if(isset($called_id))
             @php
                 $calledTicket = $tickets->firstWhere('id', $called_id);

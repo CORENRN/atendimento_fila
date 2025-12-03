@@ -42,7 +42,7 @@
                     </div>
 
                     <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
-                        <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel do Administrador</a>
+                        <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">do Administrador</a>
                     </div>
                 @endif
             </div>

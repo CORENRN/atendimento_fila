@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('content')
 
-<section class="h-screen w-full p-5">
-    <h1 class="text-4xl text-[#142136] font-bold px-10 py-2">Painel do administrador</h1>
+<section class="h-screen bg-blackPrimary w-full p-5">
+    <h1 class="text-4xl text-lightW font-bold px-10 py-2">Painel do administrador</h1>
     <main class="flex w-full h-full px-5">
         <aside class=" top-[165px] w-64 h-full p-4 z-50">
             <nav class="flex flex-col h-fit p-5 rounded-md bg-white shadow-2xl gap-5">
@@ -49,8 +49,8 @@
         <section class=" flex w-[80%] h-full gap-10">
             <div class="flex flex-col h-full w-[50%]">
                 @if(auth()->user() && auth()->user()->categoria === 'superAdmin')
-                    <div class="mt-4 bg-white p-6 rounded-lg shadow-lg w-[100%] h-fit">
-                        <h2 class="text-2xl font-bold mb-4">Atualizar Vídeo do Painel</h2>
+                    <div class="mt-4 bg-blackSecondary p-6 rounded-lg w-[100%] h-fit">
+                        <h2 class="text-2xl text-lightW font-bold mb-4">Atualizar Vídeo do Painel</h2>
                         @if(session('success'))
                             <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
                                 {{ session('success') }}
@@ -59,12 +59,15 @@
                         <form action="{{ route('panel.updateVideo') }}" method="POST">
                             @csrf
                             <input type="url" name="video_url" placeholder="https://www.youtube.com/embed/..." class="w-full p-3 border border-gray-300 rounded mb-4" value="{{ $videoUrl }}" required>
-                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar Vídeo</button>
+                            <div class="bg-blackThirdy flex flex-col rounded justify-center w-[25%] hover:p-1 duration-300 ">
+                                <button type="submit" class="bg-blackSecondary border-4 border-blackThirdy shadow-sm text-lightW px-4 py-2 rounded">Atualizar Vídeo</button>
+                            </div>
+                            
                         </form>
                     </div>
                 @endif
-                    <div class="mt-4 bg-white p-6 rounded-lg shadow-lg w-full h-[55%]">
-                        <h2 class="text-2xl font-bold mb-4">Impressoras cadastradas:</h2>
+                    <div class="mt-4 bg-blackSecondary p-6 rounded-lg shadow-lg w-full h-[55%]">
+                        <h2 class="text-2xl text-lightW font-bold mb-4">Impressoras cadastradas:</h2>
 
                         @if($printers->isEmpty())
                             <p class="text-gray-500">Nenhuma impressora cadastrada.</p>
