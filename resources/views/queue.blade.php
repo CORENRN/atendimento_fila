@@ -5,7 +5,7 @@
 
   <!-- Sidebar -->
    <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
-    <nav class="flex flex-col h-fit p-5 rounded-md bg-[#202e36] shadow-2xl gap-5">
+    <nav class="flex flex-col h-fit p-5 rounded-md bg-blackSecondary shadow-2xl gap-5">
         <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>
 
         @php
@@ -18,8 +18,8 @@
                 // Só adiciona dashboard se for admin ou superAdmin
                 ...($isAdmin ? [['dashboard', 'Dashboard']] : []),
                 ['ticket.take', 'Retirar Senha'],
-                ['queue', 'Fila de Triagem', 'triagem'],
-                ['queue', 'Fila de Atendimento', 'atendimento'],
+                ['queue', 'Triagem', 'triagem'],
+                ['queue', 'Atendimento', 'atendimento'],
             ];
         @endphp
 
@@ -33,16 +33,21 @@
                     $isActive = Route::currentRouteName() === $item[0];
                 }
 
-                $baseClasses = 'h-10 transition duration-300 text-black px-4 py-2 rounded';
-                $activeClasses = $isActive ? 'bg-black text-white' : 'bg-white hover:bg-gray-200';
+                    $baseClasses = 'h-10 transition text-lightW bg-blackSecondary w-full px-4 py-2 rounded';
+                    $divBaseClasses ='bg-blackThirdy flex items-center rounded justify-center duration-300';
+                    $hoverClasses = !$isActive ? 'hover:p-[6px]' : '';
+                    $activeClasses = $isActive ? 'border-[6px] p-0 border-blackThirdy ' : '';
+                
             @endphp
-
-            <a 
-                href="{{ isset($item[2]) ? route($item[0], $item[2]) : route($item[0]) }}" 
-                class="{{ $baseClasses }} {{ $activeClasses }}"
-            >
-                {{ $item[1] }}
-            </a>
+            <div class="{{$divBaseClasses}} {{$hoverClasses}}">
+                    <a 
+                    href="{{ isset($item[2]) ? route($item[0], $item[2]) : route($item[0]) }}" 
+                    class="trasition duration-300{{ $baseClasses }} {{ $activeClasses }}"
+                >
+                    {{ $item[1] }}
+                </a>
+            </div>
+            
         @endforeach
     </nav>
 </aside>
@@ -61,7 +66,7 @@
     <section class="flex ml-64 h-full z-10 -mt-28">
 
         <!-- da fila -->
-        <div class="min-w-[50%] h-[75vh] bg-[#1a262b] p-8 rounded shadow">
+        <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl shadow-xl/30">
 
         <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
         <div class="mb-4 flex space-x-4">
