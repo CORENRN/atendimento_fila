@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
 
-            $table->enum('type', ['regular', 'preferencial'])->default('regular');
+            $table->enum('type', ['Regular', 'Preferencial'])->default('regular');
             $table->enum('service', [
                 'financeiro',
                 'documentacao',

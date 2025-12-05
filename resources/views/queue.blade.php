@@ -100,9 +100,9 @@
         </div>
 
             <!-- Tabela de tickets -->
-            <table class="w-full text-sm text-left rtl:text-right text-gray-900">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr class="bg-[#202e36]">
+            <table class="w-full text-sm text-left rtl:text-right text-lightW">
+                <thead class="text-xs text-gray-700 uppercase rounded border-blackThirdy border-r-[7px] border-l-[6px] bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr class="bg-[#202e36] rounded">
                         <th class="p-2 text-[#eceef0]">ID</th>
                         <th class="p-2 text-[#eceef0]">Tipo</th>
                         @if($stage === 'atendimento')
@@ -220,9 +220,9 @@
             @endphp
 
             @if($calledTicket)
-                <div class="ml-6 p-6 h-fit bg-white border border-white/30 rounded shadow-md w-[95%]">
+                <div class="ml-6 p-6 h-fit bg-blackSecondary rounded shadow-md w-[95%]">
                     <div class="flex gap-3 items-center bg mb-3">
-                        <h2 class="font-bold text-xl">Ficha em Atendimento:</h2>
+                        <h2 class="font-bold text-xl text-lightW">Ficha em Atendimento:</h2>
                         <div class="w-10 h-10 flex items-center justify-center font-semibold bg-black rounded-full text-white">
                             #{{ $calledTicket->id }}
                         </div>
@@ -230,30 +230,37 @@
 
                     <div class="flex flex-col gap-3  justify-between">
                         <div class="flex items-center gap-1">
-                            <div class="font-bold">Tipo de ticket:</div>
-                            <div class="font-semibold">{{ $calledTicket->type }}</div>
+                            <div class="font-bold text-lightW">Tipo de ticket:</div>
+                            <div class="font-semibold {{ $calledTicket->type === 'preferencial' ? 'text-red' : ($calledTicket->type === 'regular' ? 'text-green' : 'text-lightW') }}">
+                            {{ $calledTicket->type }}
+                            </div>
                         </div>
 
                         @if($stage === 'atendimento')
-                            <div>{{ $services[$calledTicket->service] ?? '-' }}</div>
+                            <div class="text-lightW">{{ $services[$calledTicket->service] ?? '-' }}</div>
                         @endif
 
                         <div class="flex flex-col gap-3">
                             @if($canFinish)
                                 <div>
-                                    <h3 class="font-bold mb-1">Encerrar:</h3>
+                                    <h3 class="font-bold mb-1 text-lightW">Encerrar:</h3>
                                     <div class="flex flex-row w-full gap-6">
                                         <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
                                             @csrf
-                                            <button class="bg-green-500 w-full transition duration-300 text-white px-3 py-3 rounded hover:bg-green-600 mb-3">
-                                                Finalizar
-                                            </button>
+                                            <div class="hover:p-2 rounded duration-300">
+                                                <button class="border-[5px] border-blackThirdy w-full transition duration-300 text-lightW px-3 py-3 rounded hover:bg-green-600 mb-3">
+                                                    Finalizar
+                                                </button>
+                                            </div>
+                                                
                                         </form>
                                         <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
                                             @csrf
-                                            <button class="bg-red-500 transition duration-300 w-full text-white px-3 py-3 rounded hover:bg-red-600">
-                                                Cancelar
-                                            </button>
+                                            <div class="hover:p-2 rounded duration-300">
+                                                <button class="border-[5px] border-blackThirdy w-full transition duration-300 text-lightW px-3 py-3 rounded hover:bg-green-600 mb-3">
+                                                    Cancelar
+                                                </button>
+                                            </div>
                                         </form>
                                     </div>
 
@@ -261,7 +268,7 @@
 
                                 @if($stage === 'triagem')
                                     <div>
-                                        <h3 class="font-bold mb-1">Avançar:</h3>
+                                        <h3 class="font-bold mb-1 text-lightW">Avançar:</h3>
 
                                         <form 
                                             action="{{ route('queue.advance', $calledTicket->id) }}" 
@@ -273,26 +280,30 @@
                                                 name="service" 
                                                 required
                                                 onchange="document.getElementById('advance-btn-{{ $calledTicket->id }}').disabled = (this.value === '')"
-                                                class="border rounded px-24 py-3 mr-2"
+                                                class="rounded px-24 hover"
                                             >
                                                 <option value="">Selecione o serviço</option>
                                                 @foreach($services as $key => $label)
                                                     <option 
-                                                        value="{{ $key }}" 
+                                                        value="{{ $key }}"
                                                         {{ $calledTicket->service === $key ? 'selected' : '' }}
                                                     >
                                                         {{ $label }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            <button 
-                                                id="advance-btn-{{ $calledTicket->id }}" 
-                                                class="bg-purple-500 transition duration-300 text-white px-5 py-3 w-full rounded hover:bg-purple-600" 
-                                                disabled 
-                                                type="submit"
-                                            >
-                                                Avançar
-                                            </button>
+                                            <div class="w-full hover:p-2 duration-300">
+                                                <button 
+                                                    id="advance-btn-{{ $calledTicket->id }}" 
+                                                    class="bg-blacSecondary border-[5px] border-blackThirdy transition duration-300 text-white px-5 py-3 w-full rounded" 
+                                                    disabled 
+                                                    type="submit"
+                                                >
+                                                    Avançar
+                                                </button>
+                                            </div>
+                                                
+                                            
                                         </form>
                                         </div>
                                         
@@ -305,7 +316,7 @@
                     </div>
                 </div>
             @else
-                <p class="text-red-600 ml-6">Ticket chamado não encontrado.</p>
+                <p class="text-red ml-6">Ticket chamado não encontrado.</p>
             @endif
         @endif
 
@@ -340,7 +351,7 @@
         if (tickets.length === 0) {
             tbody.innerHTML = `
                 <tr id="empty-row">
-                    <td colspan="{{ $stage === 'atendimento' ? 6 : 5 }}" class="p-4 text-center text-gray-500">
+                    <td colspan="{{ $stage === 'atendimento' ? 6 : 5 }}" class="p-4 text-center text-">
                         Nenhum ticket na fila.
                     </td>
                 </tr>`;
@@ -353,16 +364,16 @@
             tr.id = `ticket-${ticket.id}`;
 
             let innerHTML = `
-                <td class="p-2 border text-center">${ticket.id}</td>
-                <td class="p-2 border">${ticket.type}</td>`;
+                <td class="p-2 bg-blackSecondary border-[6px] border-blackThirdy rounded text-center">${ticket.id}</td>
+                <td class="p-2 bg-blackSecondary border-[6px] border-blackThirdy rounded">${ticket.type}</td>`;
 
             if ("{{ $stage }}" === 'atendimento') {
-                innerHTML += `<td class="p-2 border">${ticket.service ?? '-'}</td>`;
+                innerHTML += `<td class="p-2 border-blackThirdy border-[6px]">${ticket.service ?? '-'}</td>`;
             }
 
             innerHTML += `
-                <td class="p-2 border text-center">${ticket.status.toUpperCase()}</td>
-                <td class="p-2 border text-center">-</td>`;
+                <td class="p-2 bg-blackSecondary border-[6px] border-blackThirdy roundedtext-center">${ticket.status.toUpperCase()}</td>
+                <td class="p-2 bg-blackSecondary border-[6px] border-blackThirdy rounded text-center">-</td>`;
 
             tr.innerHTML = innerHTML;
             tbody.appendChild(tr);
