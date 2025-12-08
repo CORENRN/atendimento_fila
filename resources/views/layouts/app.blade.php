@@ -45,11 +45,11 @@
             @if (session('success'))
 
                 <div id="flash-message" class="w-full flex justify-center">
-                    <div class="fixed mt-5 w-[60%] mx-auto
-                                bg-green-100 border border-green-400 text-green-700 
+                    <div class="text-center fixed mt-5 w-[60%] mx-auto
+                                bg-green-100 text-green-700 
                                 px-6 py-3 rounded shadow-lg z-50">
-                        <strong class="font-bold">Sucesso! </strong>
-                        <span class="block sm:inline">{{ session('success') }}</span>
+                        <strong class="font-bold text-lightW">Sucesso! </strong>
+                        <span class="block sm:inline text-lightW">{{ session('success') }}</span>
                     </div>
                 </div>
 
