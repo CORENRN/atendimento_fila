@@ -206,7 +206,7 @@
         <div class="flex w-full">
 
 
-        
+        <!-- do ticket chamado -->
         @if(isset($called_id))
             @php
                 $calledTicket = $tickets->firstWhere('id', $called_id);
