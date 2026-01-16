@@ -2,12 +2,7 @@
 
 @section('content')
 <div class="flex h-screen w-full">
-    <!-- <div class="relative flex flex-col text-6xl font-black w-[50%] h-full bg-white items-center justify-center">
-        <img src="{{ asset('images/atendimento.jpg') }}" 
-            alt="tickets"
-            class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-[#202e36]/60"></div>
-    </div> -->
+    
 
     <div class="bg-[#141e22] w-full h-full flex flex-col items-center justify-center">
 
