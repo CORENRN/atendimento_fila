@@ -94,13 +94,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        
+        // Dados do backend
         const atendimentosPorUsuario = @json($atendimentosPorUsuario);
         const tempoMedioPorUsuario = @json($tempoMedioPorUsuario);
         const atendimentosPorServico = @json($atendimentosPorServico);
 
+        // Labels e dados para gráficos de usuário
         const labelsUsuarios = atendimentosPorUsuario.map(item => item.nome);
         const atendimentosUsuarios = atendimentosPorUsuario.map(item => item.quantidade);
+        // Tempo médio em minutos (já arredondado no backend), converter para segundos para o gráfico?
+        // Como o gráfico está em segundos, vamos converter para segundos * 60
         const tempoMedioUsuariosSeg = tempoMedioPorUsuario.map(item => Math.abs(item.media));
 
 

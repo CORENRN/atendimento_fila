@@ -52,12 +52,17 @@
     </nav>
 </aside>
 
+
+
+    <!-- Título -->
      <div class="flex items-center mb-4 z-10 bg-[#141e22] justify-center  h-48 w-full">
         <h1 class="text-4xl text-[#56cbec] font-bold px-4 py-2 -mt-24">
             Fila de {{ $stage === 'triagem' ? 'Triagem' : 'Atendimento' }}
         </h1>
      </div>
 
+
+    <!-- Conteúdo Principal-->
     <section class="flex ml-64 h-full z-10 -mt-28">
 
         <!-- da fila -->
