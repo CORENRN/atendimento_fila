@@ -102,7 +102,7 @@
                             IP da Impressora:
                             <input type="text" name="ip" placeholder="digite o ip da impressora Ex:192.168.0.1" class="border-blackThirdy border-4 p-2 w-full rounded bg-blackSecondary" required>
                         </label>
-                        <div class="bg-blackThirdy hover:p-1 rounded duration-300 me-[500px] ">
+                        <div class="bg-blackThirdy hover:p-1 rounded duration-300 me-[450px] ">
                             <button type="submit" class="bg-blackSecondary w-full text-white px-4 py-2 rounded">Salvar Impressora</button>
                         </div>
                         
