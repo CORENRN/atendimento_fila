@@ -51,7 +51,7 @@
                     </p>
                 </button>
 
-            
+                <!-- Botão Preferencial -->
                 <button 
                     type="submit" 
                     name="type" 
