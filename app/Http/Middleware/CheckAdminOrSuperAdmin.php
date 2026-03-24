@@ -12,7 +12,7 @@ class CheckAdminOrSuperAdmin
     {
         $user = $request->user();
 
-        if (!$user || !in_array($user->categoria, ['superAdmin', 'admin'])) {
+        if (!$user || !in_array($user->categoria, ['superAdmin', 'supervisor'])) {
             abort(403, "Acesso limitado apenas para Administradores");
         }
 

@@ -2,75 +2,101 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Seu Ticket</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Ticket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-image: url('/images/bgticket.png');
-            background-size: cover;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-
-        h1, p {
-            font-family: 'Libre Baskerville', serif;
-        }
-
-        /* Oculta todos os elementos na impressão exceto os marcados como print-only */
+        /* MANTIDO EXATAMENTE COMO NO SEU ORIGINAL */
         @media print {
-            .print-hidden {
-                display: none !important;
+            @page {
+                size: 80mm auto;
+                margin: 0 !important;
             }
-            .print-only {
-                display: block !important;
-            }
-            body, html {
-                background: none !important;
+
+            body {
                 margin: 0 !important;
                 padding: 0 !important;
+                background: white !important;
+                width: 80mm;
+            }
+
+            .print-hidden { display: none !important; }
+
+            .print-only {
+                display: block !important;
+                position: absolute;
+                left: 6mm; 
+                width: 45mm !important;
+                text-align: center;
+                color: black !important;
+            }
+
+            .bg-black {
+                background-color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
 
-        /* Oculta os elementos de impressão no modo normal */
-        .print-only {
-            display: none;
+        .print-only { display: none; }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
         }
+        .animate-pulse-slow { animation: pulse-slow 2s infinite ease-in-out; }
     </style>
+</head>
+<body class="bg-slate-50 flex items-center justify-center h-screen overflow-hidden">
+
+    <div class="print-hidden text-center px-6">
+        <div class="mb-6 flex justify-center">
+            <div class="relative">
+                <div class="w-20 h-20 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600 animate-pulse-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Imprimindo sua Senha</h1>
+        <p class="text-slate-500 mt-3 text-lg">Por favor, retire seu ticket na impressora abaixo.</p>
+        
+        <div class="mt-8 inline-flex items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-100">
+            <span class="relative flex h-3 w-3 mr-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+            Aguarde o redirecionamento...
+        </div>
+    </div>
+
+    <div class="print-only" style="font-family: Arial, sans-serif;">
+        <div style="border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 5px;">
+            <h2 style="font-size: 9px; font-weight: bold; text-transform: uppercase; margin: 0;">SENHA</h2>
+        </div>
+
+        <div style="margin-bottom: 5px;">
+            <h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">#{{ $ticket->id }}</h1>
+        </div>
+
+        <div class="bg-black" style="padding: 3px 0; margin-bottom: 5px;">
+            <h2 style="font-size: 12px; font-weight: bold; color: white !important; text-transform: uppercase; margin: 0;">
+                {{ $ticket->type == 'Preferencial' ? 'PREFERENCIAL' : 'NORMAL' }}
+            </h2>
+        </div>
+
+        <div style="border-top: 1px dashed black; padding-top: 5px; font-size: 8px;">
+            <p style="margin: 0;">{{ date('d/m/Y H:i:s') }}</p>
+            <div style="margin-top: 8px;">*******</div>
+        </div>
+    </div>
 
     <script>
-        window.onload = function () {
-            window.print();
+        window.onload = function() {
+            setTimeout(() => { window.print(); }, 500);
+            setTimeout(() => { window.location.href = "{{ route('ticket.take') }}"; }, 3000);
         };
     </script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-
-    <!-- Bloco visível normalmente (mas não impresso) -->
-    <div class="print-hidden flex flex-col gap-3 p-8 rounded text-center items-center">
-        <h1 class="text-4xl text-[#213555] font-bold mb-2">Sua senha foi cadastrada com sucesso!</h1>
-        <p class="mb-8 text-lg font-bold text-[#213555]/80 w-[60%]">Aguarde seu número ser chamado no painel de atendimento.</p>
-    </div>
-
-    <!-- Bloco impresso -->
-    <div class="print-only w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-md text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mt-8 h-16 w-16 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-        </svg>
-        <h1 class="mt-2 text-center text-2xl font-bold text-[#213555]">#00{{ $ticket->id }}</h1>
-        <h1 class="mb-2 text-center text-lg font-bold text-[#213555]">{{ ucfirst($ticket->type) }}</h1>
-        <p class="mb-8 text-center text-sm text-[#213555]/70">Sua senha foi gerada com sucesso!</p>
-    </div>
-
-    <!-- Redireciona após 5 segundos -->
-    <script>
-        setTimeout(() => {
-            window.location.href = "{{ route('ticket.take') }}";
-        }, 5000);
-    </script>
-
 </body>
 </html>

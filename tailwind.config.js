@@ -7,6 +7,7 @@ export default {
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.vue', // Adicionei caso você use Vue/React no Laravel
     ],
 
     theme: {
@@ -24,8 +25,23 @@ export default {
                 green: "#39db7d",
                 lightW: "#eceef0"
             },
+            // --- Sucess animation ---
+            keyframes: {
+                slideDownReturn: {
+                    // 0%: Escondido acima
+                    '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                    
+                    '10%, 90%': { transform: 'translateY(20px)', opacity: '1' },
+                    
+                    '100%': { transform: 'translateY(-100%)', opacity: '0' },
+                }
+            },
+            animation: {
+                notification: 'slideDownReturn 5s ease-in-out forwards',
+}
+            // --------------------------------
         },
     },
-
+    
     plugins: [forms],
 };

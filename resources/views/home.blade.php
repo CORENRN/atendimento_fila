@@ -25,16 +25,16 @@
                     <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2  duration-300 bg-[#1a262d] transition text-white px-6 py-7 rounded hover:text-[#eef4ff]"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Triagem</a>
                 </div>
                 <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
-                    <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
+                    <a href="{{ route('guiche.select.view') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Atendimento</a>
                 </div>
                 @endif
-                @if(auth()->user() && auth()->user()->categoria === 'superAdmin' || auth()->user()->categoria === 'admin')
+                @if(auth()->user() && auth()->user()->categoria === 'superAdmin' || auth()->user()->categoria === 'supervisor')
                     <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
                         <a href="{{ route('queue', 'triagem') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">Triagem</a>
                     </div>
 
                     <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
-                        <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Fila de Atendimento</a>
+                        <a href="{{ route('queue', 'atendimento') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/atendenteico.png') }}" alt="atendente" class="w-14">Atendimento</a>
                     </div>
 
                     <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
@@ -42,7 +42,11 @@
                     </div>
 
                     <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
-                        <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel do Administrador</a>
+                        <a href="{{ route('adminPanel') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/painel.png') }}" alt="atendente" class="w-14">Painel de Gestão</a>
+                    </div>
+
+                    <div class="bg-[#202e36] hover:p-2 duration-300 rounded">
+                        <a href="{{ route('panel.index') }}" class="flex items-center gap-2 bg-[#1a262d] hover:text-[#eef4ff] transition duration-300 text-white px-6 py-7 rounded"><img src="{{ asset('images/painel_tickets.png') }}" alt="atendente" class="w-14">Controle do Visor</a>
                     </div>
                 @endif
             </div>

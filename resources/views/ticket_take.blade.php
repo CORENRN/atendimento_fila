@@ -25,29 +25,30 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body class="bg-gray-100 flex items-center justify-center h-screen w-screen">
 
-    <div class="p-8 rounde">
-        <h1 class="text-5xl mb-2 text-center text-[#213555] font-black uppercase">Retirar Senha</h1>
+    <div class="p-2 rounded">
+        <h1 class="text-6xl mb-2 text-center text-[#213555] font-black uppercase">Retirar Senha</h1>
 
        <form action="{{ route('ticket.take.post') }}" method="POST">
         @csrf
 
-            <label class="block mb-2 text-md text-[#213555]/80 text-center uppercase font-bold">Toque na tela para escolher o tipo de senha:</label>
-            <div class="flex justify-center gap-4 mt-10">
+            <label class="block mb-10 text-xl text-[#213555]/80 text-center uppercase font-bold">Toque na tela para escolher o tipo de senha:</label>
+            <div class="flex justify-center gap-5">
                 <!-- Botão Regular -->
                 <button 
                     type="submit" 
                     name="type" 
                     value="regular"
-                    class="group flex flex-col font-semibold text-lg items-center justify-center shadow-xl bg-white text-black px-10 py-8 w-96 h-60 rounded-lg hover:bg-[#7cccfa] hover:text-white transition duration-300"
+                    class="group flex w-[700px] h-[400px] flex-col font-semibold text-lg items-center justify-center shadow-xl bg-white text-black px-10 py-8 rounded-[25px] hover:bg-[#7cccfa] hover:text-white transition duration-300"
                 >
-                    <img src="{{ asset('images/regular.png') }}" alt="atendente" class="w-20 ">
-                    <h3 class="text-lg font-black uppercase tracking-wider text-[#213555] group-hover:text-[#f3f8ff] transition duration-300">
+                    <img src="{{ asset('images/regular.png') }}" alt="atendente" class="w-35">
+                    <h3 class="text-2xl font-black uppercase tracking-wider text-[#213555] group-hover:text-[#f3f8ff] transition duration-300">
                         Regular
                     </h3>
-                    <p class="text-sm text-[#213555]/70 group-hover:text-[#f9f9fa] transition duration-300">
+                    <p class="text-md text-[#213555]/70 group-hover:text-[#f9f9fa] transition duration-300">
                         A ficha regular é destinada ao atendimento padrão, seguindo a ordem de chegada.
+                        
                     </p>
                 </button>
 
@@ -56,14 +57,14 @@
                     type="submit" 
                     name="type" 
                     value="preferencial"
-                    class="group flex flex-col font-semibold text-lg items-center justify-center shadow-xl bg-white text-black px-10 py-8 w-96 h-60 rounded-lg hover:bg-[#7cccfa] hover:text-white transition duration-300"
+                    class="group flex w-[700px] h-[400px] flex-col font-semibold text-lg items-center justify-center shadow-xl bg-white text-black px-10 py-8 rounded-[25px] hover:bg-[#7cccfa] hover:text-white transition duration-300"
                 >
-                    <img src="{{ asset('images/preferencial.png') }}" alt="atendente" class="w-20 ">
-                    <h3 class="text-lg font-black uppercase tracking-wider text-[#213555] group-hover:text-[#f3f8ff] transition duration-300">
+                    <img src="{{ asset('images/preferencial.png') }}" alt="atendente" class="w-35">
+                    <h3 class="text-2xl font-black uppercase tracking-wider text-[#213555] group-hover:text-[#f3f8ff] transition duration-300">
                         Preferencial
                     </h3>
-                    <p class="text-sm text-[#213555]/70 group-hover:text-[#f9f9fa] transition duration-300">
-                        A ficha preferencial é destinada a pessoas que têm direito a atendimento prioritário, como idosos, gestantes ou pessoas portadoras de alguma deficiência.
+                    <p class="text-md text-[#213555]/70 group-hover:text-[#f9f9fa] transition duration-300">
+                        A ficha preferencial é destinada a pessoas que têm direito a atendimento prioritário.
                     </p>
                 </button>
 

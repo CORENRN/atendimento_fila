@@ -2,90 +2,104 @@
 
 @section('content')
 
-<div class="p-10 w-full bg-blackPrimary -mt-4">
+<section class="h-screen w-screen relative bg-[#141e22]">
 
-    <div class="flex items-center black gap-10 mb-5">
-        <h1 class="text-3xl text-lightW font-bold">Dashboard de Atendimentos:</h1>
-        <form method="GET" action="{{ route('dashboard') }}" class=" flex gap-4 items-end">
-            <div>
-                <label for="date" class="block font-medium text-lightW">Data:</label>
-                <input type="date" id="date" name="date" value="{{ request('date') }}" class="border rounded px-3 py-2">
-            </div>
-            <div>
-                <label for="month" class="block font-medium text-lightW">Mês:</label>
-                <input type="month" id="month" name="month" value="{{ request('month') }}" class="border rounded px-3 py-2">
-            </div>
-            <div class="bg-blackSecondary hover:p-1 duration-300 rounded">
-                <button type="submit" class="bg-blackThirdy text-white px-4 py-2 rounded">Filtrar</button>
-            </div>
-        </form>
-            @if(request('date') || request('month'))
-            <div class="text-sm text-gray-600 italic mt-6">
-                Filtro aplicado: 
-                @if(request('date'))
-                    Dia: {{ \Carbon\Carbon::parse(request('date'))->format('d/m/Y') }}
-                @endif
-                @if(request('month'))
-                    Mês: {{ \Carbon\Carbon::parse(request('month'))->translatedFormat('F Y') }}
-                @endif
-            </div>
-        @endif
+  <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
+    <nav class="flex flex-col h-fit p-5 rounded-md bg-blackSecondary shadow-2xl gap-5">
+        <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>
 
-    </div>
+                @php
+                    $user = auth()->user();
+                    $hasAdminAccess = $user && $user->hasAdminAccess();
 
+                    if (!isset($menuItems)) {
+                        $menuItems = [
+                            ['home', 'Home'],
+                        ];
 
-    
-    <div class="w-full flex flex-col h-[79vh] gap-5 rounded">
+                    if ($hasAdminAccess) {
+                            $menuItems[] = ['dashboard', 'Dashboard'];
+                            $menuItems[] = ['adminPanel', 'Gestão'];
+                            $menuItems[] = ['panel.index', 'Visor'];
+                            $menuItems[] = ['ticket.take', 'Retirar Senha'];
+                        }
 
+                        $menuItems[] = ['queue', 'Triagem', 'triagem'];
+                        $menuItems[] = ['queue', 'Atendimento', 'atendimento'];
+                    }
+                @endphp
 
+                @foreach($menuItems as $item)
+                    @php
+                        $isActive = false;
 
-            <div class="w-[100%] h-72  bg-blackSecondary shadow-lg rounded-md p-10">
+                        if ($item[0] === 'queue') {
+                            $isActive = Route::currentRouteName() === 'queue' && (request()->route('stage') === ($item[2] ?? ''));
+                        } else {
+                            $isActive = Route::currentRouteName() === $item[0];
+                        }
+
+                        $baseClasses = 'h-10 transition text-lightW bg-blackSecondary w-full px-4 py-2 rounded flex items-center';
+                        
+                        $divBaseClasses ='bg-blackThirdy flex items-center rounded justify-center duration-300 w-full';
+                    
+                        $hoverClasses = !$isActive ? 'hover:p-[4px]' : 'p-[4px]'; 
+                        $activeClasses = $isActive ? 'border-2 border-blackThirdy' : ''; 
+                        
+                    @endphp
+                    <div class="{{$divBaseClasses}} {{$hoverClasses}}">
+                            <a 
+                            href="{{ isset($item[2]) ? route($item[0], $item[2]) : route($item[0]) }}" 
+                            class="transition duration-300 {{ $baseClasses }} {{ $activeClasses }}"
+                        >
+                            {{ $item[1] }}
+                        </a>
+                    </div>
+                @endforeach
+    </nav>
+</aside>
+
+    <div class="ml-[216px] mt-[54px] p-10 flex flex-col h-[79vh] gap-5 rounded overflow-y-auto">
+
+            <div class="w-[100%] h-72 bg-blackSecondary shadow-lg rounded-md p-10">
                 <p class="text-xl font-semibold text-lightW mb-4">Atendimentos por Usuário</p>
-                <canvas id="chartAtendimentosUsuario" class="w-full h-full"></canvas>
-            </div>
-
-            <div class="flex justify-between">
-                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de financias</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap['financeiro'] ?? 0 }}
-                    </p>
-                </div>
-                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de documentos</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap['documentacao'] ?? 0 }}
-                    </p>
-                </div>
-                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de informacoes</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap['informacoes'] ?? 0 }}
-                    </p>
-                </div>
-                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de cadastro</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap['cadastro'] ?? 0 }}
-                    </p>
-                </div>
-                <div class="bg-blackSecondary shadow-lg w-80 h-36 rounded-md p-3">
-                    <p class="text-md tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de suporte</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap['suporte'] ?? 0 }}
-                    </p>
+                <div class="h-44"> <canvas id="chartAtendimentosUsuario"></canvas>
                 </div>
             </div>
 
-            <div class="w-full flex gap-10 h-56">
+            <div class="flex justify-between gap-4">
+                @php
+                    $cards = [
+                        ['financias', 'financeiro'],
+                        ['documentos', 'documentacao'],
+                        ['informacoes', 'informacoes'],
+                        ['cadastro', 'cadastro'],
+                        ['suporte', 'suporte']
+                    ];
+                @endphp
+                @foreach($cards as $card)
+                <div class="bg-blackSecondary shadow-lg flex-1 h-36 rounded-md p-3">
+                    <p class="text-[10px] tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de {{ $card[0] }}</p>
+                    <p class="text-center text-3xl font-bold text-lightW mt-4">
+                        {{ $atendimentosPorServicoMap[$card[1]] ?? 0 }}
+                    </p>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="w-full flex gap-10 h-80">
                 <div class="bg-blackSecondary h-full w-[50%] shadow-lg rounded-md p-10">
-                    <h2 class="text-xl text-lightW font-semibold mb-4">Tempo Médio de Atendimento (hh:mm:ss)</h2>
-                    <canvas id="chartTempoMedioUsuario" class="w-full h-full"></canvas>
+                    <h2 class="text-xl text-lightW font-semibold mb-4">Tempo Médio (hh:mm:ss)</h2>
+                    <div class="h-48">
+                        <canvas id="chartTempoMedioUsuario"></canvas>
+                    </div>
                 </div>
 
                 <div class="bg-blackSecondary h-full shadow-lg w-[50%] rounded-md p-10">
                     <h2 class="text-xl text-lightW font-semibold mb-4">Atendimentos por Categoria</h2>
-                    <canvas id="chartAtendimentosCategoria" class="w-full h-full"></canvas>
+                    <div class="h-48">
+                        <canvas id="chartAtendimentosCategoria"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -94,21 +108,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // Dados do backend
         const atendimentosPorUsuario = @json($atendimentosPorUsuario);
         const tempoMedioPorUsuario = @json($tempoMedioPorUsuario);
         const atendimentosPorServico = @json($atendimentosPorServico);
 
-        // Labels e dados para gráficos de usuário
         const labelsUsuarios = atendimentosPorUsuario.map(item => item.nome);
         const atendimentosUsuarios = atendimentosPorUsuario.map(item => item.quantidade);
-        // Tempo médio em minutos (já arredondado no backend), converter para segundos para o gráfico?
-        // Como o gráfico está em segundos, vamos converter para segundos * 60
         const tempoMedioUsuariosSeg = tempoMedioPorUsuario.map(item => Math.abs(item.media));
-
-
         
-        // Função para formatar segundos em hh:mm:ss
         function formatarTempo(segundos) {
             const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
             const m = Math.floor((segundos % 3600) / 60).toString().padStart(2, '0');
@@ -116,7 +123,6 @@
             return `${h}:${m}:${s}`;
         }
 
-        // Gráfico 1: Atendimentos por usuário (barra)
         new Chart(document.getElementById('chartAtendimentosUsuario'), {
             type: 'bar',
             data: {
@@ -124,28 +130,35 @@
                 datasets: [{
                     label: 'Atendimentos',
                     data: atendimentosUsuarios,
-                    backgroundColor: 'rgba(59, 130, 246, 0.7)', // azul
-                    borderColor: 'rgba(59, 130, 246, 1)',
+                    backgroundColor: 'rgba(86, 203, 236, 0.7)',
+                    borderColor: '#56cbec',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true, precision: 0 } }
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        precision: 0,
+                        ticks: { color: '#eceef0' }
+                    },
+                    x: { ticks: { color: '#eceef0' } }
+                },
+                plugins: { legend: { display: false } }
             }
         });
 
-        // Gráfico 2: Tempo médio de atendimento por usuário (barra com label customizado)
         new Chart(document.getElementById('chartTempoMedioUsuario'), {
             type: 'bar',
             data: {
                 labels: tempoMedioPorUsuario.map(item => item.nome),
                 datasets: [{
-                    label: 'Tempo Médio (segundos)',
+                    label: 'Tempo Médio',
                     data: tempoMedioUsuariosSeg,
-                    backgroundColor: 'rgba(34, 197, 94, 0.7)', // verde
-                    borderColor: 'rgba(34, 197, 94, 1)',
+                    backgroundColor: 'rgba(57, 219, 125, 0.7)',
+                    borderColor: '#39db7d',
                     borderWidth: 1
                 }]
             },
@@ -156,13 +169,14 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
-                                return formatarTempo(value);
-                            }
+                            color: '#eceef0',
+                            callback: value => formatarTempo(value)
                         },
-                    }
+                    },
+                    x: { ticks: { color: '#eceef0' } }
                 },
                 plugins: {
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: ctx => `Tempo Médio: ${formatarTempo(ctx.parsed.y)}`
@@ -172,39 +186,27 @@
             }
         });
 
-        // Gráfico 3: Atendimentos por categoria (pizza)
         new Chart(document.getElementById('chartAtendimentosCategoria'), {
             type: 'doughnut',
             data: {
-                labels: atendimentosPorServico.map(item => {
-                    // Capitalizar a primeira letra da categoria
-                    return item.servico.charAt(0).toUpperCase() + item.servico.slice(1);
-                }),
+                labels: atendimentosPorServico.map(item => item.servico.charAt(0).toUpperCase() + item.servico.slice(1)),
                 datasets: [{
-                    label: 'Atendimentos',
                     data: atendimentosPorServico.map(item => item.quantidade),
-                    backgroundColor: [
-                        '#3B82F6', // azul
-                        '#F59E0B', // amarelo
-                        '#10B981', // verde
-                        '#EF4444', // vermelho
-                        '#8B5CF6'  // roxo
-                    ]
+                    backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#8B5CF6'],
+                    borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { 
+                        position: 'right',
+                        labels: { color: '#eceef0' }
+                    }
                 }
             }
         });
-
-        console.log(labelsUsuarios); // mesmo tamanho que tempoMedioUsuariosSeg?
-        console.log(tempoMedioUsuariosSeg);
     </script>
-
-</div>
-
+</section>
 @endsection

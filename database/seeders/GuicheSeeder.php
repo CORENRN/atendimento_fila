@@ -14,13 +14,7 @@ class GuicheSeeder extends Seeder
     {
         for ($i = 1; $i <= 6; $i++) {
             Guiche::create([
-                'name' => 'Atendimento ' . $i,
-            ]);
-        }
-
-        for ($i = 1; $i <= 2; $i++) {
-            Guiche::create([
-                'name' => 'Triagem ' . $i,
+                'name' => 'Guichê ' . $i,
             ]);
         }
     }

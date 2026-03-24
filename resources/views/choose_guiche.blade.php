@@ -31,7 +31,6 @@
                     Escolher Guichê
                 </button>
             </div> 
-                <p class="text-md text-lightW text-center mt-5">guichê já escolhido? <a href="/home" class="text-lightW hover:text-primary transition duration-300">ir para "home"</a></p>
         </form>
     </div>
     

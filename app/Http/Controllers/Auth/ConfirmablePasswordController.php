@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-
+/* -------------------------------------------------------------------------- */
+/*                            Confirmação de senha                            */
+/* -------------------------------------------------------------------------- */
 class ConfirmablePasswordController extends Controller
 {
     /**
-     * Show the confirm password view.
+     * Exibir a tela de confirmação de senha.
      */
     public function show(): View
     {
@@ -20,7 +22,7 @@ class ConfirmablePasswordController extends Controller
     }
 
     /**
-     * Confirm the user's password.
+     * Processar a confirmação de senha recebida.
      */
     public function store(Request $request): RedirectResponse
     {

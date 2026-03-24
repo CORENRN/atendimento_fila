@@ -45,6 +45,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('guiche.select.view', absolute: false));
+        return redirect(route('home', absolute: false));
     }
 }

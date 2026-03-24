@@ -22,25 +22,42 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $user)
+                @foreach ($allUsers as $user)
                     <tr>
                         <td class="border px-4 py-2">{{ $user->id }}</td>
                         <td class="border px-4 py-2">{{ $user->name }}</td>
                         <td class="border px-4 py-2">{{ $user->email }}</td>
                         <td class="border px-4 py-2">{{ $user->categoria ?? 'Nenhuma' }}</td>
                         <td class="border px-4 py-2">
-                            <form action="{{ route('users.updateCategory', $user->id) }}" method="POST" class="flex items-center gap-2">
-                                @csrf
-                                @method('PUT')
-                                <select name="categoria" class="border rounded px-2 py-1">
-                                    <option value="">Selecione</option>
-                                    <option value="admin" @if($user->categoria === 'admin') selected @endif>Admin</option>
-                                    <option value="superAdmin" @if($user->categoria === 'superAdmin') selected @endif>Super Admin</option>
-                                </select>
-                                <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                    Salvar
-                                </button>
-                            </form>
+                            <div class="flex items-center gap-2">
+                                <form action="{{ route('users.updateCategory', $user->id) }}" method="POST" class="flex items-center gap-2">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="categoria" class="border rounded px-2 py-1">
+                                        <option value="">Selecione</option>
+                                        <option value="user" @if($user->categoria === 'user') selected @endif>Atendente</option>
+                                        <option value="supervisor" @if($user->categoria === 'supervisor') selected @endif>Supervisor</option>
+                                        <option value="superAdmin" @if($user->categoria === 'superAdmin') selected @endif>Super Admin</option>
+                                    </select>
+                                    <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                        Salvar
+                                    </button>
+                                </form>
+
+                                @if(auth()->user()->isSuperAdmin())
+                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="if({{ $user->id }} === {{ auth()->id() }}){ 
+                                        alert('Você não pode excluir sua própria conta!'); 
+                                        return false; 
+                                    } 
+                                    return confirm('Tem certeza que deseja excluir este usuário?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @endforeach

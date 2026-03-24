@@ -2,48 +2,32 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    // Constantes de categoria
     public const CATEGORIA_SUPER_ADMIN = 'superAdmin';
-    public const CATEGORIA_ADMIN = 'admin';
+    public const CATEGORIA_SUPERVISOR = 'supervisor';
     public const CATEGORIA_USER = 'user';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
         'categoria',
+        'email_verified_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -52,47 +36,22 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Relacionamento com guichês.
-     */
-    public function guiches()
-    {
-        return $this->belongsToMany(Guiche::class, 'user_guiche', 'user_id', 'guiche_id')->withTimestamps();
+    // Métodos de permissão que o seu Menu (Sidebar) exige:
+    public function isSuperAdmin(): bool { 
+        return $this->categoria === self::CATEGORIA_SUPER_ADMIN; 
     }
 
-    /**
-     * Retorna as categorias válidas.
-     */
-    public static function categorias(): array
-    {
-        return [
-            self::CATEGORIA_SUPER_ADMIN,
-            self::CATEGORIA_ADMIN,
-            self::CATEGORIA_USER,
-        ];
+    public function isSupervisor(): bool { 
+        return $this->categoria === self::CATEGORIA_SUPERVISOR; 
     }
 
-    /**
-     * Verifica se é Super Admin.
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->categoria === self::CATEGORIA_SUPER_ADMIN;
+    public function isUser(): bool { 
+        return $this->categoria === self::CATEGORIA_USER; 
     }
+    
 
-    /**
-     * Verifica se é Admin.
-     */
-    public function isAdmin(): bool
+    public function hasAdminAccess(): bool
     {
-        return $this->categoria === self::CATEGORIA_ADMIN;
-    }
-
-    /**
-     * Verifica se é User.
-     */
-    public function isUser(): bool
-    {
-        return $this->categoria === self::CATEGORIA_USER;
+        return $this->isSuperAdmin() || $this->isSupervisor();
     }
 }

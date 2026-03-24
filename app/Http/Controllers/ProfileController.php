@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -39,22 +42,40 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's account.
-    */
-    public function destroy(Request $request): RedirectResponse
+     */
+    public function destroy($id)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+        // Check if user is superAdmin
+        if (auth()->user()->categoria !== 'superAdmin') {
+            return back()->with('error', 'Ação não autorizada.');
+        }
 
-        $user = $request->user();
+        $user = User::findOrFail($id);
 
-        Auth::logout();
+        // Prevent deleting own account
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Você não pode excluir sua própria conta.');
+        }
 
-        $user->delete();
+        try {
+            DB::beginTransaction();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            // 1. Delete relations in user_guiche
+            DB::table('user_guiche')->where('user_id', $user->id)->delete();
 
-        return Redirect::to('/');
+            // 2. Delete linked tickets
+            DB::table('tickets')->where('attendant_id', $user->id)->delete();
+
+            // 3. Delete user
+            $user->delete();
+
+            DB::commit();
+
+            return back()->with('success', 'Usuário e seus vínculos foram excluídos com sucesso.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erro ao excluir usuário: ' . $e->getMessage());
+            return back()->with('error', 'Erro ao excluir usuário: ' . $e->getMessage());
+        }
     }
 }

@@ -1,132 +1,81 @@
 <?php
 
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
-use Monolog\Processor\PsrLogMessageProcessor;
-
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Log Channel
+    | Default LDAP Connection Name
     |--------------------------------------------------------------------------
     |
-    | This option defines the default log channel that is utilized to write
-    | messages to your logs. The value provided here should match one of
-    | the channels present in the list of "channels" configured below.
+    | Here you may specify which of the LDAP connections below you wish
+    | to use as your default connection for all LDAP operations. Of
+    | course you may add as many connections you'd like below.
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LDAP_CONNECTION', 'default'),
 
     /*
     |--------------------------------------------------------------------------
-    | Deprecations Log Channel
+    | LDAP Connections
     |--------------------------------------------------------------------------
     |
-    | This option controls the log channel that should be used to log warnings
-    | regarding deprecated PHP and library features. This allows you to get
-    | your application ready for upcoming major versions of dependencies.
+    | Below you may configure each LDAP connection your application requires
+    | access to. Be sure to include a valid base DN - otherwise you may
+    | not receive any results when performing LDAP search operations.
     |
     */
 
-    'deprecations' => [
-        'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
-        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
+    'connections' => [
+
+        'default' => [
+            'hosts' => [env('LDAP_HOST', '127.0.0.1')],
+            'username' => env('LDAP_USERNAME', 'cn=user,dc=local,dc=com'),
+            'password' => env('LDAP_PASSWORD', 'secret'),
+            'port' => env('LDAP_PORT', 389),
+            'base_dn' => env('LDAP_BASE_DN', 'dc=local,dc=com'),
+            'timeout' => env('LDAP_TIMEOUT', 5),
+            'use_ssl' => env('LDAP_SSL', false),
+            'use_tls' => env('LDAP_TLS', false),
+            'use_sasl' => env('LDAP_SASL', false),
+            'sasl_options' => [
+                // 'mech' => 'GSSAPI',
+            ],
+        ],
+
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Log Channels
+    | LDAP Logging
     |--------------------------------------------------------------------------
     |
-    | Here you may configure the log channels for your application. Laravel
-    | utilizes the Monolog PHP logging library, which includes a variety
-    | of powerful log handlers and formatters that you're free to use.
-    |
-    | Available drivers: "single", "daily", "slack", "syslog",
-    |                    "errorlog", "monolog", "custom", "stack"
+    | When LDAP logging is enabled, all LDAP search and authentication
+    | operations are logged using the default application logging
+    | driver. This can assist in debugging issues and more.
     |
     */
 
-    'channels' => [
+    'logging' => [
+        'enabled' => env('LDAP_LOGGING', true),
+        'channel' => env('LOG_CHANNEL', 'stack'),
+        'level' => env('LOG_LEVEL', 'info'),
+    ],
 
-        'stack' => [
-            'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
-            'ignore_exceptions' => false,
-        ],
+    /*
+    |--------------------------------------------------------------------------
+    | LDAP Cache
+    |--------------------------------------------------------------------------
+    |
+    | LDAP caching enables the ability of caching search results using the
+    | query builder. This is great for running expensive operations that
+    | may take many seconds to complete, such as a pagination request.
+    |
+    */
 
-        'single' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'replace_placeholders' => true,
-        ],
-
-        'daily' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
-            'replace_placeholders' => true,
-        ],
-
-        'slack' => [
-            'driver' => 'slack',
-            'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
-            'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level' => env('LOG_LEVEL', 'critical'),
-            'replace_placeholders' => true,
-        ],
-
-        'papertrail' => [
-            'driver' => 'monolog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
-            'handler_with' => [
-                'host' => env('PAPERTRAIL_URL'),
-                'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
-            ],
-            'processors' => [PsrLogMessageProcessor::class],
-        ],
-
-        'stderr' => [
-            'driver' => 'monolog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'handler' => StreamHandler::class,
-            'handler_with' => [
-                'stream' => 'php://stderr',
-            ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
-            'processors' => [PsrLogMessageProcessor::class],
-        ],
-
-        'syslog' => [
-            'driver' => 'syslog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
-            'replace_placeholders' => true,
-        ],
-
-        'errorlog' => [
-            'driver' => 'errorlog',
-            'level' => env('LOG_LEVEL', 'debug'),
-            'replace_placeholders' => true,
-        ],
-
-        'null' => [
-            'driver' => 'monolog',
-            'handler' => NullHandler::class,
-        ],
-
-        'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
-        ],
-
+    'cache' => [
+        'enabled' => env('LDAP_CACHE', false),
+        'driver' => env('CACHE_DRIVER', 'file'),
     ],
 
 ];

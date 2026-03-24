@@ -1,0 +1,51 @@
+[90m= [39m[
+    {#5285
+      +"[1mField[22m": "[32mid[39m",
+      +"[1mType[22m": "[32mvarchar(255)[39m",
+      +"[1mNull[22m": "[32mNO[39m",
+      +"[1mKey[22m": "[32mPRI[39m",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+    {#5286
+      +"[1mField[22m": "[32muser_id[39m",
+      +"[1mType[22m": "[32mbigint unsigned[39m",
+      +"[1mNull[22m": "[32mYES[39m",
+      +"[1mKey[22m": "[32mMUL[39m",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+    {#5287
+      +"[1mField[22m": "[32mip_address[39m",
+      +"[1mType[22m": "[32mvarchar(45)[39m",
+      +"[1mNull[22m": "[32mYES[39m",
+      +"[1mKey[22m": "",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+    {#5288
+      +"[1mField[22m": "[32muser_agent[39m",
+      +"[1mType[22m": "[32mtext[39m",
+      +"[1mNull[22m": "[32mYES[39m",
+      +"[1mKey[22m": "",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+    {#5283
+      +"[1mField[22m": "[32mpayload[39m",
+      +"[1mType[22m": "[32mlongtext[39m",
+      +"[1mNull[22m": "[32mNO[39m",
+      +"[1mKey[22m": "",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+    {#5282
+      +"[1mField[22m": "[32mlast_activity[39m",
+      +"[1mType[22m": "[32mint[39m",
+      +"[1mNull[22m": "[32mNO[39m",
+      +"[1mKey[22m": "[32mMUL[39m",
+      +"[1mDefault[22m": [36mnull[39m,
+      +"[1mExtra[22m": "",
+    },
+  ]
+

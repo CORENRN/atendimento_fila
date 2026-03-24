@@ -5,18 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Guiche;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class GuicheController extends Controller
 {
     public function showSelectGuiche()
     {
+        $userId = Auth::id();
+
+        // Verifica se VOCÊ já escolheu um guichê nas últimas 12h
+        $exists = DB::table('user_guiche')
+            ->where('user_id', $userId)
+            ->where('created_at', '>=', now()->subHours(12))
+            ->first();
+
+        // BUSCA OS GUICHÊS: Filtra os que foram escolhidos por QUALQUER usuário
         $guiches = Guiche::whereNotIn('id', function ($query) {
             $query->select('guiche_id')
                 ->from('user_guiche')
                 ->where('created_at', '>=', now()->subHours(12));
         })->get();
 
-        return view('choose_guiche', compact('guiches'));
+        return $exists ? redirect()->route('queue', 'atendimento') : view('choose_guiche', compact('guiches'));
     }
 
     public function selectGuiche(Request $request)
@@ -25,26 +35,26 @@ class GuicheController extends Controller
             'guiche_id' => 'required|exists:guiches,id',
         ]);
 
-        $userId = auth()->id();
+        $userId = Auth::id();
 
-        // Verifica se o usuário já está associado a um guichê nas últimas 12 horas
-        $exists = DB::table('user_guiche')
-            ->where('user_id', $userId)
+        // Verificação de segurança: Alguém escolheu esse guichê nos últimos segundos?
+        $isOccupied = DB::table('user_guiche')
+            ->where('guiche_id', $request->guiche_id)
             ->where('created_at', '>=', now()->subHours(12))
-            ->first();
+            ->exists();
 
-        if ($exists) {
-            return back()->with('error', 'Você já está associado a um guichê nas últimas 12 horas.');
+        if ($isOccupied) {
+            return back()->with('error', 'Este guichê acabou de ser ocupado por outro atendente.');
         }
 
-        // Faz a associação
         DB::table('user_guiche')->insert([
-            'user_id' => $userId,
+            'user_id' => (int) $userId,
             'guiche_id' => $request->guiche_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('home')->with('success', 'Guichê selecionado com sucesso.');
+        return redirect()->route('queue', ['stage' => 'atendimento'])
+                    ->with('success', 'Guichê selecionado com sucesso.');
     }
 }

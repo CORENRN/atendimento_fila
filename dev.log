@@ -1,0 +1,279 @@
+nohup: ignoring input
+
+> dev
+> vite
+
+
+  VITE v6.4.1  ready in 376 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.10.222:5173/
+  ➜  Network: http://172.19.0.1:5173/
+
+  LARAVEL v12.15.0  plugin v1.3.0
+
+  ➜  APP_URL: http://192.168.10.222:8000
+6:30:21 PM [vite] (client) page reload vendor/dompdf/dompdf/lib/fonts/mustRead.html
+nohup: ignoring input
+
+> dev
+> vite
+
+
+  VITE v6.4.1  ready in 383 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.10.222:5173/
+  ➜  Network: http://172.19.0.1:5173/
+
+  LARAVEL v12.15.0  plugin v1.3.0
+
+  ➜  APP_URL: http://192.168.10.222:8000
+2:08:17 PM [vite] full reload resources/views/auth/login.blade.php
+2:08:17 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:09:16 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+2:09:51 PM [vite] full reload resources/views/auth/login.blade.php
+2:09:51 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:09:51 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+2:09:53 PM [vite] full reload resources/views/auth/login.blade.php
+2:09:53 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:09:53 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+2:09:54 PM [vite] full reload resources/views/auth/login.blade.php
+2:09:54 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:10:20 PM [vite] full reload resources/views/auth/login.blade.php
+2:10:20 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:10:20 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+2:10:32 PM [vite] full reload resources/views/auth/login.blade.php
+2:10:32 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:10:32 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+2:10:39 PM [vite] full reload resources/views/auth/login.blade.php
+2:10:39 PM [vite] (client) page reload resources/views/auth/login.blade.php
+2:10:39 PM [vite] (client) page reload storage/framework/views/04cf3a448aafd502605053f5e3d464e8.php
+5:01:13 PM [vite] full reload routes/web.php
+5:01:13 PM [vite] full reload routes/web.php
+5:01:13 PM [vite] full reload routes/web.php
+5:36:35 PM [vite] full reload resources/views/home.blade.php
+5:36:35 PM [vite] (client) page reload resources/views/home.blade.php
+5:36:35 PM [vite] full reload resources/views/home.blade.php
+5:36:35 PM [vite] (client) page reload resources/views/home.blade.php
+5:36:35 PM [vite] full reload resources/views/home.blade.php
+5:36:35 PM [vite] (client) page reload resources/views/home.blade.php
+5:36:36 PM [vite] full reload resources/views/home.blade.php
+5:36:36 PM [vite] (client) page reload resources/views/home.blade.php
+5:36:36 PM [vite] full reload resources/views/home.blade.php
+5:36:36 PM [vite] (client) page reload resources/views/home.blade.php
+6:03:09 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:03:09 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:03:09 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:03:09 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:03:20 PM [vite] full reload routes/web.php
+6:03:20 PM [vite] full reload routes/web.php
+6:03:40 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+6:03:47 PM [vite] (client) page reload storage/framework/views/e24924ba77f6fccfdbc36b0a1df5c379.php
+6:04:07 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:07 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:04:08 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:00:44 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:00:44 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:00:46 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:00:46 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:01:18 PM [vite] full reload resources/views/panel/admin.blade.php
+6:01:18 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+6:01:18 PM [vite] full reload resources/views/panel/admin.blade.php
+6:01:18 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+6:01:18 PM [vite] full reload resources/views/panel/admin.blade.php
+6:01:18 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+6:08:08 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:08:08 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:08:40 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:08:53 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:08:53 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:09:21 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:09:21 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:09:24 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:09:24 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:09:24 PM [vite] full reload resources/views/users/assign_category.blade.php
+6:09:24 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+6:10:43 PM [vite] (client) page reload storage/framework/views/e24924ba77f6fccfdbc36b0a1df5c379.php
+6:13:58 PM [vite] (client) page reload storage/framework/views/594990c06f835ebb809c2e31c5e63600.php
+6:35:59 PM [vite] full reload resources/views/home.blade.php
+6:35:59 PM [vite] (client) page reload resources/views/home.blade.php
+6:36:00 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+6:36:03 PM [vite] full reload resources/views/queue.blade.php
+6:36:03 PM [vite] (client) page reload resources/views/queue.blade.php
+6:54:54 PM [vite] full reload resources/views/home.blade.php
+6:54:54 PM [vite] (client) page reload resources/views/home.blade.php
+6:54:54 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+6:54:54 PM [vite] full reload resources/views/home.blade.php
+6:54:54 PM [vite] (client) page reload resources/views/home.blade.php
+6:55:10 PM [vite] full reload resources/views/home.blade.php
+6:55:10 PM [vite] (client) page reload resources/views/home.blade.php
+6:55:10 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+6:55:10 PM [vite] full reload resources/views/home.blade.php
+6:55:10 PM [vite] (client) page reload resources/views/home.blade.php
+7:32:01 PM [vite] full reload resources/views/dashboard.blade.php
+7:32:01 PM [vite] (client) page reload resources/views/dashboard.blade.php
+7:32:12 PM [vite] (client) page reload storage/framework/views/4b1b25cb8101c10d87848bfc06b55349.php
+7:36:13 PM [vite] full reload resources/views/panel/admin.blade.php
+7:36:13 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+7:36:13 PM [vite] (client) page reload storage/framework/views/594990c06f835ebb809c2e31c5e63600.php
+7:49:09 PM [vite] (client) page reload storage/framework/views/a07113b087450d9e810c5d3c87616f6d.php
+12:02:30 PM [vite] full reload resources/views/panel/admin.blade.php
+12:02:30 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:03:02 PM [vite] full reload resources/views/panel/admin.blade.php
+12:03:02 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:05:01 PM [vite] (client) page reload storage/framework/views/594990c06f835ebb809c2e31c5e63600.php
+12:05:35 PM [vite] full reload resources/views/panel/admin.blade.php
+12:05:35 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:05:50 PM [vite] full reload resources/views/queue.blade.php
+12:05:50 PM [vite] (client) page reload resources/views/queue.blade.php
+12:06:56 PM [vite] full reload resources/views/dashboard.blade.php
+12:06:56 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:06:56 PM [vite] (client) page reload storage/framework/views/4b1b25cb8101c10d87848bfc06b55349.php
+12:07:25 PM [vite] full reload resources/views/queue.blade.php
+12:07:25 PM [vite] (client) page reload resources/views/queue.blade.php
+12:07:35 PM [vite] (client) page reload storage/framework/views/a07113b087450d9e810c5d3c87616f6d.php
+12:07:58 PM [vite] full reload resources/views/home.blade.php
+12:07:58 PM [vite] (client) page reload resources/views/home.blade.php
+12:07:59 PM [vite] full reload resources/views/home.blade.php
+12:07:59 PM [vite] (client) page reload resources/views/home.blade.php
+12:07:59 PM [vite] full reload resources/views/home.blade.php
+12:07:59 PM [vite] (client) page reload resources/views/home.blade.php
+12:07:59 PM [vite] full reload resources/views/home.blade.php
+12:07:59 PM [vite] (client) page reload resources/views/home.blade.php
+12:08:00 PM [vite] full reload resources/views/dashboard.blade.php
+12:08:00 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] full reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] full reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] full reload resources/views/dashboard.blade.php
+12:08:01 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:08:03 PM [vite] full reload resources/views/panel/admin.blade.php
+12:08:03 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:08:03 PM [vite] full reload resources/views/panel/admin.blade.php
+12:08:03 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:08:03 PM [vite] full reload resources/views/panel/admin.blade.php
+12:08:03 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:09:35 PM [vite] full reload resources/views/panel/admin.blade.php
+12:09:35 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:09:46 PM [vite] full reload resources/views/panel/admin.blade.php
+12:09:46 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:09:47 PM [vite] full reload resources/views/panel/admin.blade.php
+12:09:47 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:10:41 PM [vite] full reload resources/views/panel/admin.blade.php
+12:10:41 PM [vite] (client) page reload resources/views/panel/admin.blade.php
+12:11:00 PM [vite] full reload resources/views/queue.blade.php
+12:11:00 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:06 PM [vite] full reload resources/views/queue.blade.php
+12:11:06 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:06 PM [vite] full reload resources/views/queue.blade.php
+12:11:06 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:06 PM [vite] full reload resources/views/queue.blade.php
+12:11:06 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:10 PM [vite] full reload resources/views/queue.blade.php
+12:11:10 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:17 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:17 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:26 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:27 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:46 PM [vite] full reload resources/views/dashboard.blade.php
+12:11:46 PM [vite] (client) page reload resources/views/dashboard.blade.php
+12:11:54 PM [vite] full reload resources/views/queue.blade.php
+12:11:54 PM [vite] (client) page reload resources/views/queue.blade.php
+12:11:56 PM [vite] full reload resources/views/queue.blade.php
+12:11:56 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:05 PM [vite] full reload resources/views/queue.blade.php
+12:12:05 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:14 PM [vite] full reload resources/views/queue.blade.php
+12:12:14 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:15 PM [vite] full reload resources/views/queue.blade.php
+12:12:15 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:18 PM [vite] full reload resources/views/queue.blade.php
+12:12:18 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:19 PM [vite] full reload resources/views/queue.blade.php
+12:12:19 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:19 PM [vite] full reload resources/views/queue.blade.php
+12:12:19 PM [vite] (client) page reload resources/views/queue.blade.php
+12:12:34 PM [vite] (client) page reload storage/framework/views/a07113b087450d9e810c5d3c87616f6d.php
+12:12:34 PM [vite] (client) page reload storage/framework/views/4b1b25cb8101c10d87848bfc06b55349.php
+12:12:39 PM [vite] (client) page reload storage/framework/views/594990c06f835ebb809c2e31c5e63600.php
+1:28:14 PM [vite] full reload resources/views/queue.blade.php
+1:28:14 PM [vite] (client) page reload resources/views/queue.blade.php
+1:28:14 PM [vite] (client) page reload storage/framework/views/a07113b087450d9e810c5d3c87616f6d.php
+1:28:14 PM [vite] full reload resources/views/queue.blade.php
+1:28:14 PM [vite] (client) page reload resources/views/queue.blade.php
+2:47:17 PM [vite] full reload resources/views/home.blade.php
+2:47:17 PM [vite] (client) page reload resources/views/home.blade.php
+2:47:25 PM [vite] full reload resources/views/home.blade.php
+2:47:25 PM [vite] (client) page reload resources/views/home.blade.php
+2:48:49 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+2:57:10 PM [vite] full reload resources/views/users/assign_category.blade.php
+2:57:10 PM [vite] (client) page reload resources/views/users/assign_category.blade.php
+2:57:44 PM [vite] (client) page reload storage/framework/views/e24924ba77f6fccfdbc36b0a1df5c379.php
+2:57:53 PM [vite] full reload resources/views/home.blade.php
+2:57:53 PM [vite] (client) page reload resources/views/home.blade.php
+2:57:53 PM [vite] full reload resources/views/home.blade.php
+2:57:53 PM [vite] (client) page reload resources/views/home.blade.php
+2:57:53 PM [vite] full reload resources/views/home.blade.php
+2:57:53 PM [vite] (client) page reload resources/views/home.blade.php
+2:57:53 PM [vite] full reload resources/views/home.blade.php
+2:57:53 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:10 PM [vite] full reload resources/views/home.blade.php
+2:58:10 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:10 PM [vite] full reload resources/views/home.blade.php
+2:58:10 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:10 PM [vite] full reload resources/views/home.blade.php
+2:58:10 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:10 PM [vite] full reload resources/views/home.blade.php
+2:58:10 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:10 PM [vite] full reload resources/views/home.blade.php
+2:58:10 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:11 PM [vite] full reload resources/views/home.blade.php
+2:58:11 PM [vite] (client) page reload resources/views/home.blade.php
+2:58:11 PM [vite] full reload resources/views/home.blade.php
+2:58:11 PM [vite] (client) page reload resources/views/home.blade.php
+3:04:06 PM [vite] full reload resources/views/queue.blade.php
+3:04:06 PM [vite] (client) page reload resources/views/queue.blade.php
+3:04:11 PM [vite] full reload resources/views/queue.blade.php
+3:04:11 PM [vite] (client) page reload resources/views/queue.blade.php
+3:04:14 PM [vite] full reload resources/views/queue.blade.php
+3:04:14 PM [vite] (client) page reload resources/views/queue.blade.php
+3:04:39 PM [vite] full reload resources/views/queue.blade.php
+3:04:39 PM [vite] (client) page reload resources/views/queue.blade.php
+3:07:55 PM [vite] full reload resources/views/home.blade.php
+3:07:55 PM [vite] (client) page reload resources/views/home.blade.php
+3:07:55 PM [vite] full reload resources/views/home.blade.php
+3:07:55 PM [vite] (client) page reload resources/views/home.blade.php
+3:08:44 PM [vite] full reload resources/views/home.blade.php
+3:08:44 PM [vite] (client) page reload resources/views/home.blade.php
+3:09:35 PM [vite] (client) page reload storage/framework/views/696e2cd3d2a5184f2f15532ac8fefed1.php
+Killed
