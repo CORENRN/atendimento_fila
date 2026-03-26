@@ -21,6 +21,7 @@ class Ticket extends Model
         'stage',
         'type',
         'service',
+        'cpf',
     ];
 
     protected $casts = [

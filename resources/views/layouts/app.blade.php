@@ -49,7 +49,7 @@
                 </div>
             @endif
 
-            <main class="flex flex-col min-h-[calc(100vh-64px)]">
+            <main class="flex flex-col h-screen overflow-hidden">
                  @yield('content')
             </main>
         </div>

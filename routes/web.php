@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AllowNotification;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
@@ -16,7 +17,7 @@ Route::get('/ticket/{id}', [TicketController::class, 'showTicket'])->name('ticke
 Route::get('/painel', [PanelController::class, 'index'])->name('panel.index');
 Route::get('/painel/data', [PanelController::class, 'data'])->name('panel.data');
 Route::get('/ticket/{id}/print', [PrintController::class, 'printTicket'])->name('ticket.print');
-
+Route::get('/allow', [AllowNotification::class, 'index']);
 // --- ROTAS PROTEGIDAS (Precisa de Login LDAP) ---
 Route::middleware('auth')->group(function () {
     
@@ -34,14 +35,26 @@ Route::middleware('auth')->group(function () {
 
     // Fila (Atendimento)
     Route::prefix('queue')->group(function () {
-        Route::get('{stage}', [TicketController::class, 'queue'])->name('queue');
-        Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])->name('queue.tickets.json');
-        Route::post('{stage}/call', [TicketController::class, 'callNext'])->name('queue.call');
-        Route::post('{id}/finish', [TicketController::class, 'finish'])->name('queue.finish');
-        Route::post('{id}/cancel', [TicketController::class, 'cancel'])->name('queue.cancel');
-        Route::post('{id}/advance', [TicketController::class, 'advance'])->name('queue.advance');
-        Route::post('{stage}/call-priority', [TicketController::class, 'callNextPriority'])->name('queue.priority');
-        Route::post('recall/{id}', [TicketController::class, 'recall'])->name('queue.recall');
+
+        Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])
+            ->name('queue.tickets.json');
+        Route::post('recall/{id}', [TicketController::class, 'recall'])
+            ->name('queue.recall');
+
+
+        Route::get('{stage}', [TicketController::class, 'queue'])
+            ->name('queue');
+        Route::post('{stage}/call', [TicketController::class, 'callNext'])
+            ->name('queue.call');
+        Route::post('{stage}/call-priority', [TicketController::class, 'callNextPriority'])
+            ->name('queue.priority');
+
+        Route::post('{id}/finish', [TicketController::class, 'finish'])
+            ->name('queue.finish');
+        Route::post('{id}/cancel', [TicketController::class, 'cancel'])
+            ->name('queue.cancel');
+        Route::post('{id}/advance', [TicketController::class, 'advance'])
+            ->name('queue.advance');
     });
 
     // Impressoras

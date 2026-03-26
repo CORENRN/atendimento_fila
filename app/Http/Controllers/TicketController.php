@@ -1,10 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Events\TicketUpdated;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
-use App\Http\Controllers\PrintController;
 
 class TicketController extends Controller
 {
@@ -13,72 +13,47 @@ class TicketController extends Controller
         return view('home');
     }
 
-public function queue($stage)
-{
-    $status = $stage === 'triagem' ? 'triagem' : 'atendimento';
+    public function queue($stage)
+    {
+        $statusValue = in_array($stage, ['triagem', 'atendimento', 'carteira']) ? $stage : 'triagem';
+        $attendantId = auth()->id();
 
-    $attendantId = auth()->id();
+        $tickets = Ticket::where('stage', $stage)
+            ->whereIn('status', ['aguardando', $statusValue])
+            ->orderByRaw('called_at IS NULL, called_at ASC')
+            ->orderBy('created_at')
+            ->get();
 
-    $tickets = Ticket::where('stage', $stage)
-        ->whereIn('status', ['aguardando', $status])
-        ->orderByRaw('called_at IS NULL, called_at ASC')
-        ->orderBy('created_at')
-        ->get();
+        $services = [
+            'inscricao' => 'Inscrição', 'renovacao' => 'Renovação', 'regularizacao' => 'Regularização',
+            'transferencia' => 'Transferência', 'secundaria' => 'Secundária', 'especializacao' => 'Especialização',
+            'cancelamento' => 'Cancelamento', 'remida' => 'Remida', 'reativacao' => 'Reativação',
+            'certidao' => 'Certidão', 'financeiro' => 'Financeiro', 'documentacao' => 'Documentação',
+            'informacao' => 'Informações', 'art' => 'ART', 'outros' => 'Outros',
+        ];
 
-    $services = [
-        'inscricao' => 'Inscrição',
-        'renovacao' => 'Renovação',
-        'regularizacao' => 'Regularização',
-        'transferencia' => 'Transferência',
-        'secundaria' => 'Secundária',
-        'especializacao' => 'Especialização',
-        'cancelamento' => 'Cancelamento',
-        'remida' => 'Remida',
-        'reativacao' => 'Reativação',
-        'certidao' => 'Certidão',
-        'financeiro' => 'Financeiro',
-        'documentacao' => 'Documentação',
-        'informacao' => 'Informações',
-        'art' => 'ART',
-        'outros' => 'Outros',
-    ];
+        $calledTicket = Ticket::where('stage', $stage)
+            ->where('attendant_id', $attendantId)
+            ->where('status', $statusValue)
+            ->whereNull('finished_at')
+            ->first();
 
-    // Ticket que o atendente logado está atendendo (se existir)
-    $calledTicket = Ticket::where('stage', $stage)
-        ->where('attendant_id', $attendantId)
-        ->where('status', $status)
-        ->when($stage === 'triagem', function ($query) {
-            return $query->whereNotNull('called_tri_at');
-        }, function ($query) {
-            return $query->whereNotNull('called_at');
-        })
-        ->whereNull('finished_at')
-        ->first();
+        $called_id = $calledTicket?->id;
 
-    $called_id = $calledTicket?->id;
+        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'calledTicket'));
+    }
 
-    $statusCounts = Ticket::where('stage', $stage)
-        ->selectRaw('status, COUNT(*) as count')
-        ->groupBy('status')
-        ->pluck('count', 'status')
-        ->toArray();
-
-    return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'statusCounts', 'calledTicket'));
-}
-
-
-  public function callNext($stage)
+    public function callNext($stage)
     {
         $attendantId = auth()->id();
 
-        $existingCall = Ticket::where('stage', $stage)
-            ->where('attendant_id', $attendantId)
-            ->whereIn('status', ['triagem', 'atendimento'])
+        $existingCall = Ticket::where('attendant_id', $attendantId)
+            ->where('status', $stage)
             ->whereNull('finished_at')
             ->first();
 
         if ($existingCall) {
-            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+            return back()->with('error', 'Você já está atendendo um ticket.');
         }
         
         $ticket = Ticket::where('stage', $stage)
@@ -87,64 +62,39 @@ public function queue($stage)
             ->first();
 
         if ($ticket) {
-            $data = [
-                'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
+            $data = [ 
                 'attendant_id' => $attendantId,
                 'last_called_at' => now(),
+                'status' => $stage
             ];
 
             if ($stage === 'triagem') {
-                if (!$ticket->called_tri_at) {
-                    $data['called_tri_at'] = now();
-                }
+                if (!$ticket->called_tri_at) $data['called_tri_at'] = now();
                 $data['triagem_id'] = $attendantId;
             } else {
-                if (!$ticket->called_at) {
-                    $data['called_at'] = now();
-                }
+                if (!$ticket->called_at) $data['called_at'] = now();
             }
 
             $ticket->update($data);
-
             event(new TicketUpdated($ticket));
 
-            return back()->with('success', 'Ticket chamado com sucesso.');
+            return back()->with('success', 'Ticket chamado.');
         }
 
-        return back()->with('info', 'Não há tickets aguardando na fila.');
+        return back()->with('info', 'Fila vazia.');
     }
-
-public function getTicketsJson($stage)
-{
-    $statusValue = $stage === 'triagem' ? 'triagem' : 'atendimento';
-
-    $tickets = Ticket::where('stage', $stage)
-        ->whereIn('status', ['aguardando', $statusValue])
-        ->orderByRaw('called_at IS NULL, called_at ASC')
-        ->orderBy('created_at')
-        ->get();
-
-    return response()->json([
-        'tickets' => $tickets,
-    ]);
-}
-
-
-
 
     public function callNextPriority($stage)
     {
         $attendantId = auth()->id();
 
-        $existingCall = Ticket::where('stage', $stage)
-            ->where('attendant_id', $attendantId)
-            ->whereIn('status', ['triagem', 'atendimento'])
-            ->whereNotNull('called_at')
+        $existingCall = Ticket::where('attendant_id', $attendantId)
+            ->whereIn('status', ['triagem', 'atendimento', 'carteira'])
             ->whereNull('finished_at')
             ->first();
 
         if ($existingCall) {
-            return back()->with('error', 'Você já está atendendo um ticket. Finalize-o antes de chamar outro.');
+            return back()->with('error', 'Você já está atendendo um ticket.');
         }
 
         $ticket = Ticket::where('stage', $stage)
@@ -155,54 +105,33 @@ public function getTicketsJson($stage)
 
         if ($ticket) {
             $data = [
-                'status' => $stage === 'triagem' ? 'triagem' : 'atendimento',
+                'status' => $stage,
                 'attendant_id' => $attendantId,
                 'last_called_at' => now(),
             ];
 
             if ($stage === 'triagem') {
-                if (!$ticket->called_tri_at) {
-                    $data['called_tri_at'] = now();
-                }
+                if (!$ticket->called_tri_at) $data['called_tri_at'] = now();
                 $data['triagem_id'] = $attendantId;
             } else {
-                if (!$ticket->called_at) {
-                    $data['called_at'] = now();
-                }
+                if (!$ticket->called_at) $data['called_at'] = now();
             }
 
             $ticket->update($data);
-
             event(new TicketUpdated($ticket));
 
-            return back()->with('success', 'Ticket prioritário chamado com sucesso.');
+            return back()->with('success', 'Prioritário chamado.');
         }
 
-        return back()->with('info', 'Não há tickets prioritários aguardando na fila.');
-    }
-
-    public function recall($id)
-    {
-        $ticket = Ticket::findOrFail($id);
-        
-        // Força a atualização do timestamp mesmo que nada mais mude
-        $ticket->update([
-            'last_called_at' => now(),
-            'updated_at' => now(), 
-        ]);
-
-        event(new TicketUpdated($ticket->fresh()));
-
-        return back()->with('success', 'Chamado novamente.');
+        return back()->with('info', 'Sem prioritários.');
     }
 
     public function finish(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
 
-        
         if ($ticket->attendant_id !== auth()->id()) {
-            return back()->with('error', 'Você não pode finalizar um ticket que não está atendendo.');
+            return back()->with('error', 'Acesso negado.');
         }
 
         $ticket->update([
@@ -211,8 +140,7 @@ public function getTicketsJson($stage)
         ]);
 
         event(new TicketUpdated($ticket));
-
-        return back()->with('success', 'Ticket finalizado.');
+        return back()->with('success', 'Finalizado.');
     }
 
     public function cancel(Request $request, $id)
@@ -220,7 +148,7 @@ public function getTicketsJson($stage)
         $ticket = Ticket::findOrFail($id);
 
         if ($ticket->attendant_id !== auth()->id()) {
-            return back()->with('error', 'Você não pode cancelar um ticket que não está atendendo.');
+            return back()->with('error', 'Acesso negado.');
         }
 
         $ticket->update([
@@ -229,8 +157,7 @@ public function getTicketsJson($stage)
         ]);
 
         event(new TicketUpdated($ticket));
-
-        return back()->with('success', 'Ticket cancelado.');
+        return back()->with('success', 'Cancelado.');
     }
 
     public function advance(Request $request, $id)
@@ -238,7 +165,7 @@ public function getTicketsJson($stage)
         $ticket = Ticket::findOrFail($id);
 
         if ($ticket->attendant_id !== auth()->id()) {
-            return back()->with('error', 'Você não pode avançar um ticket que não está atendendo.');
+            return back()->with('error', 'Acesso negado.');
         }
 
         $request->validate([
@@ -255,43 +182,57 @@ public function getTicketsJson($stage)
             ]);
 
             event(new TicketUpdated($ticket));
-
-            return back()->with('success', 'Ticket avançado para atendimento.');
+            return back()->with('success', 'Avançado.');
         }
 
-        return back()->with('error', 'Este ticket não está na triagem.');
+        return back()->with('error', 'Ticket inválido.');
+    }
+
+    public function recall($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $ticket->update(['last_called_at' => now()]);
+        event(new TicketUpdated($ticket->fresh()));
+        return back()->with('success', 'Chamado novamente.');
     }
 
     public function takeTicket(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:regular,preferencial',
-        ]);
+            'type' => 'required|in:regular,preferencial,carteira',
+            'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
+            ]);
 
         $ticket = Ticket::create([
             'type' => $request->type,
-            'stage' => 'triagem',
+            'stage' => $request->type === 'carteira' ? 'carteira' : 'triagem',
             'status' => 'aguardando',
+            'cpf' => $request->cpf,
         ]);
-
-        // try {
-        //     app(PrintController::class)->printTicket($ticket->id);
-        // } catch (\Exception $e) {
-        //     \Log::error('Erro na impressão: ' . $e->getMessage());
-        // }
 
         return redirect()->route('ticket.show', ['id' => $ticket->id]);
     }
-
 
     public function showTicket($id)
     {
         $ticket = Ticket::findOrFail($id);
         return view('ticket_show', compact('ticket'));
     }
+
     public function takeTicketView()
     {
-    
         return view('ticket_take'); 
+    }
+
+    public function getTicketsJson($stage)
+    {
+        $statusValue = in_array($stage, ['triagem', 'atendimento', 'carteira']) ? $stage : 'triagem';
+        $tickets = Ticket::where('stage', $stage)
+            ->whereIn('status', ['aguardando', $statusValue])
+            ->orderByRaw('called_at IS NULL, called_at ASC')
+            ->orderBy('created_at')
+            ->get();
+
+        return response()->json(['tickets' => $tickets]);
     }
 }

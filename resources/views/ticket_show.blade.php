@@ -2,51 +2,22 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Ticket</title>
+    <title>Ticket #{{ $ticket->id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* MANTIDO EXATAMENTE COMO NO SEU ORIGINAL */
         @media print {
-            @page {
-                size: 80mm auto;
-                margin: 0 !important;
-            }
-
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-                width: 80mm;
-            }
-
+            @page { size: 80mm auto; margin: 0 !important; }
+            body { margin: 0 !important; padding: 0 !important; background: white !important; width: 80mm; }
             .print-hidden { display: none !important; }
-
-            .print-only {
-                display: block !important;
-                position: absolute;
-                left: 6mm; 
-                width: 45mm !important;
-                text-align: center;
-                color: black !important;
-            }
-
-            .bg-black {
-                background-color: black !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            .print-only { display: block !important; position: absolute; left: 6mm; width: 45mm !important; text-align: center; color: black !important; }
+            .bg-black { background-color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
-
         .print-only { display: none; }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.95); }
-        }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.95); } }
         .animate-pulse-slow { animation: pulse-slow 2s infinite ease-in-out; }
     </style>
 </head>
 <body class="bg-slate-50 flex items-center justify-center h-screen overflow-hidden">
-
     <div class="print-hidden text-center px-6">
         <div class="mb-6 flex justify-center">
             <div class="relative">
@@ -58,40 +29,16 @@
                 </div>
             </div>
         </div>
-        
         <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Imprimindo sua Senha</h1>
-        <p class="text-slate-500 mt-3 text-lg">Por favor, retire seu ticket na impressora abaixo.</p>
-        
-        <div class="mt-8 inline-flex items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-100">
-            <span class="relative flex h-3 w-3 mr-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-            </span>
-            Aguarde o redirecionamento...
-        </div>
+        <p class="text-slate-500 mt-3 text-lg">Retire seu ticket na impressora.</p>
+        <div class="mt-8 inline-flex items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-100">Aguarde...</div>
     </div>
-
     <div class="print-only" style="font-family: Arial, sans-serif;">
-        <div style="border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 5px;">
-            <h2 style="font-size: 9px; font-weight: bold; text-transform: uppercase; margin: 0;">SENHA</h2>
-        </div>
-
-        <div style="margin-bottom: 5px;">
-            <h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">#{{ $ticket->id }}</h1>
-        </div>
-
-        <div class="bg-black" style="padding: 3px 0; margin-bottom: 5px;">
-            <h2 style="font-size: 12px; font-weight: bold; color: white !important; text-transform: uppercase; margin: 0;">
-                {{ $ticket->type == 'Preferencial' ? 'PREFERENCIAL' : 'NORMAL' }}
-            </h2>
-        </div>
-
-        <div style="border-top: 1px dashed black; padding-top: 5px; font-size: 8px;">
-            <p style="margin: 0;">{{ date('d/m/Y H:i:s') }}</p>
-            <div style="margin-top: 8px;">*******</div>
-        </div>
+        <div style="border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 5px;"><h2 style="font-size: 9px; font-weight: bold; text-transform: uppercase; margin: 0;">SENHA</h2></div>
+        <div style="margin-bottom: 5px;"><h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">#{{ $ticket->id }}</h1></div>
+        <div class="bg-black" style="padding: 3px 0; margin-bottom: 5px;"><h2 style="font-size: 12px; font-weight: bold; color: white !important; text-transform: uppercase; margin: 0;">{{ $ticket->type }}</h2></div>
+        <div style="border-top: 1px dashed black; padding-top: 5px; font-size: 8px;"><p style="margin: 0;">{{ date('d/m/Y H:i:s') }}</p><div style="margin-top: 8px;">*******</div></div>
     </div>
-
     <script>
         window.onload = function() {
             setTimeout(() => { window.print(); }, 500);

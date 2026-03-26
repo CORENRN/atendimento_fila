@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         @keyframes pulse-glow-blue {
             0%, 100% { box-shadow: 0 0 8px 4px rgba(59, 130, 246, 0.7); }
@@ -30,13 +31,13 @@
     <section class="flex items-center justify-center min-h-screen -mt-10">
         <div class="flex flex-col w-[50%] h-screen p-20">
             <div class="h-[50vh] w-[120%] bg-gray-600 rounded-lg flex justify-center items-center">
-                <iframe class="w-[100%] h-[100%] rounded-lg" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe id="youtube-player" class="w-[100%] h-[100%] rounded-lg" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
 
             <div class="h-[30vh] w-[120%] shadow-2xl bg-white rounded-lg mt-5 p-8">
-                <h3 class="text-2xl font-bold mb-4">Últimos atendimentos:</h3>
+                <h3 class="text-2xl font-bold mb-4">Últimas fichas chamadas:</h3>
                 <div id="last-atendimentos-list" class="flex gap-4">
-                    </div>
+                </div>
             </div>
         </div>
 
@@ -67,13 +68,17 @@
     const sound = document.getElementById('notification-sound');
     const enableSoundBtn = document.getElementById('enable-sound-btn');
     
-    // VARIÁVEIS PARA CONTROLAR O QUE JÁ FOI TOCADO
     let lastTriagemKey = null;
     let lastAtendimentoKey = null;
-    
     let soundEnabled = false;
     let speechQueue = [];
     let isSpeaking = false;
+    let ytPlayer;
+
+    // Inicializa a API do YouTube
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('youtube-player');
+    }
 
     function loadVoices() { window.speechSynthesis.getVoices(); }
     window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -92,23 +97,18 @@
             if (!response.ok) return;
             const data = await response.json();
 
-            // VERIFICA TRIAGEM
             if (data.triagem && data.triagem.length > 0) {
                 const t = data.triagem[0];
-                // A CHAVE USA ID + TIMESTAMP (ESSENCIAL PARA O RECALL)
                 const currentKey = `${t.id}-${t.last_called_at || t.updated_at}`;
-                
                 if (currentKey !== lastTriagemKey) {
                     lastTriagemKey = currentKey;
                     playNotification('card-triagem', 'blue', t, 'Triagem');
                 }
             } else { lastTriagemKey = null; }
 
-            // VERIFICA ATENDIMENTO
             if (data.atendimento && data.atendimento.length > 0) {
                 const t = data.atendimento[0];
                 const currentKey = `${t.id}-${t.last_called_at || t.updated_at}`;
-                
                 if (currentKey !== lastAtendimentoKey) {
                     lastAtendimentoKey = currentKey;
                     playNotification('card-atendimento', 'green', t, 'Atendimento');
@@ -125,8 +125,12 @@
     function renderLastAtendimentos(atendimentos) {
         const container = document.getElementById('last-atendimentos-list');
         if (!container) return;
-        let html = atendimentos.length ? '' : '<p class="text-gray-500">Nenhum atendimento registrado</p>';
-        atendimentos.forEach(atendimento => {
+        
+        // ORDENAÇÃO DECRESCENTE (EX: 58, 57...)
+        const atendimentosSorted = [...atendimentos].sort((a, b) => b.id - a.id);
+        
+        let html = atendimentosSorted.length ? '' : '<p class="text-gray-500">Nenhum atendimento registrado</p>';
+        atendimentosSorted.forEach(atendimento => {
             html += `
                 <div class="flex-shrink-0 w-[32%] bg-white p-3 rounded-lg shadow-md border border-gray-300">
                     <p class="font-bold text-3xl text-[#213555] mb-2">#${atendimento.id}</p>
@@ -164,21 +168,45 @@
 
     function playNotification(cardId, color, ticket, tipo) {
         if (!soundEnabled || !ticket) return;
+        
+        // BAIXAR VOLUME DO YOUTUBE
+        if (ytPlayer && ytPlayer.setVolume) { ytPlayer.setVolume(10); }
+
         sound.pause();
         sound.currentTime = 0;
         let frase = `Senha número ${ticket.id}. ` + (tipo === 'Triagem' ? `Dirija-se à triagem.` : `Dirija-se ao ${ticket.guiche || 'atendimento'}.`);
+        
         sound.play().then(() => {
             speechQueue.push(frase);
             setTimeout(processQueue, 1500);
-        }).catch(() => { speechQueue.push(frase); processQueue(); });
+        }).catch(() => { 
+            speechQueue.push(frase); 
+            processQueue(); 
+        });
     }
 
     function processQueue() {
-        if (isSpeaking || speechQueue.length === 0) return;
+        if (isSpeaking || speechQueue.length === 0) {
+            // Se a fila esvaziar e não estiver mais falando, restaura o volume
+            if (speechQueue.length === 0 && !isSpeaking && ytPlayer && ytPlayer.setVolume) {
+                ytPlayer.setVolume(100);
+            }
+            return;
+        }
+        
         isSpeaking = true;
         const msg = new SpeechSynthesisUtterance(speechQueue.shift());
         msg.lang = 'pt-BR';
-        msg.onend = () => { isSpeaking = false; setTimeout(processQueue, 300); };
+        
+        msg.onend = () => { 
+            isSpeaking = false; 
+            if (speechQueue.length > 0) {
+                setTimeout(processQueue, 300);
+            } else {
+                // RESTAURAR VOLUME DO YOUTUBE
+                if (ytPlayer && ytPlayer.setVolume) { ytPlayer.setVolume(100); }
+            }
+        };
         window.speechSynthesis.speak(msg);
     }
 

@@ -19,6 +19,7 @@
 
                 $menuItems[] = ['queue', 'Triagem', 'triagem'];
                 $menuItems[] = ['queue', 'Atendimento', 'atendimento'];
+                $menuItems[] = ['queue', 'Carteira', 'carteira']
             @endphp
 
             @foreach($menuItems as $item)
