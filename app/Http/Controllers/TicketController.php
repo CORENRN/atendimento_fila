@@ -48,7 +48,6 @@ class TicketController extends Controller
         $attendantId = auth()->id();
 
         $existingCall = Ticket::where('attendant_id', $attendantId)
-            ->where('status', $stage)
             ->whereNull('finished_at')
             ->first();
 
@@ -89,7 +88,6 @@ class TicketController extends Controller
         $attendantId = auth()->id();
 
         $existingCall = Ticket::where('attendant_id', $attendantId)
-            ->whereIn('status', ['triagem', 'atendimento', 'carteira'])
             ->whereNull('finished_at')
             ->first();
 
@@ -188,6 +186,46 @@ class TicketController extends Controller
         return back()->with('error', 'Ticket inválido.');
     }
 
+    public function callMultiple(Request $request, $stage)
+    {
+        if ($stage !== 'carteira') {
+            return back()->with('error', 'Operação inválida.');
+        }
+
+        $request->validate([
+            'ticket_ids'   => 'required|array|min:1',
+            'ticket_ids.*' => 'integer|exists:tickets,id',
+        ]);
+
+        $attendantId = auth()->id();
+
+        $tickets = Ticket::whereIn('id', $request->ticket_ids)
+            ->where('stage', 'carteira')
+            ->where('status', 'aguardando')
+            ->get();
+
+        if ($tickets->isEmpty()) {
+            return back()->with('info', 'Nenhum ticket válido selecionado.');
+        }
+
+        foreach ($tickets as $ticket) {
+            $data = [
+                'status'         => 'carteira',
+                'attendant_id'   => $attendantId,
+                'last_called_at' => now(),
+            ];
+
+            if (!$ticket->called_at) {
+                $data['called_at'] = now();
+            }
+
+            $ticket->update($data);
+            event(new TicketUpdated($ticket));
+        }
+
+        return back()->with('success', count($tickets) . ' ticket(s) chamado(s).');
+    }
+
     public function recall($id)
     {
         $ticket = Ticket::findOrFail($id);
@@ -201,7 +239,7 @@ class TicketController extends Controller
         $request->validate([
             'type' => 'required|in:regular,preferencial,carteira',
             'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
-            ]);
+        ]);
 
         $ticket = Ticket::create([
             'type' => $request->type,

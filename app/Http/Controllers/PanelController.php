@@ -52,12 +52,23 @@ class PanelController extends Controller
             ->map(fn($t) => [
                 'id' => $t->id,
                 'called_at' => $t->called_tri_at->format('H:i:s'),
-                'guiche' => $this->getGuicheName($t->attendant_id),
                 // Passamos os campos brutos para o JS comparar a chave
                 'last_called_at' => $t->last_called_at ? $t->last_called_at->toDateTimeString() : null,
-                'updated_at' => $t->updated_at->toDateTimeString(),
             ]);
-
+        // Carteira
+        $carteira = Ticket::where('stage', 'carteira')
+            ->where('status', 'carteira')
+            ->whereNotNull('last_called_at')
+            ->whereNull('finished_at')
+            ->orderBy('last_called_at', 'DESC')
+            ->get()
+            ->map(fn($t) => [
+                'id' => $t->id,
+                // Usamos o format padrão primeiro para garantir que não quebre
+                'called_at' => $t->last_called_at->format('H:i:s'),
+                'guiche' => 'Retirada', 
+                'last_called_at' => $t->last_called_at->toDateTimeString(),
+            ]);
         // Atendimento
         $atendimento = Ticket::where('stage', 'atendimento')
             ->where('status', 'atendimento')
@@ -84,6 +95,7 @@ class PanelController extends Controller
             ]);
 
         return response()->json([
+            'carteira' => $carteira,
             'triagem' => $triagem,
             'atendimento' => $atendimento,
             'lastAtendimentos' => $lastAtendimentos,

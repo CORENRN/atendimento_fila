@@ -54,4 +54,11 @@ class User extends Authenticatable
     {
         return $this->isSuperAdmin() || $this->isSupervisor();
     }
+    /**
+ * Relacionamento com Guiche (muitos-para-muitos).
+ */
+    public function guiches()
+    {
+        return $this->belongsToMany(Guiche::class, 'user_guiche', 'user_id', 'guiche_id')->withTimestamps();
+    }
 }

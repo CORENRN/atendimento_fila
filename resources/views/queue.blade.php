@@ -65,24 +65,44 @@
     </div> 
 
     <section class="flex ml-64 h-full z-10 -mt-28">
-
         <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl flex flex-col">
             <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
             <div class="mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">
-                <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
-                    @csrf
-                    <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
-                        Próximo
+              
+                @if($stage === 'carteira')
+                    <button
+                        type="button"
+                        id="btn-call-selected"
+                        disabled
+                        onclick="submitSelected()"
+                        class=" border-2 border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        Chamar Selecionados
+                        <span id="selected-count" class="ml-1 text-sm font-normal"></span>
                     </button>
-                </form>
 
+                    <form id="form-call-multiple" action="{{ route('queue.callMultiple', $stage) }}" method="POST" class="hidden">
+                        @csrf
+                        <div id="hidden-ids"></div>
+                    </form>
+                @endif  
+                
+                @if($stage === 'triagem' || $stage === 'atendimento')
+                    <form action="{{ route('queue.call', $stage) }}" method="POST" class="flex-1">
+                        @csrf
+                        <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
+                            Próximo
+                        </button>
+                    </form>
+                @endif
+                @if($stage === 'triagem' || $stage === 'atendimento')
                 <form action="{{ route('queue.priority', $stage) }}" method="POST" class="flex-1">
                     @csrf
                     <button class="transition bg-[#202e36] border-2 border-red duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:bg-red">
                         Prioritário
                     </button>
                 </form>
-
+                @endif
                 <form action="{{ route('queue.recall', $called_id ?? 0) }}" method="POST" class="flex-1">
                     @csrf
                     <button 
@@ -97,12 +117,23 @@
                         Novamente
                     </button>
                 </form>
+
             </div>
 
             <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
                 <table class="w-full text-sm text-left rtl:text-right text-lightW">
                     <thead class="text-xs text-gray-700 uppercase sticky top-0 z-20 bg-[#141e22]">
                         <tr class="bg-[#202e36]">
+                            @if($stage === 'carteira')
+                                <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy text-center">
+                                    <input
+                                        type="checkbox"
+                                        id="check-all"
+                                        class="w-4 h-4 cursor-pointer accent-purple-500"
+                                        title="Selecionar todos"
+                                    >
+                                </th>
+                            @endif
                             <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">ID</th>
                             <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">Tipo</th>
                             @if($stage === 'atendimento')
@@ -117,8 +148,17 @@
                     </thead>
                     <tbody id="tickets-body">
                         @forelse ($tickets as $ticket)
-                            @if(!isset($called_id) || $ticket->id != $called_id)
+                            @if($ticket->status === 'aguardando' || $ticket->status === 'triagem_pendente')
                                 <tr>
+                                    @if($stage === 'carteira')
+                                        <td class="p-2 border-[6px] border-blackThirdy text-center">
+                                            <input
+                                                type="checkbox"
+                                                class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"
+                                                value="{{ $ticket->id }}"
+                                            >
+                                        </td>
+                                    @endif
                                     <td class="p-2 border-[6px] border-blackThirdy text-center">{{ $ticket->id }}</td>
                                     <td class="p-2 border-[6px] border-blackThirdy">{{ $ticket->type }}</td>
                                     @if($stage === 'atendimento')
@@ -141,28 +181,40 @@
             </div>
         </div>
 
-        <div class="flex w-full">
-        @if(isset($called_id))
+        <div class="flex w-full flex-col gap-4 overflow-y-auto h-[75vh] custom-scrollbar px-6">
             @php
-                $calledTicket = $tickets->firstWhere('id', $called_id);
-                $isActive = ($stage === 'triagem' && $calledTicket?->status === 'triagem') || ($stage === 'atendimento' && $calledTicket?->status === 'atendimento') || ($stage === 'carteira' && $calledTicket?->status === 'carteira');
-                $canFinish = $stage === 'triagem' ? $isActive : ($isActive && $calledTicket?->called_at !== null);
+                $activeTickets = collect();
+                
+                if ($stage === 'carteira') {
+                    $activeTickets = $tickets->where('status', 'carteira');
+                }
+                
+                if ($activeTickets->isEmpty() && isset($called_id)) {
+                    $mainTicket = \App\Models\Ticket::find($called_id);
+                    if ($mainTicket) $activeTickets->push($mainTicket);
+                }
             @endphp
 
-            @if($calledTicket)
-                <div class="ml-6 p-6 h-fit bg-blackSecondary rounded shadow-md w-[95%]">
-                    <div class="flex gap-3 items-center bg mb-3">
+            @forelse($activeTickets as $calledTicket)
+                @php
+                    $isCorrectStage = ($stage === 'triagem' && $calledTicket->status === 'triagem') || 
+                                     ($stage === 'atendimento' && $calledTicket->status === 'atendimento') || 
+                                     ($stage === 'carteira' && $calledTicket->status === 'carteira');
+                @endphp
+
+                <div class="p-6 bg-blackSecondary rounded shadow-md w-full border-l-4 {{ $calledTicket->type === 'preferencial' ? 'border-red' : 'border-green' }}">
+                    <div class="flex gap-3 items-center mb-3">
                         <h2 class="font-bold text-xl text-lightW">Ficha em Atendimento:</h2>
                         <div class="w-10 h-10 flex items-center justify-center font-semibold bg-black rounded-full text-white">
                             #{{ $calledTicket->id }}
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-3 justify-between">
+                    <div class="flex flex-col gap-3">
                         <div class="flex items-center gap-1">
-                            <div class="font-bold text-lightW">Tipo de ticket:</div>
-                            <div class="font-semibold {{ $calledTicket->type === 'preferencial' ? ($calledTicket->type === 'carteira' ? 'text-red' : 'text-blue-500') : ($calledTicket->type === 'regular' ? 'text-green' : 'text-lightW') }}">
-                            {{ $calledTicket->type }}
+                            <div class="font-bold text-lightW">Tipo:</div>
+                            <div class="font-semibold {{ $calledTicket->type === 'preferencial' ? 'text-red' : 'text-green' }}">
+                                {{ strtoupper($calledTicket->type) }}
                             </div>
                         </div>
 
@@ -180,68 +232,43 @@
                         @endif
 
                         <div class="flex flex-col gap-3 mt-4">
-                            @if($canFinish)
-                                <div>
-                                    <h3 class="font-bold mb-1 text-lightW">Encerrar:</h3>
-                                    <div class="flex flex-row w-full gap-6">
-                                        <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
-                                            @csrf
-                                            <div class="hover:p-1 bg-blackThirdy rounded duration-300">
-                                                <button class="border-3 border-blackThirdy bg-blackSecondary w-full transition duration-300 text-lightW px-3 py-3 rounded hover:bg-green-600 font-black uppercase tracking-wider">
-                                                    Finalizar
-                                                </button>
-                                            </div>
-                                        </form>
-                                        <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="inline w-[50%]">
-                                            @csrf
-                                            <div class="hover:p-1 bg-blackThirdy rounded duration-300">
-                                                <button class="border-3 border-blackThirdy bg-blackSecondary w-full transition duration-300 text-lightW px-3 py-3 rounded hover:bg-green-600 font-black uppercase tracking-wider">
-                                                    Cancelar
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                            <div class="flex flex-row w-full gap-4">
+                                <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="flex-1">
+                                    @csrf
+                                    <button class="w-full bg-green-600 transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider hover:bg-green-700">
+                                        Finalizar
+                                    </button>
+                                </form>
+                                <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="flex-1">
+                                    @csrf
+                                    <button class="w-full bg-red transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider hover:opacity-80">
+                                        Cancelar
+                                    </button>
+                                </form>
+                            </div>
 
-                                @if($stage === 'triagem')
-                                    <div>
-                                        <h3 class="font-bold mb-1 text-lightW">Tipo de serviço:</h3>
-                                        <form action="{{ route('queue.advance', $calledTicket->id) }}" method="POST" class="flex gap-3">
-                                            @csrf
-                                            <select 
-                                                name="service" 
-                                                required
-                                                onchange="document.getElementById('advance-btn-{{ $calledTicket->id }}').disabled = (this.value === '')"
-                                                class="rounded w-full bg-blackSecondary border-blackThirdy text-lightW text-center"
-                                            >
-                                                <option value="">Selecione o serviço</option>
-                                                @foreach($services as $key => $label)
-                                                    <option value="{{ $key }}" {{ $calledTicket->service === $key ? 'selected' : '' }}>
-                                                        {{ $label }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <div class="hover:p-1 bg-blackThirdy w-full duration-300">
-                                                <button 
-                                                    id="advance-btn-{{ $calledTicket->id }}" 
-                                                    class="bg-blackSecondary transition duration-300 text-white w-full py-3 rounded font-black uppercase tracking-wider" 
-                                                    disabled 
-                                                    type="submit"
-                                                >
-                                                    Avançar
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                @endif
-                            @else
-                                <span class="text-gray-500">-</span>
+                            @if($stage === 'triagem')
+                                <form action="{{ route('queue.advance', $calledTicket->id) }}" method="POST" class="flex gap-3 mt-2">
+                                    @csrf
+                                    <select name="service" required class="rounded w-full bg-blackSecondary border-blackThirdy text-lightW text-center">
+                                        <option value="">Selecione o serviço</option>
+                                        @foreach($services as $key => $label)
+                                            <option value="{{ $key }}" {{ $calledTicket->service == $key ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button class="bg-blue-500 transition duration-300 text-white px-4 py-2 rounded font-black uppercase tracking-wider">
+                                        Avançar
+                                    </button>
+                                </form>
                             @endif
                         </div>
                     </div>
                 </div>
-            @endif
-        @endif
+            @empty
+                <div class="p-10 text-center text-gray-500 italic">
+                    Aguardando chamada...
+                </div>
+            @endforelse
         </div>  
     </section>
 </section>
@@ -254,41 +281,60 @@
 
 <script>
     let lastTicketCount = null;
+    let selectedTicketIds = new Set();
     const currentStage = "{{ $stage }}";
     const calledId = @json($called_id ?? null);
 
     document.addEventListener('DOMContentLoaded', () => {
-        const permissaoAtual = Notification.permission;
-
-        if (permissaoAtual === "denied" || permissaoAtual === "default") {
-            localStorage.removeItem('notificacao_ativada_v1');
+        Notification.requestPermission();
+        fetchTickets();
+        if (currentStage === 'carteira') {
+            bindCheckboxEvents();
         }
+    });
 
-        if(permissaoAtual === "granted"){
-            localStorage.removeItem('aviso_ativado_v1');
-        }
-
-        Notification.requestPermission().then(permissao => {
-            if (permissao === "granted") {
-                const jaNotificou = localStorage.getItem('notificacao_ativada_v1');
-                if (!jaNotificou) {
-                    localStorage.setItem('notificacao_ativada_v1', 'true');
-                    new Notification("Notificação ativada", {
-                        body: "Notificação ativada com sucesso!",
-                        icon: "/favicon.ico"
-                    });
-                }
-            } else {
-                const jaAvisou = localStorage.getItem('aviso_ativado_v1');
-                if(!jaAvisou){
-                    localStorage.setItem('aviso_ativado_v1', 'true');
-                    alert('Por favor ative as notificações.');
-                }   
-            }
+    function bindCheckboxEvents() {
+        const checkAll = document.getElementById('check-all');
+        const checkboxes = document.querySelectorAll('.ticket-checkbox');
+        
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelectionState);
         });
 
-        fetchTickets();
-    });
+        if (checkAll) {
+            checkAll.addEventListener('change', () => {
+                document.querySelectorAll('.ticket-checkbox:not(:disabled)').forEach(cb => {
+                    cb.checked = checkAll.checked;
+                });
+                updateSelectionState();
+            });
+        }
+    }
+
+    function updateSelectionState() {
+        const checkboxes = document.querySelectorAll('.ticket-checkbox');
+        const btn = document.getElementById('btn-call-selected');
+        const countEl = document.getElementById('selected-count');
+        
+        selectedTicketIds.clear();
+        checkboxes.forEach(cb => {
+            if (cb.checked) selectedTicketIds.add(cb.value);
+        });
+
+        if (btn) {
+            btn.disabled = selectedTicketIds.size === 0;
+            countEl.textContent = selectedTicketIds.size > 0 ? `(${selectedTicketIds.size})` : '';
+        }
+    }
+
+    function submitSelected() {
+        const ids = Array.from(selectedTicketIds);
+        if (ids.length === 0) return;
+
+        const container = document.getElementById('hidden-ids');
+        container.innerHTML = ids.map(id => `<input type="hidden" name="ticket_ids[]" value="${id}">`).join('');
+        document.getElementById('form-call-multiple').submit();
+    }
 
     async function fetchTickets() {
         try {
@@ -296,63 +342,50 @@
             const data = await response.json();
             const currentTickets = data.tickets || [];
             
-            const availableTickets = currentTickets.filter(t => t.id != calledId);
+            const availableTickets = currentTickets.filter(t => t.status === 'aguardando' || t.status === 'triagem_pendente');
             const currentCount = availableTickets.length;
 
             if (lastTicketCount !== null && currentCount > lastTicketCount) {
-                if (!calledId) {
-                    if (Notification.permission === "granted") {
-                        const msg = currentStage === 'triagem' 
-                            ? "Novo ticket aguardando triagem." 
-                            : "Novo ticket disponível.";
-
-                        new Notification("Fila de " + currentStage.charAt(0).toUpperCase() + currentStage.slice(1), {
-                            body: msg,
-                            icon: "/favicon.ico",
-                            tag: "novo-ticket-" + currentStage
-                        });
-                    }
+                if (!calledId && Notification.permission === "granted") {
+                    new Notification("Novo ticket na fila", { body: "Fila: " + currentStage });
                 }
             }
 
             lastTicketCount = currentCount;
             updateTable(currentTickets);
-        } catch (error) { 
-            console.error('Erro ao buscar tickets:', error); 
-        }
+        } catch (error) { console.error(error); }
     }
 
     function updateTable(tickets) {
         const tbody = document.getElementById('tickets-body');
-        tbody.innerHTML = '';
-        
-        const filtered = tickets.filter(t => t.id != calledId);
+        const filtered = tickets.filter(t => t.status === 'aguardando' || t.status === 'triagem_pendente');
         
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr id="empty-row"><td colspan="6" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td></tr>';
             return;
         }
 
-        filtered.forEach(ticket => {
-            const tr = document.createElement('tr');
-            let html = `
-                <td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.id}</td>
+        tbody.innerHTML = filtered.map(ticket => {
+            const isChecked = selectedTicketIds.has(ticket.id.toString()) ? 'checked' : '';
+            
+            let html = `<tr>`;
+            if (currentStage === 'carteira') {
+                html += `<td class="p-2 border-[6px] border-blackThirdy text-center">
+                    <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="${ticket.id}" ${isChecked}>
+                </td>`;
+            }
+            html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.id}</td>
                 <td class="p-2 border-[6px] border-blackThirdy">${ticket.type}</td>`;
             
-            if (currentStage === 'atendimento') {
-                html += `<td class="p-2 border-[6px] border-blackThirdy">${ticket.service ?? '-'}</td>`;
-            }
+            if (currentStage === 'atendimento') html += `<td class="p-2 border-[6px] border-blackThirdy">${ticket.service ?? '-'}</td>`;
+            if (currentStage === 'carteira') html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.cpf ?? '-'}</td>`;
+            
+            html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.status.toUpperCase()}</td>
+                <td class="p-2 border-[6px] border-blackThirdy text-center">-</td></tr>`;
+            return html;
+        }).join('');
 
-            if (currentStage === 'carteira') {
-                html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.cpf ?? '-'}</td>`;
-            }
-
-            html += `
-                <td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.status.toUpperCase()}</td>
-                <td class="p-2 border-[6px] border-blackThirdy text-center">-</td>`;
-            tr.innerHTML = html;
-            tbody.appendChild(tr);
-        });
+        if (currentStage === 'carteira') bindCheckboxEvents();
     }
 
     setInterval(fetchTickets, 5000);

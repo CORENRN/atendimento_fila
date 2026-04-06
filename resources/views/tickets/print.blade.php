@@ -31,6 +31,11 @@
             font-weight: bold;
             margin-top: 30px;
         }
+        .date-large {
+            font-size: 7px; 
+            margin-top: 10px;
+            display: block;
+        }
         .small-text {
             font-size: 14px;
             font-weight: normal;

@@ -41,10 +41,21 @@
             @endisset
 
             @if (session('success'))
-                <div  class="w-full flex justify-center fixed z-[100] mt-[-65px]">
-                    <div class="bg-blackPrimary border border-white/10 px-6 py-3 rounded shadow-md animate-notification flex items-center gap-2">
+                {{-- 
+                    1. pointer-events-none: Faz o container ser "invisível" para o mouse.
+                    2. z-[100]: Mantém na frente visualmente.
+                    3. w-full flex justify-center: Mantém o alinhamento central.
+                --}}
+                <div class="w-full flex justify-center fixed z-[100] mt-[-65px] pointer-events-none">
+                    {{-- 
+                        1. pointer-events-auto: Faz com que APENAS a caixinha preta 
+                        reaja ao mouse (caso você queira colocar um botão de fechar).
+                    --}}
+                    <div class="bg-blackPrimary border border-white/10 px-6 py-3 rounded shadow-md animate-notification flex items-center gap-2 pointer-events-auto">
                         <strong class="font-bold text-primary">Sucesso!</strong>
                         <span class="text-lightW">{{ session('success') }}</span>
+                        {{-- Botão opcional para fechar manualmente --}}
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white/50 hover:text-white">&times;</button>
                     </div>
                 </div>
             @endif
