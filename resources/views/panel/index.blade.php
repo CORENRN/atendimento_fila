@@ -11,53 +11,58 @@
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
-        @keyframes pulse-glow-blue {
-            0%, 100% { box-shadow: 0 0 8px 4px rgba(59, 130, 246, 0.7); }
-            50% { box-shadow: 0 0 12px 6px rgba(59, 130, 246, 1); }
-        }
-        @keyframes pulse-glow-green {
-            0%, 100% { box-shadow: 0 0 8px 4px rgba(22, 163, 74, 0.7); }
-            50% { box-shadow: 0 0 12px 6px rgba(22, 163, 74, 1); }
-        }
+        @keyframes pulse-glow-blue { 0%, 100% { box-shadow: 0 0 8px 4px rgba(59, 130, 246, 0.7); } 50% { box-shadow: 0 0 12px 6px rgba(59, 130, 246, 1); } }
+        @keyframes pulse-glow-green { 0%, 100% { box-shadow: 0 0 8px 4px rgba(22, 163, 74, 0.7); } 50% { box-shadow: 0 0 12px 6px rgba(22, 163, 74, 1); } }
+        @keyframes pulse-glow-amber { 0%, 100% { box-shadow: 0 0 8px 4px rgba(245, 158, 11, 0.7); } 50% { box-shadow: 0 0 12px 6px rgba(245, 158, 11, 1); } }
         .custom-pulse-blue { animation: pulse-glow-blue 2s infinite; }
         .custom-pulse-green { animation: pulse-glow-green 2s infinite; }
+        .custom-pulse-amber { animation: pulse-glow-amber 2s infinite; }
         h2, h1 { font-family: "Lora", serif; }
         p { font-family: "Roboto Slab", serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 overflow-hidden">
-    <h1 class="text-5xl uppercase tracking-wide font-bold text-[#213555] text-center pt-7">Painel de Chamadas:</h1>
+    <h1 class="text-5xl uppercase tracking-wide font-bold text-[#213555] text-center pt-7">Painel de Chamadas</h1>
     
-    <section class="flex items-center justify-center min-h-screen -mt-10">
+    <section class="flex items-center justify-center min-h-screen -mt-12">
         <div class="flex flex-col w-[50%] h-screen p-20">
-            <div class="h-[50vh] w-[120%] bg-gray-600 rounded-lg flex justify-center items-center">
-                <iframe id="youtube-player" class="w-[100%] h-[100%] rounded-lg" src="{{ $videoUrl }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <div class="h-[50vh] w-[120%] bg-gray-600 rounded-lg flex justify-center items-center overflow-hidden shadow-2xl">
+                <iframe id="youtube-player" class="w-full h-full" src="{{ $videoUrl }}?enablejsapi=1&autoplay=1&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
 
-            <div class="h-[30vh] w-[120%] shadow-2xl bg-white rounded-lg mt-5 p-8">
-                <h3 class="text-2xl font-bold mb-4">Últimas fichas chamadas:</h3>
-                <div id="last-atendimentos-list" class="flex gap-4">
+            <div class="h-[30vh] w-[120%] shadow-2xl bg-white rounded-lg mt-5 p-8 overflow-hidden">
+                <h3 class="text-2xl font-bold mb-4">Últimas fichas finalizadas:</h3>
+                <div id="last-atendimentos-list" class="flex gap-4 overflow-x-auto hide-scrollbar">
+                    <p class="text-gray-500 text-sm">Carregando...</p>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-col w-[50%] gap-10 h-screen p-20 items-center">
-            <div id="card-triagem" class="bg-white rounded-2xl shadow-xl h-fit p-8 w-[80%]">
-                <h2 class="text-3xl font-bold text-blue-600 mb-4">Triagem</h2>
-                <div id="triagem-list" class="space-y-2">
-                    <p class="text-gray-500">Nenhum chamado</p>
+        <div class="flex flex-col w-[50%] gap-6 h-screen p-10 items-center mt-20">
+            <div id="card-triagem" class="bg-white rounded-2xl shadow-xl p-6 w-[85%] transition-all duration-500">
+                <h2 class="text-3xl font-bold text-blue-600 mb-2 border-b pb-2">Triagem</h2>
+                <div id="triagem-list" class="space-y-2 mt-3">
+                    <p class="text-gray-500 text-sm italic">Aguardando chamado...</p>
                 </div>
             </div>
 
-            <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-8 w-[80%] h-fit">
-                <h2 class="text-3xl font-bold text-green-600 mb-4">Atendimento</h2>
-                <div id="atendimento-list" class="space-y-2">
-                    <p class="text-gray-500">Nenhum chamado</p>
+            <div id="card-atendimento" class="bg-white rounded-2xl shadow-xl p-6 w-[85%] transition-all duration-500">
+                <h2 class="text-3xl font-bold text-green-600 mb-2 border-b pb-2">Atendimento</h2>
+                <div id="atendimento-list" class="grid grid-cols-1 gap-3 mt-3">
+                    <p class="text-gray-500 text-sm italic">Aguardando chamado...</p>
                 </div>
             </div>
 
-            <button id="enable-sound-btn" class="px-5 py-5 bg-[#527cd1] text-white rounded-md hover:bg-[#223458] transition duration-300 w-[80%] shadow-lg">
-                Ativar Som de Notificação
+            <div id="card-carteira" class="bg-white rounded-2xl shadow-xl p-6 w-[85%] transition-all duration-500">
+                <h2 class="text-3xl font-bold text-amber-500 mb-2 border-b pb-2">Retirada de Carteira</h2>
+                <div id="carteira-list" class="grid grid-cols-1 gap-3 mt-3">
+                    <p class="text-gray-500 text-sm italic">Aguardando chamado...</p>
+                </div>
+            </div>
+
+            <button id="enable-sound-btn" class="px-5 py-4 bg-[#527cd1] text-white rounded-md hover:bg-[#223458] transition duration-300 w-[85%] shadow-lg font-bold uppercase tracking-widest mt-4">
+                🔈 Ativar Som e Voz
             </button>
         </div>
     </section>
@@ -65,24 +70,28 @@
     <audio id="notification-sound" src="/sounds/notification.mp3" preload="auto"></audio>
 
 <script>
+    let ytPlayer;
+    let voices = [];
+
+    function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player('youtube-player', {
+            events: { 'onReady': (event) => { event.target.playVideo(); } }
+        });
+    }
+
+    function loadVoices() { voices = window.speechSynthesis.getVoices(); }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
     const sound = document.getElementById('notification-sound');
     const enableSoundBtn = document.getElementById('enable-sound-btn');
     
     let lastTriagemKey = null;
     let lastAtendimentoKey = null;
+    let knownCarteiraKeys = new Set();
     let soundEnabled = false;
     let speechQueue = [];
     let isSpeaking = false;
-    let ytPlayer;
-
-    // Inicializa a API do YouTube
-    function onYouTubeIframeAPIReady() {
-        ytPlayer = new YT.Player('youtube-player');
-    }
-
-    function loadVoices() { window.speechSynthesis.getVoices(); }
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices();
 
     enableSoundBtn.addEventListener('click', () => {
         soundEnabled = true;
@@ -93,124 +102,140 @@
 
     async function fetchData() {
         try {
-            const response = await fetch('{{ route('panel.data') }}');
+            const response = await fetch('{{ route("panel.data") }}');
             if (!response.ok) return;
             const data = await response.json();
 
-            if (data.triagem && data.triagem.length > 0) {
-                const t = data.triagem[0];
-                const currentKey = `${t.id}-${t.last_called_at || t.updated_at}`;
-                if (currentKey !== lastTriagemKey) {
-                    lastTriagemKey = currentKey;
-                    playNotification('card-triagem', 'blue', t, 'Triagem');
+            // 1. TRIAGEM
+            const triagemTickets = data.triagem || [];
+            renderTickets('triagem', triagemTickets, 'blue');
+            if (triagemTickets.length > 0) {
+                const t = triagemTickets[0];
+                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                if (key !== lastTriagemKey) {
+                    lastTriagemKey = key;
+                    notify(t, 'Triagem');
                 }
-            } else { lastTriagemKey = null; }
+            }
 
-            if (data.atendimento && data.atendimento.length > 0) {
-                const t = data.atendimento[0];
-                const currentKey = `${t.id}-${t.last_called_at || t.updated_at}`;
-                if (currentKey !== lastAtendimentoKey) {
-                    lastAtendimentoKey = currentKey;
-                    playNotification('card-atendimento', 'green', t, 'Atendimento');
+            // 2. ATENDIMENTO
+            const atendimentoTickets = data.atendimento || [];
+            renderTickets('atendimento', atendimentoTickets, 'green');
+            if (atendimentoTickets.length > 0) {
+                const t = atendimentoTickets[0];
+                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                if (key !== lastAtendimentoKey) {
+                    lastAtendimentoKey = key;
+                    notify(t, 'Atendimento');
                 }
-            } else { lastAtendimentoKey = null; }
+            }
 
-            renderTickets('triagem', data.triagem || [], 'blue');
-            renderTickets('atendimento', data.atendimento || [], 'green');
-            renderLastAtendimentos(data.lastAtendimentos || []);
+            // 3. CARTEIRA
+            const carteiraTickets = data.carteira || [];
+            renderTickets('carteira', carteiraTickets, 'amber');
+            carteiraTickets.forEach(t => {
+                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                if (!knownCarteiraKeys.has(key)) {
+                    knownCarteiraKeys.add(key);
+                    notify(t, 'Carteira');
+                }
+            });
 
-        } catch (error) { console.error('Erro ao buscar dados:', error); }
-    }
-    
-    function renderLastAtendimentos(atendimentos) {
-        const container = document.getElementById('last-atendimentos-list');
-        if (!container) return;
-        
-        // ORDENAÇÃO DECRESCENTE (EX: 58, 57...)
-        const atendimentosSorted = [...atendimentos].sort((a, b) => b.id - a.id);
-        
-        let html = atendimentosSorted.length ? '' : '<p class="text-gray-500">Nenhum atendimento registrado</p>';
-        atendimentosSorted.forEach(atendimento => {
-            html += `
-                <div class="flex-shrink-0 w-[32%] bg-white p-3 rounded-lg shadow-md border border-gray-300">
-                    <p class="font-bold text-3xl text-[#213555] mb-2">#${atendimento.id}</p>
-                    <p class="text-gray-600 mb-2">${atendimento.finished_at || ''}</p>
-                    ${atendimento.guiche ? `<p class="text-green-600 font-semibold">${atendimento.guiche}</p>` : ''}
-                </div>`;
-        });
-        container.innerHTML = html;
+            const currentCarteiraKeys = new Set(carteiraTickets.map(t => `${t.id}-${t.last_called_at || t.updated_at}`));
+            knownCarteiraKeys.forEach(k => { if(!currentCarteiraKeys.has(k)) knownCarteiraKeys.delete(k); });
+
+            if (data.lastAtendimentos) renderLastAtendimentos(data.lastAtendimentos);
+
+        } catch (error) { console.error('Erro:', error); }
     }
 
     function renderTickets(type, tickets, color) {
-        const listElement = document.getElementById(`${type}-list`);
-        const cardElement = document.getElementById(`card-${type}`);
-        if (!listElement) return;
-
-        listElement.innerHTML = tickets.length ? '' : '<p class="text-gray-500">Nenhum chamado</p>';
+        const list = document.getElementById(`${type}-list`);
+        const card = document.getElementById(`card-${type}`);
         
-        if (tickets.length) {
-            cardElement.classList.add(color === 'blue' ? 'custom-pulse-blue' : 'custom-pulse-green', 'ring-4', color === 'blue' ? 'ring-blue-400' : 'ring-green-400');
-        } else {
-            cardElement.classList.remove('custom-pulse-blue', 'custom-pulse-green', 'ring-4', 'ring-blue-400', 'ring-green-400');
+        if (tickets.length === 0) {
+            list.innerHTML = `<p class="text-gray-500 text-sm italic col-span-2">Aguardando chamado...</p>`;
+            card.classList.remove(`custom-pulse-${color}`, 'ring-4', `ring-${color}-400`);
+            return;
         }
 
-        tickets.forEach(ticket => {
-            const div = document.createElement('div');
-            div.className = 'p-3 rounded-xl border border-gray-200 shadow-sm bg-white';
-            div.innerHTML = `
-                <p class="text-4xl font-bold ${color === 'blue' ? 'text-blue-800' : 'text-green-800'}">#${ticket.id}</p>
-                <p class="text-sm text-gray-500">Chamado às ${ticket.called_at || ''}</p>
-                ${ticket.guiche ? `<p class="text-2xl text-gray-800 font-bold">${ticket.guiche}</p>` : ''}
-            `;
-            listElement.appendChild(div);
-        });
+        // LÓGICA DE COLUNAS: Se houver mais de 1 ticket, quebra em 2 colunas. Se tiver 1, ocupa a linha toda.
+        if (tickets.length > 1) {
+            list.classList.remove('grid-cols-1');
+            list.classList.add('grid-cols-2');
+        } else {
+            list.classList.remove('grid-cols-2');
+            list.classList.add('grid-cols-1');
+        }
+
+        card.classList.add(`custom-pulse-${color}`, 'ring-4', `ring-${color}-400`);
+        list.innerHTML = tickets.map(t => `
+            <div class="p-3 rounded-xl border border-gray-100 shadow-sm bg-gray-50 flex justify-between items-center">
+                <div>
+                    <p class="text-4xl font-black text-gray-800">#${t.id}</p>
+                    <p class="text-[12px] text-gray-400 uppercase font-bold">${t.type || 'REGULAR'}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold text-${color}-600">${t.guiche || ''}</p>
+                    <p class="text-[20px] text-gray-400 italic">${t.called_at || ''}</p>
+                </div>
+            </div>
+        `).join('');
     }
 
-    function playNotification(cardId, color, ticket, tipo) {
-        if (!soundEnabled || !ticket) return;
-        
-        // BAIXAR VOLUME DO YOUTUBE
-        if (ytPlayer && ytPlayer.setVolume) { ytPlayer.setVolume(10); }
+    function renderLastAtendimentos(atendimentos) {
+        const container = document.getElementById('last-atendimentos-list');
+        container.innerHTML = atendimentos.map(a => `
+            <div class="flex-shrink-0 w-40 bg-gray-50 p-4 rounded-lg border-t-4 border-[#213555] shadow-sm">
+                <p class="font-black text-2xl text-[#213555]">#${a.id}</p>
+                <p class="text-[10px] text-gray-500 font-bold uppercase">${a.guiche || 'Finalizado'}</p>
+            </div>
+        `).join('');
+    }
+
+    function notify(ticket, tipo) {
+        if (!soundEnabled) return;
+        if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(10);
 
         sound.pause();
         sound.currentTime = 0;
-        let frase = `Senha número ${ticket.id}. ` + (tipo === 'Triagem' ? `Dirija-se à triagem.` : `Dirija-se ao ${ticket.guiche || 'atendimento'}.`);
-        
-        sound.play().then(() => {
-            speechQueue.push(frase);
-            setTimeout(processQueue, 1500);
-        }).catch(() => { 
-            speechQueue.push(frase); 
-            processQueue(); 
-        });
+        sound.play().catch(() => {});
+
+        let frase = `Senha número ${ticket.id}. `;
+        if (tipo === 'Triagem') frase += "Dirija-se à triagem.";
+        else if (tipo === 'Carteira') frase += "Por favor, dirija-se ao guichê para retirar sua carteira.";
+        else frase += `Dirija-se ao ${ticket.guiche || 'atendimento'}.`;
+
+        speechQueue.push(frase);
+        if (!isSpeaking) setTimeout(processQueue, 1500);
     }
 
     function processQueue() {
         if (isSpeaking || speechQueue.length === 0) {
-            // Se a fila esvaziar e não estiver mais falando, restaura o volume
-            if (speechQueue.length === 0 && !isSpeaking && ytPlayer && ytPlayer.setVolume) {
-                ytPlayer.setVolume(100);
-            }
+            if (speechQueue.length === 0 && !isSpeaking && ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(100);
             return;
         }
-        
+
         isSpeaking = true;
         const msg = new SpeechSynthesisUtterance(speechQueue.shift());
+        const naturalVoice = voices.find(v => v.lang === 'pt-BR' && v.name.includes('Google')) 
+                          || voices.find(v => v.lang === 'pt-BR' && v.name.includes('Maria'))
+                          || voices.find(v => v.lang === 'pt-BR');
+
+        if (naturalVoice) msg.voice = naturalVoice;
         msg.lang = 'pt-BR';
-        
-        msg.onend = () => { 
-            isSpeaking = false; 
-            if (speechQueue.length > 0) {
-                setTimeout(processQueue, 300);
-            } else {
-                // RESTAURAR VOLUME DO YOUTUBE
-                if (ytPlayer && ytPlayer.setVolume) { ytPlayer.setVolume(100); }
-            }
+        msg.rate = 0.85;
+        msg.pitch = 1.0; 
+
+        msg.onend = () => {
+            isSpeaking = false;
+            if (speechQueue.length > 0) setTimeout(processQueue, 600);
+            else if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(100);
         };
         window.speechSynthesis.speak(msg);
     }
 
-    setInterval(fetchData, 3000); 
+    setInterval(fetchData, 4000);
     fetchData();
 </script>
 </body>

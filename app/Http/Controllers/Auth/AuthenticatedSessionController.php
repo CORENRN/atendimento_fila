@@ -85,16 +85,22 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request)
     {
+      
+        $user = Auth::user();
+
+        if ($user) {
+           $user->guiches()->detach();
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Se for requisição AJAX/Fetch (evita erro de CORS)
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Logged out']);
         }
 
-        return redirect('/login'); // Redireciona direto para login para evitar novos loops
+        return redirect('/login');
     }
 }

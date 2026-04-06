@@ -35,13 +35,15 @@ Route::middleware('auth')->group(function () {
 
     // Fila (Atendimento)
     Route::prefix('queue')->group(function () {
-
+       
         Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])
             ->name('queue.tickets.json');
         Route::post('recall/{id}', [TicketController::class, 'recall'])
             ->name('queue.recall');
 
-
+        Route::post('{stage}/call-multiple', [TicketController::class, 'callMultiple'])
+                ->name('queue.callMultiple');
+                
         Route::get('{stage}', [TicketController::class, 'queue'])
             ->name('queue');
         Route::post('{stage}/call', [TicketController::class, 'callNext'])
