@@ -56,6 +56,7 @@ class User extends Authenticatable
     }
     /**
  * Relacionamento com Guiche (muitos-para-muitos).
+ * 
  */
     public function guiches()
     {

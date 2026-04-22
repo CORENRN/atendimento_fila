@@ -203,7 +203,7 @@
 
         let frase = `Senha número ${ticket.id}. `;
         if (tipo === 'Triagem') frase += "Dirija-se à triagem.";
-        else if (tipo === 'Carteira') frase += "Por favor, dirija-se ao guichê para retirar sua carteira.";
+        else if (tipo === 'Carteira') frase += "Por favor, dirija-se à triagem para retirar sua carteira.";
         else frase += `Dirija-se ao ${ticket.guiche || 'atendimento'}.`;
 
         speechQueue.push(frase);
