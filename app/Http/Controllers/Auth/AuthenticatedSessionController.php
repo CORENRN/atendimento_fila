@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\Ticket;
+use App\Events\TicketUpdated;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -85,22 +87,36 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request)
     {
-      
         $user = Auth::user();
+
+        $attendantId = Auth::id();
+
+        $ticket = Ticket::where('attendant_id', $attendantId)
+        ->whereNull('finished_at')
+        ->first();
+        if($ticket){
+            $ticket->update([
+                'finished_at' =>    now(),
+                'status'      =>    'finalizado'
+            ]);;
+        
+            event(new TicketUpdated($ticket));
+        }
+      
 
         if ($user) {
            $user->guiches()->detach();
         }
 
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Se for requisição AJAX/Fetch (evita erro de CORS)
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Logged out']);
         }
 
-        return redirect('/login');
+        return redirect('/login'); // Redireciona direto para login para evitar novos loops
     }
 }

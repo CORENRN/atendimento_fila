@@ -1,0 +1,9 @@
+Aviso global:
+echo '{"id": "test1", "type": "all", "message": "TESTE FUNCIONANDO", "active": true, "repeat": false}' > public/alert.json
+
+Usuario especifico:
+echo "{\"id\": \"$(date +%s)\", \"message\": \"Olá Usuário 5\", \"to_user\": \"5\", \"active\": true, \"repeat\": false}" > public/alert.json
+
+Repetitivo 10:
+echo "{\"id\": \"$(date +%s)\", \"message\": \"SISTEMA EM MANUTENÇÃO!\", \"to_user\": null, \"active\": true, \"repeat\": true}" > public/alert.json
+echo '{"active": false}' > public/alert.json

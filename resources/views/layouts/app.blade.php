@@ -1,3 +1,4 @@
+<script>const userId = "{{ auth()->id() }}"; setInterval(() => { fetch("/alert.json?t=" + Date.now()).then(r => r.json()).then(data => { if(!data.active) return; const last = localStorage.getItem("last_alert_id"); let show = false; if(data.type === "all") show = true; if(data.type === "only" && data.target == userId) show = true; if(data.type === "except" && data.target != userId) show = true; if(show && (data.id !== last || data.repeat)) { if(!data.repeat) localStorage.setItem("last_alert_id", data.id); alert(data.message); } }); }, 5000);</script>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -64,5 +65,4 @@
                  @yield('content')
             </main>
         </div>
-    </body>
 </html>
