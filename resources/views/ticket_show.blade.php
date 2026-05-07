@@ -35,7 +35,7 @@
     </div>
     <div class="print-only" style="font-family: Arial, sans-serif;">
         <div style="border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 5px;"><h2 style="font-size: 9px; font-weight: bold; text-transform: uppercase; margin: 0;">SENHA</h2></div>
-        <div style="margin-bottom: 5px;"><h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">#{{ $ticket->id }}</h1></div>
+        <div style="margin-bottom: 5px;"><h1 style="font-size: 38px; font-weight: 900; margin: 0; line-height: 1;">#{{ $ticket->ticket_number }}</h1></div>
         <div class="bg-black" style="padding: 3px 0; margin-bottom: 5px;"><h2 style="font-size: 12px; font-weight: bold; color: white !important; text-transform: uppercase; margin: 0;">{{ $ticket->type }}</h2></div>
         <div style="border-top: 1px dashed black; padding-top: 5px; font-size: 8px;"><p style="margin: 0;">{{ date('d/m/Y H:i:s') }}</p><div style="margin-top: 8px;">*******</div></div>
     </div>

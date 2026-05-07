@@ -6,8 +6,9 @@
     <aside class="fixed top-[165px] left-0 w-64 h-full p-4 z-50">
         <nav class="flex flex-col h-fit p-5 rounded-md bg-blackSecondary shadow-2xl gap-5">
             <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>
-
+            
             @php
+            //Itens do menu de navegação.
                 $user = auth()->user();
                 $hasAdminAccess = $user && $user->hasAdminAccess();
                 $currentRoute = Route::currentRouteName();
@@ -28,6 +29,7 @@
 
             @foreach($menuItems as $item)
                 @php
+                 //Restrições de direcionamento
                     if ($item['admin'] && !$hasAdminAccess) continue;
                     if ($isQueueContext && !$hasAdminAccess) {
                         $isHome = $item['route'] === 'home';
@@ -68,7 +70,7 @@
         <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl flex flex-col">
             <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
             <div class="mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">
-              
+              <!--Se estiver na área de carteira ativa as checkbox-->
                 @if($stage === 'carteira')
                     <button
                         type="button"
@@ -92,6 +94,14 @@
                         @csrf
                         <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
                             Próximo
+                        </button>
+                    </form>
+                @endif
+                @if(auth()->user()->categoria === 'renovacao' && $stage == 'atendimento')
+                    <form action="{{ route('queue.renovacao', $stage) }}" method="POST" class="flex-1">
+                        @csrf
+                        <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
+                            R
                         </button>
                     </form>
                 @endif
@@ -119,6 +129,8 @@
                 </form>
 
             </div>
+
+            <!--Área dos tickets disponíveis-->
 
             <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
                 <table class="w-full text-sm text-left rtl:text-right text-lightW">
@@ -148,6 +160,7 @@
                     </thead>
                     <tbody id="tickets-body">
                         @forelse ($tickets as $ticket)
+                        
                             @if($ticket->status === 'aguardando' || $ticket->status === 'triagem_pendente')
                                 <tr>
                                     @if($stage === 'carteira')

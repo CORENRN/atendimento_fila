@@ -38,6 +38,7 @@
                                         <option value="user" @if($user->categoria === 'user') selected @endif>Atendente</option>
                                         <option value="supervisor" @if($user->categoria === 'supervisor') selected @endif>Supervisor</option>
                                         <option value="superAdmin" @if($user->categoria === 'superAdmin') selected @endif>Super Admin</option>
+                                        <option value="renovacao"  @if($user->categoria == 'renovacao') selected @endif>Renovação</option>
                                     </select>
                                     <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                                         Salvar

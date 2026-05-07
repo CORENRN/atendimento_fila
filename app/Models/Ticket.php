@@ -22,6 +22,7 @@ class Ticket extends Model
         'type',
         'service',
         'cpf',
+        'ticket_number',
     ];
 
     protected $casts = [

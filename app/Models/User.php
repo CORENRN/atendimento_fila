@@ -13,6 +13,7 @@ class User extends Authenticatable
     public const CATEGORIA_SUPER_ADMIN = 'superAdmin';
     public const CATEGORIA_SUPERVISOR = 'supervisor';
     public const CATEGORIA_USER = 'user';
+    public const CATEGORIA_RENOVACAO = 'renovacao';
 
     protected $fillable = [
         'username',
@@ -47,6 +48,9 @@ class User extends Authenticatable
 
     public function isUser(): bool { 
         return $this->categoria === self::CATEGORIA_USER; 
+    }
+    public function isRenovacao(): bool {
+        return $this->categoria === self::CATEGORIA_RENOVACAO;
     }
     
 

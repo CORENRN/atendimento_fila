@@ -28,7 +28,7 @@ class UserController extends Controller
         }
 
         $request->validate([
-            'categoria' => ['required', Rule::in(['supervisor', 'superAdmin', 'user'])] 
+            'categoria' => ['required', Rule::in(['supervisor', 'superAdmin', 'user', 'renovacao'])] 
         ]);
         
         $user = User::findOrFail($id);
@@ -44,6 +44,9 @@ class UserController extends Controller
                 break;
             case 'user':
                 $usuarioCat = 'Atendente';
+                break;
+            case 'renovacao':
+                $usuarioCat = 'Renovação';
                 break;
 
         };

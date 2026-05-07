@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\TicketUpdated;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
@@ -39,8 +41,9 @@ class TicketController extends Controller
             ->first();
 
         $called_id = $calledTicket?->id;
+        $ticket_number = $calledTicket?->ticket_number;
 
-        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'calledTicket'));
+        return view('queue', compact('tickets', 'stage', 'services', 'called_id', 'calledTicket', 'ticket_number'));
     }
 
     public function callNext($stage)
@@ -61,7 +64,7 @@ class TicketController extends Controller
             ->first();
 
         if ($ticket) {
-            $data = [ 
+            $data = [
                 'attendant_id' => $attendantId,
                 'last_called_at' => now(),
                 'status' => $stage
@@ -122,6 +125,43 @@ class TicketController extends Controller
         }
 
         return back()->with('info', 'Sem prioritários.');
+    }
+     public function callNextPriorityRenovation($stage)
+    {
+        $attendantId = auth()->id();
+
+        $existingCall = Ticket::where('attendant_id', $attendantId)
+            ->whereNull('finished_at')
+            ->first();
+
+        if ($existingCall) {
+            return back()->with('error', 'Você já está atendendo um ticket.');
+        }
+
+        $ticket = Ticket::where('stage', $stage)
+            ->where('stage', 'atendimento')
+            ->where('status', 'aguardando')
+            ->where('service', 'renovacao')
+            ->orderBy('created_at')
+            ->first();
+
+        if ($ticket) {
+            $data = [
+                'status' => $stage,
+                'attendant_id' => $attendantId,
+                'last_called_at' => now(),
+            ];
+
+  
+            if (!$ticket->called_at) $data['called_at'] = now();
+
+            $ticket->update($data);
+            event(new TicketUpdated($ticket));
+
+            return back()->with('success', 'Renovação chamado.');
+        }
+
+        return back()->with('info', 'Sem Renovação.');
     }
 
     public function finish(Request $request, $id)
@@ -236,16 +276,31 @@ class TicketController extends Controller
 
     public function takeTicket(Request $request)
     {
+        
         $request->validate([
             'type' => 'required|in:regular,preferencial,carteira',
             'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
         ]);
+
+        $hoje = Carbon::today()->toDateString();
+        //Verifica se o dia de rotina acabou (verifica a data que foi definida no começo do expediente)
+        DB::table('ticket_counters')->updateOrInsert(
+            ['date' => $hoje],
+            []
+        );
+
+        //Incrementa 1 no numero anterior do dia ex (1 -> increment('last_number==1') result 2)
+        DB::table('ticket_counters')->where('date', $hoje)->increment('last_number');
+
+        //Numero incrementado
+        $novoNumero = DB::table('ticket_counters')->where('date', $hoje)->value('last_number');
 
         $ticket = Ticket::create([
             'type' => $request->type,
             'stage' => $request->type === 'carteira' ? 'carteira' : 'triagem',
             'status' => 'aguardando',
             'cpf' => $request->cpf,
+            'ticket_number' => $novoNumero,
         ]);
 
         return redirect()->route('ticket.show', ['id' => $ticket->id]);

@@ -50,7 +50,8 @@ Route::middleware('auth')->group(function () {
             ->name('queue.call');
         Route::post('{stage}/call-priority', [TicketController::class, 'callNextPriority'])
             ->name('queue.priority');
-
+        Route::post('{stage}/call-renovacao', [TicketController::class, 'callNextPriorityRenovation'])
+            ->name('queue.renovacao');
         Route::post('{id}/finish', [TicketController::class, 'finish'])
             ->name('queue.finish');
         Route::post('{id}/cancel', [TicketController::class, 'cancel'])

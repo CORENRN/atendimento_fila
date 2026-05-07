@@ -152,7 +152,7 @@
         // Habilita/Desabilita o botão visualmente
         function validarBotao() {
             const valor = cpfInput.value.replace(/\D/g, '');
-            if (valor.length === 11) {
+            if (valor.length === 11 && validarCPF(valor)) {
                 btnConfirmar.disabled = false;
                 btnConfirmar.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnConfirmar.classList.add('hover:bg-[#7cccfa]');
@@ -162,7 +162,29 @@
                 btnConfirmar.classList.remove('hover:bg-[#7cccfa]');
             }
         }
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
 
+            let soma = 0;
+            let resto;
+
+            // Validação do 1 Dígito
+            for (let i = 1; i <= 9; i++) soma = soma + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+            // Validação do 2 Dígito
+            soma = 0;
+            for (let i = 1; i <= 10; i++) soma = soma + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            resto = (soma * 10) % 11;
+            if ((resto === 10) || (resto === 11)) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+            return true;
+        }
+        
         // Bloqueia o envio se o formulário for forçado (Enter, etc) sem 11 dígitos
         function validarEnvio() {
             const valor = cpfInput.value.replace(/\D/g, '');

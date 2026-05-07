@@ -14,7 +14,7 @@
 
         <div class="space-y-4 m-1 p-1 mt-0 w-[70%] rounded">
 
-            @if(auth()->user() && auth()->user()->categoria === 'user')
+            @if(auth()->user() && auth()->user()->categoria === 'renovacao' || auth()->user()->categoria === 'user')
                 <a href="{{ route('queue', 'triagem') }}"
                    class="flex items-center gap-2 bg-[#1a262d] text-white px-6 py-7 rounded transition duration-300 hover:bg-[#22313a] hover:text-[#eef4ff]">
                     <img src="{{ asset('images/triagemico.png') }}" alt="atendente" class="w-14">
