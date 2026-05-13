@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/selecionar-guiche', [GuicheController::class, 'selectGuiche'])->name('guiche.select');
 
     // Fila (Atendimento)
-    Route::prefix('queue')->middleware(['auth', 'has.guiche'])->group(function () {
+    Route::prefix('queue')->group(function () {
        
         Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])
             ->name('queue.tickets.json');
@@ -44,8 +44,11 @@ Route::middleware('auth')->group(function () {
         Route::post('{stage}/call-multiple', [TicketController::class, 'callMultiple'])
                 ->name('queue.callMultiple');
                 
-        Route::get('{stage}', [TicketController::class, 'queue'])
+        Route::middleware(['has.guiche'])->group(function () {
+            Route::get('{stage}', [TicketController::class, 'queue'])
             ->name('queue');
+         });
+       
         Route::post('{stage}/call', [TicketController::class, 'callNext'])
             ->name('queue.call');
         Route::post('{stage}/call-priority', [TicketController::class, 'callNextPriority'])

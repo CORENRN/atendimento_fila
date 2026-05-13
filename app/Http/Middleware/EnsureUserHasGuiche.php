@@ -16,13 +16,16 @@ class EnsureUserHasGuiche
     public function handle(Request $request, Closure $next)
     {
         $user = $request->user();
-
-        // Verifica se o usuário está logado e se possui pelo menos um guichê vinculado
-        if (!$user || $user->guiches()->count() === 0) {
-            return redirect()->route('home') // Ou a rota de seleção de guichê
+        $stage = $request->route('stage');
+        if($stage === 'atendimento'){
+            
+            if (!$user || $user->guiches()->count() === 0) {
+                return redirect()->route('home') // Ou a rota de seleção de guichê
                 ->with('error', 'Você precisa selecionar um guichê antes de acessar a fila.');
-        }
+            }
 
+        }
+    
         return $next($request);
     }
 }
