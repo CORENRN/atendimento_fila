@@ -77,7 +77,7 @@
                         id="btn-call-selected"
                         disabled
                         onclick="submitSelected()"
-                        class=" border-2 border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                        class=" flex-1 border-2  border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         Chamar Selecionados
                         <span id="selected-count" class="ml-1 text-sm font-normal"></span>
@@ -100,8 +100,8 @@
                 @if(auth()->user()->categoria === 'renovacao' && $stage == 'atendimento')
                     <form action="{{ route('queue.renovacao', $stage) }}" method="POST" class="flex-1">
                         @csrf
-                        <button class="bg-[#202e36] border-2 border-[#39db7d] hover:bg-[#39db7d] transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
-                            R
+                        <button class="bg-[#202e36] border-2 border-purple-500 hover:bg-purple-600 transition duration-300 text-white uppercase tracking-wider font-black px-4 py-5 w-full rounded hover:text-black">
+                            Renovação
                         </button>
                     </form>
                 @endif
@@ -168,11 +168,11 @@
                                             <input
                                                 type="checkbox"
                                                 class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"
-                                                value="{{ $ticket->id }}"
+                                                value="{{ $ticket->ticket_number }}"
                                             >
                                         </td>
                                     @endif
-                                    <td class="p-2 border-[6px] border-blackThirdy text-center">{{ $ticket->id }}</td>
+                                    <td class="p-2 border-[6px] border-blackThirdy text-center">{{ $ticket->ticket_number }}</td>
                                     <td class="p-2 border-[6px] border-blackThirdy">{{ $ticket->type }}</td>
                                     @if($stage === 'atendimento')
                                         <td class="p-2 border-[6px] border-blackThirdy">{{ $services[$ticket->service] ?? '-' }}</td>

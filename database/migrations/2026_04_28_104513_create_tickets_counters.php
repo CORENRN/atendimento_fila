@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ticket_counters', function (Blueprint $table) {
-            $table->date('date')->primary();
+            $table->id();
             $table->integer('last_number')->default(0);
         });
     }

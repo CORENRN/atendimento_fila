@@ -50,7 +50,8 @@ class PanelController extends Controller
             ->orderByRaw('COALESCE(last_called_at, called_tri_at) DESC')
             ->get()
             ->map(fn($t) => [
-                'id' => $t->id,
+                'ticket_number' => $t->id,
+                'type' => $t->type,
                 'called_at' => $t->called_tri_at->format('H:i:s'),
                 // Passamos os campos brutos para o JS comparar a chave
                 'last_called_at' => $t->last_called_at ? $t->last_called_at->toDateTimeString() : null,
@@ -63,7 +64,8 @@ class PanelController extends Controller
             ->orderBy('last_called_at', 'DESC')
             ->get()
             ->map(fn($t) => [
-                'id' => $t->id,
+                'ticket_number' => $t->id,
+                'type' => $t->type,
                 // Usamos o format padrão primeiro para garantir que não quebre
                 'called_at' => $t->last_called_at->format('H:i:s'),
                 'guiche' => 'Retirada', 
@@ -77,7 +79,8 @@ class PanelController extends Controller
             ->orderByRaw('COALESCE(last_called_at, called_at) DESC')
             ->get()
             ->map(fn($t) => [
-                'id' => $t->id,
+                'ticket_number' => $t->id,
+                'type' => $t->type,
                 'called_at' => $t->called_at->format('H:i:s'),
                 'guiche' => $this->getGuicheName($t->attendant_id),
                 'last_called_at' => $t->last_called_at ? $t->last_called_at->toDateTimeString() : null,
@@ -89,7 +92,8 @@ class PanelController extends Controller
             ->limit(3)
             ->get()
             ->map(fn($t) => [
-                'id' => $t->id,
+                'ticket_number' => $t->id,
+                
                 'finished_at' => $t->finished_at ? $t->finished_at->format('d/m/Y H:i:s') : '-',
                 'guiche' => $this->getGuicheName($t->attendant_id),
             ]);

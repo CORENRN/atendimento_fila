@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.keycloak' => AuthenticateWithKeycloak::class,
             'admin' => CheckAdmin::class,
             'superAdmin' => CheckSuperAdmin::class,
+            'has.guiche' => \App\Http\Middleware\EnsureUserHasGuiche::class,
             'adminOrSuper' => CheckAdminOrSuperAdmin::class,
         ]);
     })

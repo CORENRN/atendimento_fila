@@ -105,13 +105,13 @@
             const response = await fetch('{{ route("panel.data") }}');
             if (!response.ok) return;
             const data = await response.json();
-
+            console.log('Dados recebidos:', data);
             // 1. TRIAGEM
             const triagemTickets = data.triagem || [];
             renderTickets('triagem', triagemTickets, 'blue');
             if (triagemTickets.length > 0) {
                 const t = triagemTickets[0];
-                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                const key = `${t.ticket_number}-${t.last_called_at || t.updated_at}`;
                 if (key !== lastTriagemKey) {
                     lastTriagemKey = key;
                     notify(t, 'Triagem');
@@ -123,7 +123,7 @@
             renderTickets('atendimento', atendimentoTickets, 'green');
             if (atendimentoTickets.length > 0) {
                 const t = atendimentoTickets[0];
-                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                const key = `${t.ticket_number}-${t.last_called_at || t.updated_at}`;
                 if (key !== lastAtendimentoKey) {
                     lastAtendimentoKey = key;
                     notify(t, 'Atendimento');
@@ -134,14 +134,14 @@
             const carteiraTickets = data.carteira || [];
             renderTickets('carteira', carteiraTickets, 'amber');
             carteiraTickets.forEach(t => {
-                const key = `${t.id}-${t.last_called_at || t.updated_at}`;
+                const key = `${t.ticket_number}-${t.last_called_at || t.updated_at}`;
                 if (!knownCarteiraKeys.has(key)) {
                     knownCarteiraKeys.add(key);
                     notify(t, 'Carteira');
                 }
             });
 
-            const currentCarteiraKeys = new Set(carteiraTickets.map(t => `${t.id}-${t.last_called_at || t.updated_at}`));
+            const currentCarteiraKeys = new Set(carteiraTickets.map(t => `${t.ticket_number}-${t.last_called_at || t.updated_at}`));
             knownCarteiraKeys.forEach(k => { if(!currentCarteiraKeys.has(k)) knownCarteiraKeys.delete(k); });
 
             if (data.lastAtendimentos) renderLastAtendimentos(data.lastAtendimentos);
@@ -172,7 +172,7 @@
         list.innerHTML = tickets.map(t => `
             <div class="p-3 rounded-xl border border-gray-100 shadow-sm bg-gray-50 flex justify-between items-center">
                 <div>
-                    <p class="text-4xl font-black text-gray-800">#${t.id}</p>
+                    <p class="text-4xl font-black text-gray-800">#${t.ticket_number}</p>
                     <p class="text-[12px] text-gray-400 uppercase font-bold">${t.type || 'REGULAR'}</p>
                 </div>
                 <div class="text-right">
@@ -185,55 +185,85 @@
 
     function renderLastAtendimentos(atendimentos) {
         const container = document.getElementById('last-atendimentos-list');
+    
+        container.innerHTML = '';
+
+    
+        if (!atendimentos || atendimentos.length === 0 || atendimentos[0].ticket_number === 0) {
+            container.innerHTML = `<p class="text-gray-500 text-sm italic">Nenhuma ficha finalizada recentemente.</p>`;
+            return;
+        }
+
+       
         container.innerHTML = atendimentos.map(a => `
             <div class="flex-shrink-0 w-40 bg-gray-50 p-4 rounded-lg border-t-4 border-[#213555] shadow-sm">
-                <p class="font-black text-2xl text-[#213555]">#${a.id}</p>
+                <p class="font-black text-2xl text-[#213555]">#${a.ticket_number}</p>
                 <p class="text-[10px] text-gray-500 font-bold uppercase">${a.guiche || 'Finalizado'}</p>
             </div>
         `).join('');
     }
 
     function notify(ticket, tipo) {
-        if (!soundEnabled) return;
-        if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(10);
+            if (!soundEnabled) return;
+            
+            if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(10);
 
-        sound.pause();
-        sound.currentTime = 0;
-        sound.play().catch(() => {});
+            sound.pause();
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
 
-        let frase = `Senha número ${ticket.id}. `;
-        if (tipo === 'Triagem') frase += "Dirija-se à triagem.";
-        else if (tipo === 'Carteira') frase += "Por favor, dirija-se à triagem para retirar sua carteira.";
-        else frase += `Dirija-se ao ${ticket.guiche || 'atendimento'}.`;
+            let numeroSenha = ticket.ticket_number.toString(); 
+            let frase = `Senha número ${numeroSenha}. `; 
 
-        speechQueue.push(frase);
-        if (!isSpeaking) setTimeout(processQueue, 1500);
-    }
+            if (tipo === 'Triagem') {
+                frase += "Dirija-se à triagem.";
+            } else if (tipo === 'Carteira') {
+                frase += "Por favor, dirija-se à triagem para retirar sua carteira.";
+            } else {
+                frase += `Dirija-se ao ${ticket.guiche || 'atendimento'}.`;
+            }
 
-    function processQueue() {
-        if (isSpeaking || speechQueue.length === 0) {
-            if (speechQueue.length === 0 && !isSpeaking && ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(100);
-            return;
+            speechQueue.push(frase);
+            if (!isSpeaking) setTimeout(processQueue, 1200);
         }
 
-        isSpeaking = true;
-        const msg = new SpeechSynthesisUtterance(speechQueue.shift());
-        const naturalVoice = voices.find(v => v.lang === 'pt-BR' && v.name.includes('Google')) 
-                          || voices.find(v => v.lang === 'pt-BR' && v.name.includes('Maria'))
-                          || voices.find(v => v.lang === 'pt-BR');
+        function processQueue() {
+            if (isSpeaking || speechQueue.length === 0) {
+                if (speechQueue.length === 0 && !isSpeaking && ytPlayer && ytPlayer.setVolume) {
+                    ytPlayer.setVolume(100);
+                }
+                return;
+            }
 
-        if (naturalVoice) msg.voice = naturalVoice;
-        msg.lang = 'pt-BR';
-        msg.rate = 0.85;
-        msg.pitch = 1.0; 
+            window.speechSynthesis.cancel();
+            isSpeaking = true;
+            
+            const msg = new SpeechSynthesisUtterance(speechQueue.shift());
+            const naturalVoice = voices.find(v => v.lang === 'pt-BR' && v.name.includes('Google')) 
+                            || voices.find(v => v.lang === 'pt-BR' && v.name.includes('Maria'))
+                            || voices.find(v => v.lang === 'pt-BR');
 
-        msg.onend = () => {
-            isSpeaking = false;
-            if (speechQueue.length > 0) setTimeout(processQueue, 600);
-            else if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(100);
-        };
-        window.speechSynthesis.speak(msg);
-    }
+            if (naturalVoice) msg.voice = naturalVoice;
+            msg.lang = 'pt-BR';
+            msg.rate = 0.9;
+            msg.pitch = 1.0; 
+
+            msg.onend = () => {
+                isSpeaking = false;
+                if (speechQueue.length > 0) {
+                    setTimeout(processQueue, 600);
+                } else if (ytPlayer && ytPlayer.setVolume) {
+                    ytPlayer.setVolume(100);
+                }
+            };
+
+            msg.onerror = () => {
+                isSpeaking = false;
+                processQueue();
+            };
+
+            window.speechSynthesis.speak(msg);
+        }
 
     setInterval(fetchData, 4000);
     fetchData();

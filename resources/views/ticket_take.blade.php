@@ -50,7 +50,7 @@
                 <button type="button" onclick="abrirModal()" class="group flex w-[550px] h-[400px] flex-col font-semibold text-lg items-center justify-center shadow-xl bg-white text-black px-10 py-8 rounded-[25px] hover:bg-[#7cccfa] hover:text-white transition duration-300">
                     <img src="{{ asset('images/cartao.png') }}" alt="atendente" class="w-24">
                     <h3 class="text-2xl font-black uppercase tracking-wider text-[#213555] group-hover:text-[#f3f8ff] transition duration-300">Retirada de Carteira</h3>
-                    <p class="text-md text-red-500 group-hover:text-red transition duration-300">Destinado para pessoas que solicitaram a confecção de nova carteira de enfermagem.</p>
+                    <p class="text-md text-red-500 group-hover:text-red transition duration-300"> (Em Caso de renovação, retirar ficha regular) Destinado para pessoas que solicitaram a confecção de nova carteira de enfermagem.</p>
                 </button>
 
             </div>

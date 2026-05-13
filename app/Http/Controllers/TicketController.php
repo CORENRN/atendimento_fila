@@ -282,18 +282,24 @@ class TicketController extends Controller
             'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
         ]);
 
-        $hoje = Carbon::today()->toDateString();
+       // $hoje = Carbon::today()->toDateString();
         //Verifica se o dia de rotina acabou (verifica a data que foi definida no começo do expediente)
-        DB::table('ticket_counters')->updateOrInsert(
-            ['date' => $hoje],
-            []
-        );
+      //  DB::table('ticket_counters')->updateOrInsert(
+          //  ['date' => $hoje],
+         
+         // ['last_number' => 0]);
 
-        //Incrementa 1 no numero anterior do dia ex (1 -> increment('last_number==1') result 2)
-        DB::table('ticket_counters')->where('date', $hoje)->increment('last_number');
+        $counter = DB::table('ticket_counters')->first();
 
-        //Numero incrementado
-        $novoNumero = DB::table('ticket_counters')->where('date', $hoje)->value('last_number');
+        if (!$counter) {
+            // Se não existir nada, cria o primeiro registro
+            DB::table('ticket_counters')->insert(['last_number' => 1]);
+            $novoNumero = 1;
+        } else {
+            // Se existir, incrementa e pega o novo valor
+            DB::table('ticket_counters')->increment('last_number');
+            $novoNumero = DB::table('ticket_counters')->value('last_number');
+        }
 
         $ticket = Ticket::create([
             'type' => $request->type,
@@ -303,12 +309,13 @@ class TicketController extends Controller
             'ticket_number' => $novoNumero,
         ]);
 
-        return redirect()->route('ticket.show', ['id' => $ticket->id]);
+        return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])->with('success', 'Ticket gerado: ' . $ticket->ticket_number);
     }
 
     public function showTicket($id)
     {
-        $ticket = Ticket::findOrFail($id);
+        $ticket = Ticket::where('ticket_number', $id)->firstOrFail();
+
         return view('ticket_show', compact('ticket'));
     }
 

@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/selecionar-guiche', [GuicheController::class, 'selectGuiche'])->name('guiche.select');
 
     // Fila (Atendimento)
-    Route::prefix('queue')->group(function () {
+    Route::prefix('queue')->middleware(['auth', 'has.guiche'])->group(function () {
        
         Route::get('tickets/{stage}', [TicketController::class, 'getTicketsJson'])
             ->name('queue.tickets.json');
