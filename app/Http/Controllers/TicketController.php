@@ -273,31 +273,25 @@ class TicketController extends Controller
         event(new TicketUpdated($ticket->fresh()));
         return back()->with('success', 'Chamado novamente.');
     }
-
     public function takeTicket(Request $request)
     {
-        
         $request->validate([
             'type' => 'required|in:regular,preferencial,carteira',
             'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
         ]);
 
-       // $hoje = Carbon::today()->toDateString();
-        //Verifica se o dia de rotina acabou (verifica a data que foi definida no começo do expediente)
-      //  DB::table('ticket_counters')->updateOrInsert(
-          //  ['date' => $hoje],
-         
-         // ['last_number' => 0]);
-
+        // Busca o contador atual
         $counter = DB::table('ticket_counters')->first();
 
         if (!$counter) {
-            // Se não existir nada, cria o primeiro registro
+            // Caso a tabela esteja vazia por algum motivo, cria com 1
             DB::table('ticket_counters')->insert(['last_number' => 1]);
             $novoNumero = 1;
         } else {
-            // Se existir, incrementa e pega o novo valor
+            // Incrementa o valor existente (se era 0 vira 1, se era 1 vira 2...)
             DB::table('ticket_counters')->increment('last_number');
+            
+            // Recupera o valor atualizado
             $novoNumero = DB::table('ticket_counters')->value('last_number');
         }
 
@@ -309,9 +303,9 @@ class TicketController extends Controller
             'ticket_number' => $novoNumero,
         ]);
 
-        return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])->with('success', 'Ticket gerado: ' . $ticket->ticket_number);
+        return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])
+            ->with('success', 'Ticket gerado: ' . $ticket->ticket_number);
     }
-
     public function showTicket($id)
     {
         $ticket = Ticket::where('ticket_number', $id)->firstOrFail();

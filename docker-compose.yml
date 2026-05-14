@@ -8,6 +8,19 @@ services:
       - .:/var/www
     networks:
       - db-network
+      
+  nginx:
+    image: nginx:alpine
+    container_name: atendimento-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www
+      - ./docker-config/nginx:/etc/nginx/conf.d # Verifique se você tem essa pasta de configuração
+    networks:
+      - db-network
+    depends_on:
+      - app
   mysql-laravel:
     image: mysql:8.0
     container_name: mysql-laravel
