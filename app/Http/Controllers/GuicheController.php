@@ -13,13 +13,11 @@ class GuicheController extends Controller
     {
         $userId = Auth::id();
 
-        // Verifica se VOCÊ já escolheu um guichê nas últimas 12h
         $exists = DB::table('user_guiche')
             ->where('user_id', $userId)
             ->where('created_at', '>=', now()->subHours(12))
             ->first();
 
-        // BUSCA OS GUICHÊS: Filtra os que foram escolhidos por QUALQUER usuário
         $guiches = Guiche::whereNotIn('id', function ($query) {
             $query->select('guiche_id')
                 ->from('user_guiche')

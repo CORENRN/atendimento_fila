@@ -79,7 +79,7 @@ class PanelController extends Controller
             ->orderByRaw('COALESCE(last_called_at, called_at) DESC')
             ->get()
             ->map(fn($t) => [
-                'ticket_number' => $t->id,
+                'ticket_number' => $t->ticket_number,
                 'type' => $t->type,
                 'called_at' => $t->called_at->format('H:i:s'),
                 'guiche' => $this->getGuicheName($t->attendant_id),

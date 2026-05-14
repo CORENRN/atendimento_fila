@@ -19,7 +19,7 @@ class EnsureUserHasGuiche
         $stage = $request->route('stage');
         if($stage === 'atendimento'){
             
-            if (!$user || $user->guiches()->count() === 0) {
+            if (!$user || is_null($user->guiche)) {
                 return redirect()->route('home') // Ou a rota de seleção de guichê
                 ->with('error', 'Você precisa selecionar um guichê antes de acessar a fila.');
             }
