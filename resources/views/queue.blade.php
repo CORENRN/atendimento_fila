@@ -8,7 +8,6 @@
             <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>
             
             @php
-            //Itens do menu de navegação.
                 $user = auth()->user();
                 $hasAdminAccess = $user && $user->hasAdminAccess();
                 $currentRoute = Route::currentRouteName();
@@ -29,7 +28,6 @@
 
             @foreach($menuItems as $item)
                 @php
-                 //Restrições de direcionamento
                     if ($item['admin'] && !$hasAdminAccess) continue;
                     if ($isQueueContext && !$hasAdminAccess) {
                         $isHome = $item['route'] === 'home';
@@ -70,14 +68,13 @@
         <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl flex flex-col">
             <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>
             <div class="mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">
-              <!--Se estiver na área de carteira ativa as checkbox-->
                 @if($stage === 'carteira')
                     <button
                         type="button"
                         id="btn-call-selected"
                         disabled
                         onclick="submitSelected()"
-                        class=" flex-1 border-2  border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                        class=" flex-1 border-2 border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                         Chamar Selecionados
                         <span id="selected-count" class="ml-1 text-sm font-normal"></span>
@@ -127,26 +124,19 @@
                         Novamente
                     </button>
                 </form>
-
             </div>
 
-            <!--Área dos tickets disponíveis-->
-
             <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
-                <table class="w-full text-sm text-left rtl:text-right text-lightW">
+                <table class="w-full text-sm text-left text-lightW">
                     <thead class="text-xs text-gray-700 uppercase sticky top-0 z-20 bg-[#141e22]">
                         <tr class="bg-[#202e36]">
                             @if($stage === 'carteira')
                                 <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy text-center">
-                                    <input
-                                        type="checkbox"
-                                        id="check-all"
-                                        class="w-4 h-4 cursor-pointer accent-purple-500"
-                                        title="Selecionar todos"
-                                    >
+                                    <input type="checkbox" id="check-all" class="w-4 h-4 cursor-pointer accent-purple-500">
                                 </th>
                             @endif
-                            <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">ID</th>
+                            <!-- Alterado de ID para SENHA para clareza -->
+                            <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">SENHA</th>
                             <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">Tipo</th>
                             @if($stage === 'atendimento')
                                 <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">Serviço</th>
@@ -160,19 +150,15 @@
                     </thead>
                     <tbody id="tickets-body">
                         @forelse ($tickets as $ticket)
-                        
                             @if($ticket->status === 'aguardando' || $ticket->status === 'triagem_pendente')
                                 <tr>
                                     @if($stage === 'carteira')
                                         <td class="p-2 border-[6px] border-blackThirdy text-center">
-                                            <input
-                                                type="checkbox"
-                                                class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"
-                                                value="{{ $ticket->ticket_number }}"
-                                            >
+                                            <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="{{ $ticket->id }}">
                                         </td>
                                     @endif
-                                    <td class="p-2 border-[6px] border-blackThirdy text-center">{{ $ticket->ticket_number }}</td>
+                                    <!-- CORREÇÃO: ticket_number -->
+                                    <td class="p-2 border-[6px] border-blackThirdy text-center font-bold">{{ $ticket->ticket_number }}</td>
                                     <td class="p-2 border-[6px] border-blackThirdy">{{ $ticket->type }}</td>
                                     @if($stage === 'atendimento')
                                         <td class="p-2 border-[6px] border-blackThirdy">{{ $services[$ticket->service] ?? '-' }}</td>
@@ -186,7 +172,7 @@
                             @endif
                         @empty
                             <tr id="empty-row">
-                                <td colspan="6" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td>
+                                <td colspan="7" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -197,11 +183,9 @@
         <div class="flex w-full flex-col gap-4 overflow-y-auto h-[75vh] custom-scrollbar px-6">
             @php
                 $activeTickets = collect();
-                
                 if ($stage === 'carteira') {
                     $activeTickets = $tickets->where('status', 'carteira');
                 }
-                
                 if ($activeTickets->isEmpty() && isset($called_id)) {
                     $mainTicket = \App\Models\Ticket::find($called_id);
                     if ($mainTicket) $activeTickets->push($mainTicket);
@@ -209,17 +193,12 @@
             @endphp
 
             @forelse($activeTickets as $calledTicket)
-                @php
-                    $isCorrectStage = ($stage === 'triagem' && $calledTicket->status === 'triagem') || 
-                                     ($stage === 'atendimento' && $calledTicket->status === 'atendimento') || 
-                                     ($stage === 'carteira' && $calledTicket->status === 'carteira');
-                @endphp
-
                 <div class="p-6 bg-blackSecondary rounded shadow-md w-full border-l-4 {{ $calledTicket->type === 'preferencial' ? 'border-red' : 'border-green' }}">
                     <div class="flex gap-3 items-center mb-3">
                         <h2 class="font-bold text-xl text-lightW">Ficha em Atendimento:</h2>
-                        <div class="w-10 h-10 flex items-center justify-center font-semibold bg-black rounded-full text-white">
-                            #{{ $calledTicket->id }}
+                        <!-- CORREÇÃO: ticket_number -->
+                        <div class="w-12 h-12 flex items-center justify-center font-bold bg-black rounded-full text-white text-xl">
+                            #{{ $calledTicket->ticket_number }}
                         </div>
                     </div>
 
@@ -278,9 +257,7 @@
                     </div>
                 </div>
             @empty
-                <div class="p-10 text-center text-gray-500 italic">
-                    Aguardando chamada...
-                </div>
+                <div class="p-10 text-center text-gray-500 italic">Aguardando chamada...</div>
             @endforelse
         </div>  
     </section>
@@ -309,16 +286,10 @@
     function bindCheckboxEvents() {
         const checkAll = document.getElementById('check-all');
         const checkboxes = document.querySelectorAll('.ticket-checkbox');
-        
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateSelectionState);
-        });
-
+        checkboxes.forEach(cb => cb.addEventListener('change', updateSelectionState));
         if (checkAll) {
             checkAll.addEventListener('change', () => {
-                document.querySelectorAll('.ticket-checkbox:not(:disabled)').forEach(cb => {
-                    cb.checked = checkAll.checked;
-                });
+                document.querySelectorAll('.ticket-checkbox:not(:disabled)').forEach(cb => cb.checked = checkAll.checked);
                 updateSelectionState();
             });
         }
@@ -328,12 +299,8 @@
         const checkboxes = document.querySelectorAll('.ticket-checkbox');
         const btn = document.getElementById('btn-call-selected');
         const countEl = document.getElementById('selected-count');
-        
         selectedTicketIds.clear();
-        checkboxes.forEach(cb => {
-            if (cb.checked) selectedTicketIds.add(cb.value);
-        });
-
+        checkboxes.forEach(cb => { if (cb.checked) selectedTicketIds.add(cb.value); });
         if (btn) {
             btn.disabled = selectedTicketIds.size === 0;
             countEl.textContent = selectedTicketIds.size > 0 ? `(${selectedTicketIds.size})` : '';
@@ -343,7 +310,6 @@
     function submitSelected() {
         const ids = Array.from(selectedTicketIds);
         if (ids.length === 0) return;
-
         const container = document.getElementById('hidden-ids');
         container.innerHTML = ids.map(id => `<input type="hidden" name="ticket_ids[]" value="${id}">`).join('');
         document.getElementById('form-call-multiple').submit();
@@ -354,17 +320,13 @@
             const response = await fetch(`/queue/tickets/${currentStage}`);
             const data = await response.json();
             const currentTickets = data.tickets || [];
-            
             const availableTickets = currentTickets.filter(t => t.status === 'aguardando' || t.status === 'triagem_pendente');
-            const currentCount = availableTickets.length;
-
-            if (lastTicketCount !== null && currentCount > lastTicketCount) {
+            if (lastTicketCount !== null && availableTickets.length > lastTicketCount) {
                 if (!calledId && Notification.permission === "granted") {
                     new Notification("Novo ticket na fila", { body: "Fila: " + currentStage });
                 }
             }
-
-            lastTicketCount = currentCount;
+            lastTicketCount = availableTickets.length;
             updateTable(currentTickets);
         } catch (error) { console.error(error); }
     }
@@ -380,19 +342,17 @@
 
         tbody.innerHTML = filtered.map(ticket => {
             const isChecked = selectedTicketIds.has(ticket.id.toString()) ? 'checked' : '';
-            
             let html = `<tr>`;
             if (currentStage === 'carteira') {
                 html += `<td class="p-2 border-[6px] border-blackThirdy text-center">
                     <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="${ticket.id}" ${isChecked}>
                 </td>`;
             }
-            html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.id}</td>
+            // CORREÇÃO JS: ticket.ticket_number
+            html += `<td class="p-2 border-[6px] border-blackThirdy text-center font-bold">${ticket.ticket_number}</td>
                 <td class="p-2 border-[6px] border-blackThirdy">${ticket.type}</td>`;
-            
             if (currentStage === 'atendimento') html += `<td class="p-2 border-[6px] border-blackThirdy">${ticket.service ?? '-'}</td>`;
             if (currentStage === 'carteira') html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.cpf ?? '-'}</td>`;
-            
             html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.status.toUpperCase()}</td>
                 <td class="p-2 border-[6px] border-blackThirdy text-center">-</td></tr>`;
             return html;

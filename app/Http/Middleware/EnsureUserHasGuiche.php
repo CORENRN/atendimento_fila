@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserHasGuiche
@@ -13,17 +15,23 @@ class EnsureUserHasGuiche
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
         $stage = $request->route('stage');
-        if($stage === 'atendimento'){
-            
-            if (!$user || $user->guiches()->count() === 0) {
-                return redirect()->route('home') // Ou a rota de seleção de guichê
-                ->with('error', 'Você precisa selecionar um guichê antes de acessar a fila.');
-            }
 
+        if ($stage === 'atendimento') {
+            $userId = Auth::id();
+
+            $hasActiveGuiche = DB::table('user_guiche')
+                ->where('user_id', $userId)
+                ->where('created_at', '>=', now()->subHours(12))
+                ->exists();
+
+  
+            if (!$userId || !$hasActiveGuiche) {
+                return redirect()->route('home') // Redireciona para a home/seleção
+                    ->with('error', 'Você precisa selecionar um guichê antes de acessar a fila.');
+            }
         }
     
         return $next($request);

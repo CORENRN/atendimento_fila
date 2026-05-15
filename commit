@@ -1,0 +1,426 @@
+[33mcommit 341690f97794d87088f9d0b50dcd78eb4437b0c5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mluiz_branch[m[33m)[m
+Author: luizQF <luizfqueiroz1811@gmail.com>
+Date:   Thu May 14 12:07:08 2026 +0000
+
+    correçao de chamada dos numeros.
+
+[1mdiff --git a/app/Http/Controllers/PanelController.php b/app/Http/Controllers/PanelController.php[m
+[1mindex b275454..e39ea8b 100755[m
+[1m--- a/app/Http/Controllers/PanelController.php[m
+[1m+++ b/app/Http/Controllers/PanelController.php[m
+[36m@@ -30,7 +30,7 @@[m [mpublic function index()[m
+             ->get()[m
+             ->map(function ($t) {[m
+                 return [[m
+[31m-                    'id' => $t->id, [m
+[32m+[m[32m                    'id' => $t->ticket_number,[m[41m [m
+                     'finished_at' => $t->finished_at ? $t->finished_at->format('d/m/Y H:i:s') : '-',[m
+                     'guiche' => $this->getGuicheName($t->attendant_id),[m
+                 ];[m
+[36m@@ -50,7 +50,7 @@[m [mpublic function data()[m
+             ->orderByRaw('COALESCE(last_called_at, called_tri_at) DESC')[m
+             ->get()[m
+             ->map(fn($t) => [[m
+[31m-                'ticket_number' => $t->id,[m
+[32m+[m[32m                'ticket_number' => $t->ticket_number,[m
+                 'type' => $t->type,[m
+                 'called_at' => $t->called_tri_at->format('H:i:s'),[m
+                 // Passamos os campos brutos para o JS comparar a chave[m
+[36m@@ -64,7 +64,7 @@[m [mpublic function data()[m
+             ->orderBy('last_called_at', 'DESC')[m
+             ->get()[m
+             ->map(fn($t) => [[m
+[31m-                'ticket_number' => $t->id,[m
+[32m+[m[32m                'ticket_number' => $t->ticket_number,[m
+                 'type' => $t->type,[m
+                 // Usamos o format padrão primeiro para garantir que não quebre[m
+                 'called_at' => $t->last_called_at->format('H:i:s'),[m
+[36m@@ -92,8 +92,7 @@[m [mpublic function data()[m
+             ->limit(3)[m
+             ->get()[m
+             ->map(fn($t) => [[m
+[31m-                'ticket_number' => $t->id,[m
+[31m-                [m
+[32m+[m[32m                'ticket_number' => $t->ticket_number,[m
+                 'finished_at' => $t->finished_at ? $t->finished_at->format('d/m/Y H:i:s') : '-',[m
+                 'guiche' => $this->getGuicheName($t->attendant_id),[m
+             ]);[m
+[1mdiff --git a/app/Http/Controllers/TicketController.php b/app/Http/Controllers/TicketController.php[m
+[1mindex 53978d6..8673ddd 100755[m
+[1m--- a/app/Http/Controllers/TicketController.php[m
+[1m+++ b/app/Http/Controllers/TicketController.php[m
+[36m@@ -273,31 +273,25 @@[m [mpublic function recall($id)[m
+         event(new TicketUpdated($ticket->fresh()));[m
+         return back()->with('success', 'Chamado novamente.');[m
+     }[m
+[31m-[m
+     public function takeTicket(Request $request)[m
+     {[m
+[31m-        [m
+         $request->validate([[m
+             'type' => 'required|in:regular,preferencial,carteira',[m
+             'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'[m
+         ]);[m
+ [m
+[31m-       // $hoje = Carbon::today()->toDateString();[m
+[31m-        //Verifica se o dia de rotina acabou (verifica a data que foi definida no começo do expediente)[m
+[31m-      //  DB::table('ticket_counters')->updateOrInsert([m
+[31m-          //  ['date' => $hoje],[m
+[31m-         [m
+[31m-         // ['last_number' => 0]);[m
+[31m-[m
+[32m+[m[32m        // Busca o contador atual[m
+         $counter = DB::table('ticket_counters')->first();[m
+ [m
+         if (!$counter) {[m
+[31m-            // Se não existir nada, cria o primeiro registro[m
+[32m+[m[32m            // Caso a tabela esteja vazia por algum motivo, cria com 1[m
+             DB::table('ticket_counters')->insert(['last_number' => 1]);[m
+             $novoNumero = 1;[m
+         } else {[m
+[31m-            // Se existir, incrementa e pega o novo valor[m
+[32m+[m[32m            // Incrementa o valor existente (se era 0 vira 1, se era 1 vira 2...)[m
+             DB::table('ticket_counters')->increment('last_number');[m
+[32m+[m[41m            [m
+[32m+[m[32m            // Recupera o valor atualizado[m
+             $novoNumero = DB::table('ticket_counters')->value('last_number');[m
+         }[m
+ [m
+[36m@@ -309,9 +303,9 @@[m [mpublic function takeTicket(Request $request)[m
+             'ticket_number' => $novoNumero,[m
+         ]);[m
+ [m
+[31m-        return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])->with('success', 'Ticket gerado: ' . $ticket->ticket_number);[m
+[32m+[m[32m        return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])[m
+[32m+[m[32m            ->with('success', 'Ticket gerado: ' . $ticket->ticket_number);[m
+     }[m
+[31m-[m
+     public function showTicket($id)[m
+     {[m
+         $ticket = Ticket::where('ticket_number', $id)->firstOrFail();[m
+[1mdiff --git a/app/Models/TicketCounter.php b/app/Models/TicketCounter.php[m
+[1mnew file mode 100644[m
+[1mindex 0000000..396d2d9[m
+[1m--- /dev/null[m
+[1m+++ b/app/Models/TicketCounter.php[m
+[36m@@ -0,0 +1,10 @@[m
+[32m+[m[32m<?php[m
+[32m+[m
+[32m+[m[32mnamespace App\Models;[m
+[32m+[m
+[32m+[m[32muse Illuminate\Database\Eloquent\Model;[m
+[32m+[m
+[32m+[m[32mclass TicketCounter extends Model[m
+[32m+[m[32m{[m
+[32m+[m[32m    //[m
+[32m+[m[32m}[m
+[1mdiff --git a/docker-compose.yml b/docker-compose.yml[m
+[1mindex bfeca41..60155dd 100644[m
+[1m--- a/docker-compose.yml[m
+[1m+++ b/docker-compose.yml[m
+[36m@@ -8,6 +8,19 @@[m [mservices:[m
+       - .:/var/www[m
+     networks:[m
+       - db-network[m
+[32m+[m[41m      [m
+[32m+[m[32m  nginx:[m
+[32m+[m[32m    image: nginx:alpine[m
+[32m+[m[32m    container_name: atendimento-nginx[m
+[32m+[m[32m    ports:[m
+[32m+[m[32m      - "80:80"[m
+[32m+[m[32m    volumes:[m
+[32m+[m[32m      - .:/var/www[m
+[32m+[m[32m      - ./docker-config/nginx:/etc/nginx/conf.d # Verifique se você tem essa pasta de configuração[m
+[32m+[m[32m    networks:[m
+[32m+[m[32m      - db-network[m
+[32m+[m[32m    depends_on:[m
+[32m+[m[32m      - app[m
+   mysql-laravel:[m
+     image: mysql:8.0[m
+     container_name: mysql-laravel[m
+[1mdiff --git a/nginx.conf b/nginx.conf[m
+[1mindex 96fe3d9..3852f21 100644[m
+[1m--- a/nginx.conf[m
+[1m+++ b/nginx.conf[m
+[36m@@ -1,8 +1,7 @@[m
+ server {[m
+     listen 80;[m
+     index index.php index.html;[m
+[31m-    server_name atendimento.corenrn.local;[m
+[31m-    root /var/www/public; # O Nginx precisa apontar para a pasta 'public' do Laravel[m
+[32m+[m[32m    root /var/www/public;[m
+ [m
+     location / {[m
+         try_files $uri $uri/ /index.php?$query_string;[m
+[36m@@ -11,17 +10,13 @@[m [mserver {[m
+     location ~ \.php$ {[m
+         try_files $uri =404;[m
+         fastcgi_split_path_info ^(.+\.php)(/.+)$;[m
+[31m-        fastcgi_pass app:9000; # Nome do serviço definido no docker-compose[m
+[32m+[m[32m        fastcgi_pass atendimento-app:9000;[m
+         fastcgi_index index.php;[m
+         include fastcgi_params;[m
+         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;[m
+         fastcgi_param PATH_INFO $fastcgi_path_info;[m
+     }[m
+ [m
+[31m-    location ~ /\.ht {[m
+[31m-        deny all;[m
+[31m-    }[m
+[31m-[m
+     error_log  /var/log/nginx/error.log;[m
+     access_log /var/log/nginx/access.log;[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m}[m
+[1mdiff --git a/package-lock.json b/package-lock.json[m
+[1mindex fd30154..4049231 100644[m
+[1m--- a/package-lock.json[m
+[1m+++ b/package-lock.json[m
+[36m@@ -1,5 +1,5 @@[m
+ {[m
+[31m-    "name": "atendimento_fila",[m
+[32m+[m[32m    "name": "ticket-queue",[m
+     "lockfileVersion": 3,[m
+     "requires": true,[m
+     "packages": {[m
+[1mdiff --git a/resources/views/queue.blade.php b/resources/views/queue.blade.php[m
+[1mindex 5162ed5..25d2a57 100755[m
+[1m--- a/resources/views/queue.blade.php[m
+[1m+++ b/resources/views/queue.blade.php[m
+[36m@@ -8,7 +8,6 @@[m
+             <h2 class="font-semibold text-lg tracking-widest text-[#eceef0]">MENU</h2>[m
+             [m
+             @php[m
+[31m-            //Itens do menu de navegação.[m
+                 $user = auth()->user();[m
+                 $hasAdminAccess = $user && $user->hasAdminAccess();[m
+                 $currentRoute = Route::currentRouteName();[m
+[36m@@ -29,7 +28,6 @@[m
+ [m
+             @foreach($menuItems as $item)[m
+                 @php[m
+[31m-                 //Restrições de direcionamento[m
+                     if ($item['admin'] && !$hasAdminAccess) continue;[m
+                     if ($isQueueContext && !$hasAdminAccess) {[m
+                         $isHome = $item['route'] === 'home';[m
+[36m@@ -70,14 +68,13 @@[m
+         <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl flex flex-col">[m
+             <h1 class="w-full text-center text-3xl text-[#eceef0] font-bold mb-5">Chamada de Tickets</h1>[m
+             <div class="mb-4 flex space-x-4 bg-[#202e36] p-5 rounded shadow w-full">[m
+[31m-              <!--Se estiver na área de carteira ativa as checkbox-->[m
+                 @if($stage === 'carteira')[m
+                     <button[m
+                         type="button"[m
+                         id="btn-call-selected"[m
+                         disabled[m
+                         onclick="submitSelected()"[m
+[31m-                        class=" flex-1 border-2  border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"[m
+[32m+[m[32m                        class=" flex-1 border-2 border-purple-500 bg-[#202e36] transition duration-300 text-white uppercase tracking-wider font-black rounded hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed"[m
+                     >[m
+                         Chamar Selecionados[m
+                         <span id="selected-count" class="ml-1 text-sm font-normal"></span>[m
+[36m@@ -127,26 +124,19 @@[m [mclass="bg-blue-500 transition duration-300 text-white w-full py-5 rounded upperc[m
+                         Novamente[m
+                     </button>[m
+                 </form>[m
+[31m-[m
+             </div>[m
+ [m
+[31m-            <!--Área dos tickets disponíveis-->[m
+[31m-[m
+             <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">[m
+[31m-                <table class="w-full text-sm text-left rtl:text-right text-lightW">[m
+[32m+[m[32m                <table class="w-full text-sm text-left text-lightW">[m
+                     <thead class="text-xs text-gray-700 uppercase sticky top-0 z-20 bg-[#141e22]">[m
+                         <tr class="bg-[#202e36]">[m
+                             @if($stage === 'carteira')[m
+                                 <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy text-center">[m
+[31m-                                    <input[m
+[31m-                                        type="checkbox"[m
+[31m-                                        id="check-all"[m
+[31m-                                        class="w-4 h-4 cursor-pointer accent-purple-500"[m
+[31m-                                        title="Selecionar todos"[m
+[31m-                                    >[m
+[32m+[m[32m                                    <input type="checkbox" id="check-all" class="w-4 h-4 cursor-pointer accent-purple-500">[m
+                                 </th>[m
+                             @endif[m
+[31m-                            <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">ID</th>[m
+[32m+[m[32m                            <!-- Alterado de ID para SENHA para clareza -->[m
+[32m+[m[32m                            <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">SENHA</th>[m
+                             <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">Tipo</th>[m
+                             @if($stage === 'atendimento')[m
+                                 <th class="p-2 text-[#eceef0] border-[6px] border-blackThirdy">Serviço</th>[m
+[36m@@ -160,19 +150,15 @@[m [mclass="w-4 h-4 cursor-pointer accent-purple-500"[m
+                     </thead>[m
+                     <tbody id="tickets-body">[m
+                         @forelse ($tickets as $ticket)[m
+[31m-                        [m
+                             @if($ticket->status === 'aguardando' || $ticket->status === 'triagem_pendente')[m
+                                 <tr>[m
+                                     @if($stage === 'carteira')[m
+                                         <td class="p-2 border-[6px] border-blackThirdy text-center">[m
+[31m-                                            <input[m
+[31m-                                                type="checkbox"[m
+[31m-                                                class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+[31m-                                                value="{{ $ticket->ticket_number }}"[m
+[31m-                                            >[m
+[32m+[m[32m                                            <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="{{ $ticket->id }}">[m
+                                         </td>[m
+                                     @endif[m
+[31m-                                    <td class="p-2 border-[6px] border-blackThirdy text-center">{{ $ticket->ticket_number }}</td>[m
+[32m+[m[32m                                    <!-- CORREÇÃO: ticket_number -->[m
+[32m+[m[32m                                    <td class="p-2 border-[6px] border-blackThirdy text-center font-bold">{{ $ticket->ticket_number }}</td>[m
+                                     <td class="p-2 border-[6px] border-blackThirdy">{{ $ticket->type }}</td>[m
+                                     @if($stage === 'atendimento')[m
+                                         <td class="p-2 border-[6px] border-blackThirdy">{{ $services[$ticket->service] ?? '-' }}</td>[m
+[36m@@ -186,7 +172,7 @@[m [mclass="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+                             @endif[m
+                         @empty[m
+                             <tr id="empty-row">[m
+[31m-                                <td colspan="6" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td>[m
+[32m+[m[32m                                <td colspan="7" class="p-4 text-center text-gray-500">Nenhum ticket na fila.</td>[m
+                             </tr>[m
+                         @endforelse[m
+                     </tbody>[m
+[36m@@ -197,11 +183,9 @@[m [mclass="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+         <div class="flex w-full flex-col gap-4 overflow-y-auto h-[75vh] custom-scrollbar px-6">[m
+             @php[m
+                 $activeTickets = collect();[m
+[31m-                [m
+                 if ($stage === 'carteira') {[m
+                     $activeTickets = $tickets->where('status', 'carteira');[m
+                 }[m
+[31m-                [m
+                 if ($activeTickets->isEmpty() && isset($called_id)) {[m
+                     $mainTicket = \App\Models\Ticket::find($called_id);[m
+                     if ($mainTicket) $activeTickets->push($mainTicket);[m
+[36m@@ -209,17 +193,12 @@[m [mclass="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+             @endphp[m
+ [m
+             @forelse($activeTickets as $calledTicket)[m
+[31m-                @php[m
+[31m-                    $isCorrectStage = ($stage === 'triagem' && $calledTicket->status === 'triagem') || [m
+[31m-                                     ($stage === 'atendimento' && $calledTicket->status === 'atendimento') || [m
+[31m-                                     ($stage === 'carteira' && $calledTicket->status === 'carteira');[m
+[31m-                @endphp[m
+[31m-[m
+                 <div class="p-6 bg-blackSecondary rounded shadow-md w-full border-l-4 {{ $calledTicket->type === 'preferencial' ? 'border-red' : 'border-green' }}">[m
+                     <div class="flex gap-3 items-center mb-3">[m
+                         <h2 class="font-bold text-xl text-lightW">Ficha em Atendimento:</h2>[m
+[31m-                        <div class="w-10 h-10 flex items-center justify-center font-semibold bg-black rounded-full text-white">[m
+[31m-                            #{{ $calledTicket->id }}[m
+[32m+[m[32m                        <!-- CORREÇÃO: ticket_number -->[m
+[32m+[m[32m                        <div class="w-12 h-12 flex items-center justify-center font-bold bg-black rounded-full text-white text-xl">[m
+[32m+[m[32m                            #{{ $calledTicket->ticket_number }}[m
+                         </div>[m
+                     </div>[m
+ [m
+[36m@@ -278,9 +257,7 @@[m [mclass="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+                     </div>[m
+                 </div>[m
+             @empty[m
+[31m-                <div class="p-10 text-center text-gray-500 italic">[m
+[31m-                    Aguardando chamada...[m
+[31m-                </div>[m
+[32m+[m[32m                <div class="p-10 text-center text-gray-500 italic">Aguardando chamada...</div>[m
+             @endforelse[m
+         </div>  [m
+     </section>[m
+[36m@@ -309,16 +286,10 @@[m [mclass="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500"[m
+     function bindCheckboxEvents() {[m
+         const checkAll = document.getElementById('check-all');[m
+         const checkboxes = document.querySelectorAll('.ticket-checkbox');[m
+[31m-        [m
+[31m-        checkboxes.forEach(cb => {[m
+[31m-            cb.addEventListener('change', updateSelectionState);[m
+[31m-        });[m
+[31m-[m
+[32m+[m[32m        checkboxes.forEach(cb => cb.addEventListener('change', updateSelectionState));[m
+         if (checkAll) {[m
+             checkAll.addEventListener('change', () => {[m
+[31m-                document.querySelectorAll('.ticket-checkbox:not(:disabled)').forEach(cb => {[m
+[31m-                    cb.checked = checkAll.checked;[m
+[31m-                });[m
+[32m+[m[32m                document.querySelectorAll('.ticket-checkbox:not(:disabled)').forEach(cb => cb.checked = checkAll.checked);[m
+                 updateSelectionState();[m
+             });[m
+         }[m
+[36m@@ -328,12 +299,8 @@[m [mfunction updateSelectionState() {[m
+         const checkboxes = document.querySelectorAll('.ticket-checkbox');[m
+         const btn = document.getElementById('btn-call-selected');[m
+         const countEl = document.getElementById('selected-count');[m
+[31m-        [m
+         selectedTicketIds.clear();[m
+[31m-        checkboxes.forEach(cb => {[m
+[31m-            if (cb.checked) selectedTicketIds.add(cb.value);[m
+[31m-        });[m
+[31m-[m
+[32m+[m[32m        checkboxes.forEach(cb => { if (cb.checked) selectedTicketIds.add(cb.value); });[m
+         if (btn) {[m
+             btn.disabled = selectedTicketIds.size === 0;[m
+             countEl.textContent = selectedTicketIds.size > 0 ? `(${selectedTicketIds.size})` : '';[m
+[36m@@ -343,7 +310,6 @@[m [mfunction updateSelectionState() {[m
+     function submitSelected() {[m
+         const ids = Array.from(selectedTicketIds);[m
+         if (ids.length === 0) return;[m
+[31m-[m
+         const container = document.getElementById('hidden-ids');[m
+         container.innerHTML = ids.map(id => `<input type="hidden" name="ticket_ids[]" value="${id}">`).join('');[m
+         document.getElementById('form-call-multiple').submit();[m
+[36m@@ -354,17 +320,13 @@[m [mfunction submitSelected() {[m
+             const response = await fetch(`/queue/tickets/${currentStage}`);[m
+             const data = await response.json();[m
+             const currentTickets = data.tickets || [];[m
+[31m-            [m
+             const availableTickets = currentTickets.filter(t => t.status === 'aguardando' || t.status === 'triagem_pendente');[m
+[31m-            const currentCount = availableTickets.length;[m
+[31m-[m
+[31m-            if (lastTicketCount !== null && currentCount > lastTicketCount) {[m
+[32m+[m[32m            if (lastTicketCount !== null && availableTickets.length > lastTicketCount) {[m
+                 if (!calledId && Notification.permission === "granted") {[m
+                     new Notification("Novo ticket na fila", { body: "Fila: " + currentStage });[m
+                 }[m
+             }[m
+[31m-[m
+[31m-            lastTicketCount = currentCount;[m
+[32m+[m[32m            lastTicketCount = availableTickets.length;[m
+             updateTable(currentTickets);[m
+         } catch (error) { console.error(error); }[m
+     }[m
+[36m@@ -380,19 +342,17 @@[m [mfunction updateTable(tickets) {[m
+ [m
+         tbody.innerHTML = filtered.map(ticket => {[m
+             const isChecked = selectedTicketIds.has(ticket.id.toString()) ? 'checked' : '';[m
+[31m-            [m
+             let html = `<tr>`;[m
+             if (currentStage === 'carteira') {[m
+                 html += `<td class="p-2 border-[6px] border-blackThirdy text-center">[m
+                     <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="${ticket.id}" ${isChecked}>[m
+                 </td>`;[m
+             }[m
+[31m-            html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.id}</td>[m
+[32m+[m[32m            // CORREÇÃO JS: ticket.ticket_number[m
+[32m+[m[32m            html += `<td class="p-2 border-[6px] border-blackThirdy text-center font-bold">${ticket.ticket_number}</td>[m
+                 <td class="p-2 border-[6px] border-blackThirdy">${ticket.type}</td>`;[m
+[31m-            [m
+             if (currentStage === 'atendimento') html += `<td class="p-2 border-[6px] border-blackThirdy">${ticket.service ?? '-'}</td>`;[m
+             if (currentStage === 'carteira') html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.cpf ?? '-'}</td>`;[m
+[31m-            [m
+             html += `<td class="p-2 border-[6px] border-blackThirdy text-center">${ticket.status.toUpperCase()}</td>[m
+                 <td class="p-2 border-[6px] border-blackThirdy text-center">-</td></tr>`;[m
+             return html;[m
+[1mdiff --git a/routes/console.php b/routes/console.php[m
+[1mindex 41059e6..773a8ba 100755[m
+[1m--- a/routes/console.php[m
+[1m+++ b/routes/console.php[m
+[36m@@ -13,7 +13,5 @@[m
+ Schedule::call(function () {[m
+     DB::table('tickets')->update(['ticket_number' => 0]);[m
+     DB::table('tickets')->update(['status' => 'finalizado']);[m
+[31m-    DB::table('ticket_counters')->updateOrInsert([m
+[31m-        ['last_number' => 0],[m
+[31m-    );[m
+[32m+[m[32m    DB::table('ticket_counters')->update(['last_number' => 0]);[m
+ })->dailyAt('23:59');[m
+\ No newline at end of file[m

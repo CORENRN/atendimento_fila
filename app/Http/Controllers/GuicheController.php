@@ -13,13 +13,13 @@ class GuicheController extends Controller
     {
         $userId = Auth::id();
 
-        // Verifica se VOCÊ já escolheu um guichê nas últimas 12h
+      
         $exists = DB::table('user_guiche')
             ->where('user_id', $userId)
             ->where('created_at', '>=', now()->subHours(12))
             ->first();
 
-        // BUSCA OS GUICHÊS: Filtra os que foram escolhidos por QUALQUER usuário
+
         $guiches = Guiche::whereNotIn('id', function ($query) {
             $query->select('guiche_id')
                 ->from('user_guiche')
@@ -36,10 +36,12 @@ class GuicheController extends Controller
         ]);
 
         $userId = Auth::id();
+        $guicheId = (int) $request->guiche_id;
 
-        // Verificação de segurança: Alguém escolheu esse guichê nos últimos segundos?
+
         $isOccupied = DB::table('user_guiche')
-            ->where('guiche_id', $request->guiche_id)
+            ->where('guiche_id', $guicheId)
+            ->where('user_id', '!=', $userId) 
             ->where('created_at', '>=', now()->subHours(12))
             ->exists();
 
@@ -47,12 +49,15 @@ class GuicheController extends Controller
             return back()->with('error', 'Este guichê acabou de ser ocupado por outro atendente.');
         }
 
-        DB::table('user_guiche')->insert([
-            'user_id' => (int) $userId,
-            'guiche_id' => $request->guiche_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+       
+        DB::table('user_guiche')->updateOrInsert(
+            ['user_id' => $userId],
+            [
+                'guiche_id'  => $guicheId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
 
         return redirect()->route('queue', ['stage' => 'atendimento'])
                     ->with('success', 'Guichê selecionado com sucesso.');
