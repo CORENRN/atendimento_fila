@@ -11,7 +11,15 @@ Artisan::command('inspire', function () {
 
 
 Schedule::call(function () {
-    DB::table('tickets')->update(['ticket_number' => 0]);
-    DB::table('tickets')->update(['status' => 'finalizado']);
+  
+    DB::table('tickets')
+        ->where('status', '!=', 'finalizado')
+        ->update([
+            'ticket_number' => 0,
+            'status' => 'finalizado',
+            'updated_at' => now()
+        ]);
+
+
     DB::table('ticket_counters')->update(['last_number' => 0]);
 })->dailyAt('23:59')->timezone('America/Sao_Paulo');

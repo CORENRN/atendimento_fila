@@ -7,14 +7,14 @@
             <p class="text-lightW">Escolha em qual guichê você irá trabalhar hoje dentre as opções disponiveis abaixo!</p>
 
             @if(session('error'))
-                <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+                <div class="bg-red-100 text-white px-4 py-2 rounded mb-4">
                     {{ session('error') }}
                 </div>
             @endif
 
         <form action="{{ route('guiche.select') }}" method="POST" class=" w-[50%] mt-5">
         @csrf
-
+            
             <div class="mb-4 relative">
                 <select name="guiche_id" id="guiche_id" required class=" mt-1 block w-full border border-[#213555]/30 text-[#213555] py-4 pl-16  rounded-md shadow-sm p-2">
                     <option value="" class="">Selecione um guichê</option>

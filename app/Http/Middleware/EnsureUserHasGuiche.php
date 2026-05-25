@@ -29,7 +29,7 @@ class EnsureUserHasGuiche
 
   
             if (!$userId || !$hasActiveGuiche) {
-                return redirect()->route('home') // Redireciona para a home/seleção
+                return redirect()->route('guiche.select.view') // Redireciona para a home/seleção
                     ->with('error', 'Você precisa selecionar um guichê antes de acessar a fila.');
             }
         }
