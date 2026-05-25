@@ -87,7 +87,7 @@
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #56cbec; border-radius: 10px; }
             </style>
             @if(auth()->user()->isSuperAdmin())
-                <div class="min-w-[50%] h-[75vh] custom-scrollbar bg-blackSecondary p-8 rounded shadow-xl gap-2 flex flex-col">
+                <div class="min-w-[50%] h-[75vh] overflow-y-auto custom-scrollbar bg-blackSecondary p-8 rounded shadow-xl gap-2 flex flex-col">
                     <h2 class="text-2xl text-lightW font-bold mb-6">Usuários cadastrados</h2>
                         @foreach($allUsers as $u)
                             <div class="flex justify-between items-center pb-4 border-b border-white/5">
