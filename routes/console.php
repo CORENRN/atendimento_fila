@@ -22,7 +22,4 @@ Schedule::call(function () {
 
 
     DB::table('ticket_counters')->update(['last_number' => 0]);
-
-    DB::table('user_guiche')->truncate(); 
-
-})->dailyAt('23:59')->timezone('America/Fortaleza');
+})->dailyAt('23:59')->timezone('America/Sao_Paulo');
