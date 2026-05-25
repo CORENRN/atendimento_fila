@@ -14,4 +14,4 @@ Schedule::call(function () {
     DB::table('tickets')->update(['ticket_number' => 0]);
     DB::table('tickets')->update(['status' => 'finalizado']);
     DB::table('ticket_counters')->update(['last_number' => 0]);
-})->dailyAt('10:17');
+})->dailyAt('23:59')->timezone('America/Sao_Paulo');
