@@ -307,6 +307,27 @@ class TicketController extends Controller
         return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])
             ->with('success', 'Ticket gerado: ' . $ticket->ticket_number);
     }
+
+    Public function redirect(Request $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if ($ticket->attendant_id !== auth()->id()) {
+            return back()->with('error', 'Acesso negado.');
+        }
+
+        $ticket->update([
+            'cpf' => $request->cpf,
+            'stage' => 'carteira',
+            'status' => 'aguardando',
+            'finished_at' => null,
+            'attendant_id' => null,
+        ]);
+
+        event(new TicketUpdated($ticket));
+        return back()->with('success', 'Redirecionado para Confecção de Carteira.');
+    }
+
     public function showTicket($id)
     {
         $ticket = Ticket::where('ticket_number', $id)->latest()->firstOrFail();

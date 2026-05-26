@@ -223,7 +223,7 @@
                             </div>
                         @endif
 
-                        <div class="flex flex-col gap-3 mt-4">
+                       <div class="flex flex-col gap-3 mt-4">
                             <div class="flex flex-row w-full gap-4">
                                 <form action="{{ route('queue.finish', $calledTicket->id) }}" method="POST" class="flex-1">
                                     @csrf
@@ -231,6 +231,15 @@
                                         Finalizar
                                     </button>
                                 </form>
+
+                                @if($stage === 'atendimento' && $calledTicket->service === 'inscricao')
+                                    <div class="flex-1">
+                                        <button type="button" onclick="mostrarCardCpf()" class="w-full bg-purple-600 transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider hover:bg-purple-700">
+                                            Confecção
+                                        </button>
+                                    </div>
+                                @endif
+                                
                                 <form action="{{ route('queue.cancel', $calledTicket->id) }}" method="POST" class="flex-1">
                                     @csrf
                                     <button class="w-full bg-red transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider hover:opacity-80">
@@ -270,6 +279,53 @@
 </style>
 
 <script>
+    function mostrarCardCpf() {
+        const wrapper = document.getElementById('wrapper-modal-cpf');
+        const input = document.getElementById('inline-cpf');
+        if (wrapper) {
+            wrapper.classList.remove('hidden');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+        }
+    }
+
+    function esconderCardCpf() {
+        const wrapper = document.getElementById('wrapper-modal-cpf');
+        if (wrapper) {
+            wrapper.classList.add('hidden');
+        }
+    }
+
+    function handleCpfInput(input) {
+        let raw = input.value.replace(/\D/g, "");
+
+        if (raw.length <= 3) input.value = raw;
+        else if (raw.length <= 6) input.value = raw.substring(0, 3) + "." + raw.substring(3);
+        else if (raw.length <= 9) input.value = raw.substring(0, 3) + "." + raw.substring(3, 6) + "." + raw.substring(6);
+        else input.value = raw.substring(0, 3) + "." + raw.substring(3, 6) + "." + raw.substring(6, 9) + "-" + raw.substring(9, 11);
+
+        const hiddenField = document.getElementById('hidden-cpf-field');
+        const btn = document.getElementById('btn-confeccao');
+
+        if (hiddenField) {
+            hiddenField.value = input.value;
+        }
+
+        if (btn) {
+            if (raw.length === 11) {
+                btn.disabled = false;
+                btn.classList.remove('bg-purple-900', 'opacity-40', 'cursor-not-allowed');
+                btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-purple-900', 'opacity-40', 'cursor-not-allowed');
+                btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+            }
+        }
+    }
+
     let lastTicketCount = null;
     let selectedTicketIds = new Set();
     const currentStage = "{{ $stage }}";
@@ -348,7 +404,7 @@
                     <input type="checkbox" class="ticket-checkbox w-4 h-4 cursor-pointer accent-purple-500" value="${ticket.id}" ${isChecked}>
                 </td>`;
             }
-            // CORREÇÃO JS: ticket.ticket_number
+            
             html += `<td class="p-2 border-[6px] border-blackThirdy text-center font-bold">${ticket.ticket_number}</td>
                 <td class="p-2 border-[6px] border-blackThirdy">${ticket.type}</td>`;
             if (currentStage === 'atendimento') html += `<td class="p-2 border-[6px] border-blackThirdy">${ticket.service ?? '-'}</td>`;
@@ -363,4 +419,49 @@
 
     setInterval(fetchTickets, 5000);
 </script>
+
+    @if($stage === 'atendimento' && isset($calledTicket) && $calledTicket->service === 'inscricao')
+        <div id="wrapper-modal-cpf" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            
+            <div class="bg-blackSecondary border border-blackThirdy rounded-xl shadow-2xl p-6 w-[450px] flex flex-col gap-4">
+                <div class="flex justify-between items-center border-b border-blackThirdy pb-3">
+                    <h3 class="text-lg font-black uppercase tracking-wider text-lightW">Inserir CPF do Cliente</h3>
+                    <button type="button" onclick="esconderCardCpf()" class="text-gray-400 hover:text-white text-2xl font-bold transition">&times;</button>
+                </div>
+                
+                <form action="{{ route('queue.redirect', $calledTicket->id) }}" method="POST" id="form-confeccao" class="flex flex-col gap-4">
+                    @csrf
+                    <div class="flex flex-col gap-2">
+                        <label for="inline-cpf" class="text-xs uppercase tracking-widest text-gray-400 font-bold text-left w-full pl-1">CPF do Cliente</label>
+                        <input 
+                            type="text" 
+                            id="inline-cpf" 
+                            name="cpf" 
+                            placeholder="000.000.000-00" 
+                            maxlength="14"
+                            oninput="handleCpfInput(this)"
+                            class="w-full bg-[#141e22] border border-blackThirdy rounded p-4 text-2xl text-center text-lightW font-mono focus:outline-none focus:border-purple-500 tracking-widest"
+                            autocomplete="off"
+                            required
+                        >
+                    </div>
+
+                    <div class="flex gap-3 mt-2">
+                        <button type="button" onclick="esconderCardCpf()" class="flex-1 bg-blackThirdy text-lightW py-3 rounded font-bold uppercase tracking-wider hover:opacity-80 transition">
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            id="btn-confeccao"
+                            disabled 
+                            class="flex-1 bg-purple-900 opacity-40 cursor-not-allowed transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider"
+                        >
+                            Confirmar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
 @endsection
