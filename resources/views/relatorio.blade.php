@@ -13,6 +13,13 @@
         <style>
             h2, h1 { font-family: "Lora", serif; }
             p { font-family: "Roboto Slab", serif; }
+            /* Garante uma cor suave e alternada para o efeito zebrado */
+            .table-striped > tbody > tr:nth-of-type(odd) {
+                background-color: #f8fafc !important;
+            }
+            .table-striped > tbody > tr:nth-of-type(even) {
+                background-color: #ffffff !important;
+            }
         </style>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -37,21 +44,33 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 bg-white" style="min-width: 600px;">
-                <thead style="background-color: #f1f5f9; color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+            <table class="table table-striped table-hover align-middle mb-0" style="min-width: 600px;">
+                <thead style="background-color: #f1f5f9; color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">
                     <tr>
-                        <th class="py-3 px-4" style="width: 30%;">Atendente</th>
-                        <th class="text-center py-3" style="width: 15%; text-align: center;">Finalizados</th>
-                        <th class="text-center py-3" style="width: 15%; text-align: center;">Cancelados</th>
-                        <th class="text-center py-3" style="width: 15%; text-align: center;">Total Geral</th>
-                        <th class="text-center py-3" style="width: 25%; text-align: center;">Tempo Médio de Atendimento (TMA)</th>
+                        <th class="py-3 px-4" style="width: 25%;">Atendente</th>
+                        <th class="text-center py-3" style="width: 15%; text-align: center;">Tipo</th>
+                        <th class="text-center py-3" style="width: 12%; text-align: center;">Finalizados</th>
+                        <th class="text-center py-3" style="width: 12%; text-align: center;">Cancelados</th>
+                        <th class="text-center py-3" style="width: 12%; text-align: center;">Total Geral</th>
+                        <th class="text-center py-3" style="width: 24%; text-align: center;">Tempo Médio de Atendimento (TMA)</th>
                     </tr>
                 </thead>
                 <tbody style="color: #334155;">
                     @foreach($relatorioFormatado as $u)
-                        <tr class="bg-white" style="transition: background-color 0.2s ease;">
+                        <tr style="transition: background-color 0.2s ease; border-bottom: 1px solid #e2e8f0;">
                             <td class="py-3 px-4">
                                 <strong style="color: #0f172a;">{{ $u['atendente'] }}</strong>
+                            </td>
+                            <td class="text-center py-3" style="text-align: center;">
+                                @if($u['tipo'] === 'Triagem')
+                                    <span class="badge px-2 py-1 rounded-2" style="background-color: #f3e8ff; color: #6b21a8; font-size: 0.8rem; font-weight: 600;">
+                                        {{ $u['tipo'] }}
+                                    </span>
+                                @else
+                                    <span class="badge px-2 py-1 rounded-2" style="background-color: #e0f2fe; color: #0369a1; font-size: 0.8rem; font-weight: 600;">
+                                        {{ $u['tipo'] }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="text-center text-success fw-bold py-3" style="color: #16a34a; text-align: center;">
                                 {{ $u['finalizados'] }}
