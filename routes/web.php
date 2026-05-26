@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
             ->name('queue.cancel');
         Route::post('{id}/advance', [TicketController::class, 'advance'])
             ->name('queue.advance');
+        Route::post('{id}/redirect', [TicketController::class, 'redirect'])
+            ->name('queue.redirect');
     });
 
     // Impressoras
