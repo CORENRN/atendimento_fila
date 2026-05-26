@@ -308,7 +308,7 @@ class TicketController extends Controller
     }
     public function showTicket($id)
     {
-        $ticket = Ticket::where('ticket_number', $id)->firstOrFail();
+        $ticket = Ticket::where('ticket_number', $id)->latest()->firstOrFail();
 
         return view('ticket_show', compact('ticket'));
     }
