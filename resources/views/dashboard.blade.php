@@ -67,25 +67,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-between gap-4">
-                @php
-                    $cards = [
-                        ['financias', 'financeiro'],
-                        ['documentos', 'documentacao'],
-                        ['informacoes', 'informacoes'],
-                        ['cadastro', 'cadastro'],
-                        ['suporte', 'suporte']
-                    ];
-                @endphp
-                @foreach($cards as $card)
-                <div class="bg-blackSecondary shadow-lg flex-1 h-36 rounded-md p-3">
-                    <p class="text-[10px] tracking-wide uppercase text-lightW text-center font-semibold">Atendimentos de {{ $card[0] }}</p>
-                    <p class="text-center text-3xl font-bold text-lightW mt-4">
-                        {{ $atendimentosPorServicoMap[$card[1]] ?? 0 }}
-                    </p>
-                </div>
-                @endforeach
-            </div>
+
 
             <div class="w-full flex gap-10 h-80">
                 <div class="bg-blackSecondary h-full w-[50%] shadow-lg rounded-md p-10">
@@ -102,7 +84,42 @@
                     </div>
                 </div>
             </div>
-
+            <div class="grid gap-2" style="grid-template-columns: repeat(1, minmax(0, 1fr));">
+                @php
+                $cards = [
+                    ['Finanças', 'financeiro'],
+                    ['Documentos', 'documentacao'],
+                    ['Informações', 'informacoes'],
+                    ['Cadastro', 'cadastro'],
+                    ['Suporte', 'suporte'],
+                    ['Inscrição', 'inscricao'],
+                    ['Renovação', 'renovacao'],
+                    ['Regularização', 'regularizacao'],
+                    ['Transferência', 'transferencia'],
+                    ['Secundária', 'secundaria'],
+                    ['Especialização', 'especializacao'],
+                    ['Cancelamento', 'cancelamento'],
+                    ['Remida', 'remida'],
+                    ['Reativação', 'reativacao'],
+                    ['Certidão', 'certidao'],
+                    ['ART', 'art'],
+                    ['Outros', 'outros'],
+                ];
+                @endphp
+                
+                <a href="{{ route('relatorio.desempenho.pdf') }}" class="btn btn-danger mb-3 text-white w-fit bg-blackSecondary mt-15">
+                       📃 Exportar Relatório em PDF
+                </a>
+                <div class="w-[100%] h-fit bg-blackSecondary shadow-lg rounded-md p-10 grid grid-cols-2">
+                   
+                    @foreach($cards as $card)
+                    
+                            <p class="text-[17px] tracking-wide uppercase text-lightW font-semibold p-5 bg-blackPrimary border border-blackSecondary">
+                                Atendimentos de {{ $card[0] }} :  {{ $atendimentosPorServicoMap[$card[1]] ?? 0 }}
+                            </p>
+                    @endforeach
+                </div>
+            </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

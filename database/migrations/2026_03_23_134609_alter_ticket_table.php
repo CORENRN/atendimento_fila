@@ -28,8 +28,6 @@ return new class extends Migration
                 'informacao',
                 'art',
                 'outros',
-
-
             ])->nullable()->change();
         });
     }
