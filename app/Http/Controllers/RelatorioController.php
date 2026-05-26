@@ -35,6 +35,7 @@ class RelatorioController extends Controller
             ->select(
                 'users.id as user_id',
                 'users.name as atendente',
+                DB::raw("'Atendimento' as tipo"),
                 DB::raw("SUM(CASE WHEN tickets.status = 'finalizado' AND tickets.called_at IS NOT NULL AND tickets.finished_at IS NOT NULL AND TIMESTAMPDIFF(MINUTE, tickets.called_at, tickets.finished_at) <= 180 THEN 1 ELSE 0 END) as finalizados"),
                 DB::raw("SUM(CASE WHEN tickets.status = 'cancelado' THEN 1 ELSE 0 END) as cancelados"),
                 DB::raw("CASE WHEN tickets.status = 'finalizado' AND tickets.called_at IS NOT NULL AND tickets.finished_at IS NOT NULL AND TIMESTAMPDIFF(MINUTE, tickets.called_at, tickets.finished_at) <= 180 THEN TIMESTAMPDIFF(MINUTE, tickets.called_at, tickets.finished_at) ELSE NULL END as tempo_ticket")
@@ -46,6 +47,7 @@ class RelatorioController extends Controller
             ->select(
                 'users.id as user_id',
                 'users.name as atendente',
+                DB::raw("'Triagem' as tipo"),
                 DB::raw("SUM(CASE WHEN tickets.status = 'finalizado' AND tickets.called_tri_at IS NOT NULL AND tickets.finished_at IS NOT NULL THEN 1 ELSE 0 END) as finalizados"),
                 DB::raw("SUM(CASE WHEN tickets.status = 'cancelado' THEN 1 ELSE 0 END) as cancelados"),
                 DB::raw("CASE WHEN tickets.status = 'finalizado' AND tickets.called_tri_at IS NOT NULL AND tickets.finished_at IS NOT NULL THEN TIMESTAMPDIFF(MINUTE, tickets.called_tri_at, tickets.finished_at) ELSE NULL END as tempo_ticket")
@@ -58,17 +60,19 @@ class RelatorioController extends Controller
             ->mergeBindings($subQuery)
             ->select(
                 'atendente',
+                'tipo',
                 DB::raw("SUM(finalizados) as total_finalizados"),
                 DB::raw("SUM(cancelados) as total_cancelados"),
                 DB::raw("ROUND(AVG(tempo_ticket), 1) as tma_minutos")
             )
-            ->groupBy('user_id', 'atendente')
+            ->groupBy('user_id', 'atendente', 'tipo')
             ->orderBy('total_finalizados', 'DESC')
             ->get();
 
         return $resultadoRaw->map(function ($usuario) {
             return [
                 'atendente'   => $usuario->atendente,
+                'tipo'        => $usuario->tipo,
                 'finalizados' => (int) $usuario->total_finalizados,
                 'cancelados'  => (int) $usuario->total_cancelados,
                 'total_geral' => (int) ($usuario->total_finalizados + $usuario->total_cancelados),
