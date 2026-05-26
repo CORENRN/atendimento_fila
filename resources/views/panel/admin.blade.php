@@ -54,7 +54,7 @@
     </div>
 
     <section class="flex ml-64 h-full z-10 -mt-28">
-        
+    
         <div class="min-w-[50%] h-[75vh] bg-blackSecondary p-8 rounded shadow-xl flex flex-col">
             @if(auth()->user()->hasAdminAccess())
                 <div class="shrink-0">

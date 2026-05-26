@@ -277,7 +277,7 @@ class TicketController extends Controller
     {
         $request->validate([
             'type' => 'required|in:regular,preferencial,carteira',
-            'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable'
+            'cpf'  => $request->type === 'carteira' ? 'required|min:14' : 'nullable',
         ]);
 
         // Busca o contador atual
@@ -301,6 +301,7 @@ class TicketController extends Controller
             'status' => 'aguardando',
             'cpf' => $request->cpf,
             'ticket_number' => $novoNumero,
+            'service' => $request->service,
         ]);
 
         return redirect()->route('ticket.show', ['id' => $ticket->ticket_number])
@@ -308,7 +309,9 @@ class TicketController extends Controller
     }
     public function showTicket($id)
     {
-        $ticket = Ticket::where('ticket_number', $id)->firstOrFail();
+        $ticket = Ticket::where('ticket_number', $id)
+                    ->orderByDesc('id') 
+                    ->firstOrFail();
 
         return view('ticket_show', compact('ticket'));
     }
@@ -317,7 +320,7 @@ class TicketController extends Controller
     {
         return view('ticket_take'); 
     }
-
+    
     public function getTicketsJson($stage)
     {
         $statusValue = in_array($stage, ['triagem', 'atendimento', 'carteira']) ? $stage : 'triagem';
