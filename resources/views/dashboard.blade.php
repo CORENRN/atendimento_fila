@@ -107,9 +107,45 @@
                 ];
                 @endphp
                 
-                <a href="{{ route('relatorio.desempenho.pdf') }}" class="btn btn-danger mb-3 text-white w-fit bg-blackSecondary mt-15">
-                       📃 Exportar Relatório em PDF
-                </a>
+            <form method="GET" action="{{ route('relatorio.desempenho.pdf') }}" target="_blank" class="flex flex-wrap justify-between items-center mb-4 gap-3 bg-blackSecondary p-4 rounded-md shadow-2xl border border-blackThirdy">
+                <div class="flex items-center gap-3">
+                    <label for="month_select" class="font-semibold tracking-wide text-[#eceef0]" style="font-size: 0.9rem;">
+                        Selecionar Mês do PDF:
+                    </label>
+                    
+                    @php
+                        $anoAtual = now()->year;
+                        $mesSelecionado = request('month', 'geral');
+
+                        $mesesAno = [
+                            1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril',
+                            5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
+                            9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'
+                        ];
+                    @endphp
+
+                    <select name="month" 
+                            id="month_select" 
+                            class="bg-blackPrimary text-[#eceef0] border border-blackThirdy rounded px-3 py-1.5 font-medium outline-none cursor-pointer duration-300 hover:border-[#56cbec]">
+                        <option value="geral" {{ $mesSelecionado === 'geral' ? 'selected' : '' }}>
+                            (GERAL)
+                        </option>
+                        @foreach($mesesAno as $numero => $nome)
+                            @php
+                                $valorFormatado = $anoAtual . '-' . str_pad($numero, 2, '0', STR_PAD_LEFT);
+                            @endphp
+                            <option value="{{ $valorFormatado }}" {{ $mesSelecionado === $valorFormatado ? 'selected' : '' }}>
+                                {{ $nome }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button type="submit" 
+                        class="text-white w-fit bg-blackSecondary border border-blackThirdy hover:border-[#39db7d] duration-300 flex items-center gap-2 font-semibold px-4 py-2 rounded-md shadow-md">
+                    📃 Exportar Relatório em PDF
+                </button>
+            </form>
                 <div class="w-[100%] h-fit bg-blackSecondary shadow-lg rounded-md p-10 grid grid-cols-2">
                    
                     @foreach($cards as $card)
