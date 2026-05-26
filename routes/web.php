@@ -9,6 +9,7 @@ use App\Http\Controllers\PanelController;
 use App\Http\Controllers\GuicheController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RelatorioController;
 
 // --- ROTAS PÚBLICAS (Sem login) ---
 Route::get('/ticket/take', [TicketController::class, 'takeTicketView'])->name('ticket.take');
@@ -18,6 +19,7 @@ Route::get('/painel', [PanelController::class, 'index'])->name('panel.index');
 Route::get('/painel/data', [PanelController::class, 'data'])->name('panel.data');
 Route::get('/ticket/{id}/print', [PrintController::class, 'printTicket'])->name('ticket.print');
 Route::get('/allow', [AllowNotification::class, 'index']);
+Route::get('/relatorio/desempenho/pdf', [RelatorioController::class, 'exportarPdf'])->name('relatorio.desempenho.pdf');
 // --- ROTAS PROTEGIDAS (Precisa de Login LDAP) ---
 Route::middleware('auth')->group(function () {
     
@@ -61,8 +63,7 @@ Route::middleware('auth')->group(function () {
             ->name('queue.cancel');
         Route::post('{id}/advance', [TicketController::class, 'advance'])
             ->name('queue.advance');
-        Route::post('{id}/redirect', [TicketController::class, 'redirect'])
-            ->name('queue.redirect');
+        Route::post('{stage}/redirect', [TicketController::class, 'redirect'])->name('queue.redirect');
     });
 
     // Impressoras
