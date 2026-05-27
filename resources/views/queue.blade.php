@@ -232,7 +232,7 @@
                                     </button>
                                 </form>
 
-                                @if($stage === 'atendimento' && $calledTicket->service === 'inscricao')
+                                @if($stage === 'atendimento' && in_array($calledTicket->service, ['renovacao', 'regularizacao']))
                                     <div class="flex-1">
                                         <button type="button" onclick="mostrarCardCpf()" class="w-full bg-purple-600 transition duration-300 text-lightW py-3 rounded font-black uppercase tracking-wider hover:bg-purple-700">
                                             Confecção
@@ -420,7 +420,7 @@
     setInterval(fetchTickets, 5000);
 </script>
 
-    @if($stage === 'atendimento' && isset($calledTicket) && $calledTicket->service === 'inscricao')
+    @if($stage === 'atendimento' && isset($calledTicket) && in_array($calledTicket->service, ['renovacao', 'regularizacao']))
         <div id="wrapper-modal-cpf" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             
             <div class="bg-blackSecondary border border-blackThirdy rounded-xl shadow-2xl p-6 w-[450px] flex flex-col gap-4">
